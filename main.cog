@@ -1,0 +1,55 @@
+//c-like syntax
+
+include "package.cog"
+
+event hejsa {
+    //perform input handling from sensors
+    //or other checks
+}
+
+async function main() {
+    hejsa += handleEvent;
+    int i = await takesAWhile(new int[] {2,3,5}, 1e56);
+    printf("%d\n", i);
+}
+
+int takesAWhile(int[] iArray, long sebshead) {
+    for (int i = 0; i < sebshead; i++) {
+        //perform long task on int
+    }
+    return val;
+}
+
+void handleEvent() { 
+    //do work
+}
+
+//seb syntax & semantics
+
+int main() {
+    string livoni = "Livoni";
+
+    printstring(livoni, 4);
+
+    printf("Sebastian");
+
+    return 1;
+}
+
+async void printstring(string *str, int c) {
+    for (int i; i < c; i++) {
+        printf("%d\n", str);
+    }
+}
+
+void myeventhandler(char[] props) {
+
+}
+
+main()
+// Sebastian
+// Livoni
+// Livoni
+// Livoni
+// Livoni
+

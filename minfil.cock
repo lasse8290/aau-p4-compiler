@@ -1,0 +1,18 @@
+setup {
+
+}
+
+global
+
+event onReadSensor {
+    global = data
+}
+
+loop {
+    // 
+    startReadSensor(onReadSensor)
+    tungFunktion() {
+
+        global
+    }
+}
