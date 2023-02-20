@@ -19,6 +19,8 @@ union floatByte(){
     
 }
 
+enum someEnum
+
 //event handler for i2c
 event i2c: in(byte[] bytes, int byteCount){
 
