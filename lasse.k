@@ -10,16 +10,20 @@ define event i2c {
 }
 
 //like c struct
-composite person() {
+composite person {
     
 }
 
 //like c union
-union floatByte(){
+union floatByte {
     
 }
 
-enum someEnum
+enum someEnum {
+    a,
+    b,
+    c
+}
 
 //event handler for i2c
 event i2c: in(byte[] bytes, int byteCount){
