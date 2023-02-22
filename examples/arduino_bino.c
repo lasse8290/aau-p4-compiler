@@ -1,18 +1,22 @@
 #include <stdio.h>
-#include "./pt/pt.h"
 #include <time.h>
+#include <unistd.h>
 #include <dirent.h>
+#include <sys/time.h>
+#include "./pt/pt.h"
 
+#define TICKS_SECOND 1000000
+#define TICKS_MILLISECOND TICKS_SECOND / 1000
 
-#define SECOND 1000000 
-#define TICKS_PER_MILLISECOND 1000
+int fileCount = -1;
+int directoryChanged();
 
 // Declare protothreads
 static struct pt pt1, pt2;
 clock_t start;
-#include<sys/time.h>
 
-int millis () {
+int millis()
+{
   clock_t current = clock();
   return (int)(current - start);
 }
@@ -22,9 +26,10 @@ static int printBoogie(struct pt *pt)
 {
   static unsigned long lastTimeBlink = 0;
   PT_BEGIN(pt);
-  while(1) {    
+  while (1)
+  {
     lastTimeBlink = millis();
-    PT_WAIT_UNTIL(pt, millis() - lastTimeBlink > 1 * SECOND);
+    PT_WAIT_UNTIL(pt, millis() - lastTimeBlink > 1 * TICKS_SECOND);
     printf("\nBoogie!\n");
   }
   PT_END(pt);
@@ -34,80 +39,61 @@ static int checkFilesChanges(struct pt *pt)
 {
   unsigned long lastTimeBlink = 0;
   PT_BEGIN(pt);
-  while(1) {
-    lastTimeBlink = millis();
-    PT_WAIT_UNTIL(pt, millis() - lastTimeBlink > 5 * SECOND);
-    printf("\nWonderland\n");
+  while (1)
+  {
+    PT_WAIT_UNTIL(pt, directoryChanged());
+    printf("Directory has changed!");
+    printf("File count: %d\n", fileCount);
   }
   PT_END(pt);
 }
 
-static int slowPrintFile(struct pt *pt, char* filename)
+int directoryChanged()
 {
-
-  unsigned long lastTimeBlink = 0;
-  PT_BEGIN(pt);
-  
-  FILE *fp;
-  char line[100];
-
-   fp = fopen(filename, "r");
-   if (fp == NULL) {
-      printf("Error opening the file.\n");
-      return -1;
-   }
-
-   fclose(fp);
-  while(1) {
-    lastTimeBlink = millis();
-    PT_WAIT_UNTIL(pt, millis() - lastTimeBlink > 500 * TICKS_PER_MILLISECOND);
-    printf("maybe?");
-    if (fgets(line, 100, fp) != NULL)
-      printf("%s\n", line);
+  int localFileCount = 0;
+  struct dirent *dir;
+  DIR *d = opendir("./files");
+  if (d)
+  {
+    while ((dir = readdir(d)) != NULL)
+    {
+      if (dir->d_type == DT_REG)
+        localFileCount++;
+    }
+    closedir(d);
   }
-  PT_END(pt);
-}
 
-int fileCount = -1;
+  if (fileCount != -1)
+  {
+    int tempFileCount = fileCount;
+    fileCount = localFileCount;
+    return tempFileCount != localFileCount;
+  }
 
-int DirectoryChanged() {
-    int localFileCount = 0;
-    struct dirent *dir;
-    DIR* d = opendir("./files");
-    if (d) {
-        while ((dir = readdir(d)) != NULL)
-        {
-            localFileCount++;
-        }
-        closedir(d);
-    }
-    if (fileCount != -1) {
-      int tempFileCount = fileCount;
-      fileCount = localFileCount;
-      return tempFileCount != localFileCount;
-    }
-    
-    return 0;
+  fileCount = localFileCount;
+  return 0;
 }
 
 // In setup, set all LEDs as OUTPUT, push button as INPUT, and
 // init all protothreads
-void setup() {
+void setup()
+{
   start = clock();
   PT_INIT(&pt1);
   PT_INIT(&pt2);
 }
 // In the loop we just need to call the protothreads one by one
-void loop() {
-    // printBoogie(&pt1);
-    // checkFilesChanges(&pt2);
-  
-    slowPrintFile(&pt1, "./files/testfile.txt");
+void loop()
+{
+  printBoogie(&pt1);
+  checkFilesChanges(&pt2);
 }
 
-int main() {
-    setup();
-    while (1) {
-      loop();
-    }
+int main()
+{
+  setup();
+  while (1)
+  {
+    loop();
+  }
 }
