@@ -1,0 +1,17 @@
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/bin/Debug/net7.0/AntlrCSharp
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/bin/Debug/net7.0/AntlrCSharp.deps.json
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/bin/Debug/net7.0/AntlrCSharp.runtimeconfig.json
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/bin/Debug/net7.0/AntlrCSharp.dll
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/bin/Debug/net7.0/AntlrCSharp.pdb
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/bin/Debug/net7.0/Antlr4.Runtime.Standard.dll
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.csproj.AssemblyReference.cache
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.GeneratedMSBuildEditorConfig.editorconfig
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.AssemblyInfoInputs.cache
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.AssemblyInfo.cs
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.csproj.CoreCompileInputs.cache
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.csproj.CopyComplete
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.dll
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/refint/AntlrCSharp.dll
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.pdb
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/AntlrCSharp.genruntimeconfig.cache
+/Users/seb/Developer/aau/aau-p4-compiler/seb-compiler/AntlrCSharp/obj/Debug/net7.0/ref/AntlrCSharp.dll
