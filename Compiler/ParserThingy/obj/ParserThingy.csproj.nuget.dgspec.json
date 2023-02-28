@@ -1,0 +1,87 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/lasse/repo/git/aau-p4-compiler/Compiler/ParserThingy/ParserThingy.csproj": {}
+  },
+  "projects": {
+    "/home/lasse/repo/git/aau-p4-compiler/Compiler/ParserThingy/ParserThingy.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/lasse/repo/git/aau-p4-compiler/Compiler/ParserThingy/ParserThingy.csproj",
+        "projectName": "ParserThingy",
+        "projectPath": "/home/lasse/repo/git/aau-p4-compiler/Compiler/ParserThingy/ParserThingy.csproj",
+        "packagesPath": "/home/lasse/.nuget/packages/",
+        "outputPath": "/home/lasse/repo/git/aau-p4-compiler/Compiler/ParserThingy/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/lasse/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Antlr4": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[4.6.6, )"
+            },
+            "Antlr4.Runtime": {
+              "target": "Package",
+              "version": "[4.6.6, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.14, 6.0.14]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.linux-x64",
+              "version": "[6.0.14, 6.0.14]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.14, 6.0.14]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.201/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
