@@ -1,1 +1,7 @@
 **/.vscode/
+
+*.user
+
+**/**/obj/*
+
+YALCompiler/YALParser/gen/

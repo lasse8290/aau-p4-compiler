@@ -19,8 +19,8 @@ fragment DIGIT: [0-9];
 TYPE: 'i32' | 'f32' | 'string' | 'bool';
 IN: 'in';
 
-LETTER: LOWERCASE | UPPERCASE;
-ID: LETTER (LETTER | DIGIT)*;
+fragment LETTER: LOWERCASE | UPPERCASE;
+ID: LETTER (LETTER | DIGIT)+ | LETTER;
 
 WHITESPACE          : (' '|'\t')+ -> skip ;
 NEWLINE             : ('\r'? '\n' | '\r')+ -> skip ;
