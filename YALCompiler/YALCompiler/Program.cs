@@ -10,7 +10,7 @@ try {
     string input = "";
     StringBuilder text = new StringBuilder();
 
-    text.Append("main { i32 fuck; } ");
+    text.Append("main { func(3 + (20+3)); i32 ef; bool bb = func(3,4,fr()); ef = 6; }");
     
     /*
     // to type the EOF character and end the input: use CTRL+D, then press <enter>
@@ -25,20 +25,32 @@ try {
 
     YALGrammerVisitor visitor = new YALGrammerVisitor();
 
-    IToken token;
+/*    IToken token;
 
-    do {
+    do
+    {
         token = speakLexer.NextToken();
 
         Console.WriteLine("Token: " + token.Type + " " + token.Text);
     } while (token != null && token.Type != YALGrammerLexer.Eof);
 
-    speakLexer.Reset();
-    
+    speakLexer.Reset();*/
+
     YALGrammerParser.ProgramContext? n = speakParser.program();
-    
-    var x = visitor.VisitAssignment(speakParser.assignment());
+
+    visitor.Visit(n);
+
+/*    speakParser.Reset();
+
+    var x = visitor.VisitFunction(speakParser.function());
+
+    var y = visitor.VisitAssignment(speakParser.assignment());*/
 
 } catch (Exception e) {
     Console.WriteLine(e);
 }
+
+// Note for Richard: to run antlr
+// java -jar antlr-4.12.0-complete.jar -Dlanguage=CSharp -o C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/./YALParser/gen -listener -visitor -lib C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALParser/Gammar C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALParser/Gammar/YALGrammer.g4
+// YouTube video: literally the source
+// https://www.youtube.com/watch?v=bfiAvWZWnDA

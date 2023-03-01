@@ -4,23 +4,39 @@ yalg: program EOF;
 
 program: function*;
 
-function: ID '{' variableDeclaration* '}';
+function: ID '{' (command ';' )* '}';
 
-variableDeclaration: TYPE ID ';'; 
+command: variableDeclaration | assignment | functionCall;
 
-assignment: (variableDeclaration | ID) '=' expression ';';
-expression: ID | ID '(' expression (',' expression)* ')';
+variableDeclaration: TYPE ID ; 
+
+assignment: (variableDeclaration | ID) '=' expression;
+
+expression: baseExpression 
+            | '('? baseExpression OPERATOR '('? baseExpression (OPERATOR baseExpression)* ')'? ')'?;
+
+baseExpression: 
+            ID 
+            | functionCall 
+            | NUMBER 
+            | '(' baseExpression ')' ;
+
+functionCall: ID '(' (expression (',' expression)*)? ')';
 
 
 fragment LOWERCASE: [a-z];
 fragment UPPERCASE: [A-Z];
 fragment DIGIT: [0-9];
+fragment LETTER: LOWERCASE | UPPERCASE;
+
+OPERATOR: '+' | '-' | '*' | '/' ;
 
 TYPE: 'i32' | 'f32' | 'string' | 'bool';
 IN: 'in';
 
-LETTER: LOWERCASE | UPPERCASE;
 ID: LETTER (LETTER | DIGIT)*;
+
+NUMBER: DIGIT (DIGIT)*;
 
 WHITESPACE          : (' '|'\t')+ -> skip ;
 NEWLINE             : ('\r'? '\n' | '\r')+ -> skip ;

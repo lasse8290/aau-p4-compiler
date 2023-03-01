@@ -1,1 +1,7 @@
 **/.vscode/
+*.cache
+*.user
+obj/
+bin/
+.idea/
+.vs/
