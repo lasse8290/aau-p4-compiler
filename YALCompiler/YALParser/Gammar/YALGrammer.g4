@@ -1,10 +1,12 @@
 grammar YALGrammer;
 
-program: function;
+yalg: program EOF;
 
-function: ID '{' variableDeclaration* assignment* '}';
+program: function*;
 
-variableDeclaration: TYPE ID';'; 
+function: ID '{' variableDeclaration* '}';
+
+variableDeclaration: TYPE ID ';'; 
 
 assignment: (variableDeclaration | ID) '=' expression ';';
 expression: ID | ID '(' expression (',' expression)* ')';

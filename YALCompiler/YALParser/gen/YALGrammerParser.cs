@@ -85,8 +85,12 @@ public partial class YALGrammerParser : Parser {
 	}
 
 	public partial class ProgramContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public FunctionContext function() {
-			return GetRuleContext<FunctionContext>(0);
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Eof() { return GetToken(YALGrammerParser.Eof, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public FunctionContext[] function() {
+			return GetRuleContexts<FunctionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public FunctionContext function(int i) {
+			return GetRuleContext<FunctionContext>(i);
 		}
 		public ProgramContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -115,11 +119,26 @@ public partial class YALGrammerParser : Parser {
 	public ProgramContext program() {
 		ProgramContext _localctx = new ProgramContext(Context, State);
 		EnterRule(_localctx, 0, RULE_program);
+		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 10;
-			function();
+			State = 13;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			while (_la==ID) {
+				{
+				{
+				State = 10;
+				function();
+				}
+				}
+				State = 15;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+			}
+			State = 16;
+			Match(Eof);
 			}
 		}
 		catch (RecognitionException re) {
@@ -140,12 +159,6 @@ public partial class YALGrammerParser : Parser {
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public VariableDeclarationContext variableDeclaration(int i) {
 			return GetRuleContext<VariableDeclarationContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public AssignmentContext[] assignment() {
-			return GetRuleContexts<AssignmentContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public AssignmentContext assignment(int i) {
-			return GetRuleContext<AssignmentContext>(i);
 		}
 		public FunctionContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -176,37 +189,20 @@ public partial class YALGrammerParser : Parser {
 		EnterRule(_localctx, 2, RULE_function);
 		int _la;
 		try {
-			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 12;
+			State = 18;
 			Match(ID);
-			State = 13;
+			State = 19;
 			Match(T__0);
-			State = 17;
-			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,0,Context);
-			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1 ) {
-					{
-					{
-					State = 14;
-					variableDeclaration();
-					}
-					} 
-				}
-				State = 19;
-				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,0,Context);
-			}
 			State = 23;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (_la==TYPE || _la==ID) {
+			while (_la==TYPE) {
 				{
 				{
 				State = 20;
-				assignment();
+				variableDeclaration();
 				}
 				}
 				State = 25;
@@ -445,21 +441,21 @@ public partial class YALGrammerParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,13,56,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,1,0,1,1,1,1,1,1,
-		5,1,16,8,1,10,1,12,1,19,9,1,1,1,5,1,22,8,1,10,1,12,1,25,9,1,1,1,1,1,1,
+		4,1,13,56,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,5,0,12,8,0,10,0,
+		12,0,15,9,0,1,0,1,0,1,1,1,1,1,1,5,1,22,8,1,10,1,12,1,25,9,1,1,1,1,1,1,
 		2,1,2,1,2,1,2,1,3,1,3,3,3,35,8,3,1,3,1,3,1,3,1,3,1,4,1,4,1,4,1,4,1,4,1,
 		4,5,4,47,8,4,10,4,12,4,50,9,4,1,4,1,4,3,4,54,8,4,1,4,0,0,5,0,2,4,6,8,0,
-		0,55,0,10,1,0,0,0,2,12,1,0,0,0,4,28,1,0,0,0,6,34,1,0,0,0,8,53,1,0,0,0,
-		10,11,3,2,1,0,11,1,1,0,0,0,12,13,5,11,0,0,13,17,5,1,0,0,14,16,3,4,2,0,
-		15,14,1,0,0,0,16,19,1,0,0,0,17,15,1,0,0,0,17,18,1,0,0,0,18,23,1,0,0,0,
-		19,17,1,0,0,0,20,22,3,6,3,0,21,20,1,0,0,0,22,25,1,0,0,0,23,21,1,0,0,0,
+		0,55,0,13,1,0,0,0,2,18,1,0,0,0,4,28,1,0,0,0,6,34,1,0,0,0,8,53,1,0,0,0,
+		10,12,3,2,1,0,11,10,1,0,0,0,12,15,1,0,0,0,13,11,1,0,0,0,13,14,1,0,0,0,
+		14,16,1,0,0,0,15,13,1,0,0,0,16,17,5,0,0,1,17,1,1,0,0,0,18,19,5,11,0,0,
+		19,23,5,1,0,0,20,22,3,4,2,0,21,20,1,0,0,0,22,25,1,0,0,0,23,21,1,0,0,0,
 		23,24,1,0,0,0,24,26,1,0,0,0,25,23,1,0,0,0,26,27,5,2,0,0,27,3,1,0,0,0,28,
 		29,5,8,0,0,29,30,5,11,0,0,30,31,5,3,0,0,31,5,1,0,0,0,32,35,3,4,2,0,33,
 		35,5,11,0,0,34,32,1,0,0,0,34,33,1,0,0,0,35,36,1,0,0,0,36,37,5,4,0,0,37,
 		38,3,8,4,0,38,39,5,3,0,0,39,7,1,0,0,0,40,54,5,11,0,0,41,42,5,11,0,0,42,
 		43,5,5,0,0,43,48,3,8,4,0,44,45,5,6,0,0,45,47,3,8,4,0,46,44,1,0,0,0,47,
 		50,1,0,0,0,48,46,1,0,0,0,48,49,1,0,0,0,49,51,1,0,0,0,50,48,1,0,0,0,51,
-		52,5,7,0,0,52,54,1,0,0,0,53,40,1,0,0,0,53,41,1,0,0,0,54,9,1,0,0,0,5,17,
+		52,5,7,0,0,52,54,1,0,0,0,53,40,1,0,0,0,53,41,1,0,0,0,54,9,1,0,0,0,5,13,
 		23,34,48,53
 	};
 
