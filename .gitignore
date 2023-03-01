@@ -2,6 +2,5 @@
 *.cache
 *.user
 obj/
-bin/
 .idea/
 .vs/
