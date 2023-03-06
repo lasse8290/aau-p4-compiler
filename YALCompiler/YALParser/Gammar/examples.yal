@@ -1,0 +1,70 @@
+﻿main: {
+
+    // This is a line comment
+    /* This is a block comment
+       which can span across multiple lines */
+    
+    int8 f;
+    f = 1;
+    
+    functionWithNoParams();
+    
+    functionWithInputParams(1, "hello");
+    
+    int32 i = functionWithOneOutputParam();
+    
+    (int32 ii, string ss) = functionWithInputAndOutputParams(i);
+    
+    struct MyStruct {
+        int32 num;
+        string str;
+    };
+    
+    struct MyStruct s1;
+    
+    s1.num = 1;
+    s1.str = "hello";
+    
+    union MyUnion {
+        int32 opt1;
+        string opt2;
+    };
+    
+    if (i < 0) {
+        i = 0;
+    } else if (i > 0) {
+        i = 1;
+    } else {
+        i = 2;
+    }
+    
+    while (i < 10) {
+        i = i + 1;
+    }
+    
+    for (int32 h = 0; h < 10; h++) {
+        functionWithInputAndOutputParams(h);
+    }
+}
+
+functionWithNoParams: {
+    return;
+}
+
+functionWithInputParams: in (int32 i, string args) {
+    return;
+}
+
+functionWithOneOutputParam: out (int32 o) {
+    return;
+}
+
+functionWithInputAndOutputParams: in (int32 i) out (int32 o, string s) {
+    return;
+}
+
+async functionEx: out (int32 o) {
+    longFunctionDontWait();
+    o = await longFunction();
+    return;
+}

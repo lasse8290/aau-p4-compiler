@@ -1,75 +1,146 @@
 grammar YALGrammer;
 
-yalg: program EOF;
+program: functionDeclaration* EOF;
 
-program: function*;
+functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statementBlock;
 
-function: ID ':' inputParamsDeclaration? outputParamsDeclaration? '{' (command ';' )* '}';
+formalInputParams:  IN  '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
+formalOutputParams: OUT '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
 
-inputParamsDeclaration: IN '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
-outputParamsDeclaration: OUT '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
+statementBlock: '{' (singleStatement ';' | blockStatement)* '}' ;
 
-command: variableDeclaration | assignment | functionCall | RETURN ;
+singleStatement: variableDeclaration 
+                 | assignment 
+                 | functionCall 
+                 | RETURN 
+                 ;
 
-variableDeclarationFormat: TYPE ARRAY_DEFINER? ID ;
+blockStatement: ifStatement
+                | whileStatement
+                | forStatement
+                ;
 
-variableDeclaration: variableDeclarationFormat 
-                    | STRUCT_OR_UNION ID '{' (variableDeclaration ';')* '}'
-                    | enumDeclaration
-                    | tupleVariableDeclaration; 
+variableDeclaration: variableDeclarationFormat                              # SimpleVariableDeclarationFormat
+                    | STRUCT_OR_UNION ID ID                                 # StructOrUnionVariableDeclaration
+                    | STRUCT_OR_UNION ID '{' (variableDeclaration ';')* '}' # StructOrUnionTypeDeclaration
+                    | enumDeclaration                                       # EnumVariableDeclaration
+                    | tupleDeclaration                                      # TupleVariableDeclaration
+                    ;
+
+variableDeclarationFormat: TYPE ARRAY_DEFINER ID    # ArrayDeclaration 
+                           | TYPE ID                # SimpleVariableDeclaration
+                           ;
                     
 enumDeclaration: ENUM ID '{' ((ID (',' ID)*) | (ID '=' NUMBER (',' ID '=' NUMBER)*)) '}' ; 
 
-assignment: (variableDeclaration | ID | tupleId) '=' expression;
+assignment: simpleAssignment
+            | declarationAssignment
+            | tupleAssignment
+            | structVariableAssignment
+            ;
 
-tupleVariableDeclaration: '(' TYPE ID (',' TYPE ID)* ')' ;
+structVariableAssignment: ID '.' ID '=' predicate;
+
+simpleAssignment: ID '=' predicate      # IdAssignment
+                | ID '+=' expression    # IdAdditionAssignment
+                | ID '-=' expression    # IdSubtractionAssignment
+                | ID '++'               # IdPostIncrement
+                | ID '--'               # IdPostDecrement
+                | '--' ID               # IdPreDecrement
+                | '++' ID               # IdPreIncrement
+                ;
+            
+declarationAssignment: variableDeclaration '=' predicate;
+
+tupleAssignment: tupleId '=' expression;
+
+tupleDeclaration: '(' TYPE ID (',' TYPE ID)* ')' ;
 
 tupleId: '(' ID (',' ID)* ')' ;
 
-expression: baseExpression 
-            | '('? baseExpression OPERATOR '('? baseExpression (OPERATOR baseExpression)* ')'? ')'?;
+expression:  '++' expression                # PreIncrement
+            | '--' expression               # PreDecrement
+            | expression '++'               # PostIncrement
+            | expression '--'               # PostDecrement  
+            | expression '*' expression     # Multiplication 
+            | expression '/' expression     # Division
+            | expression '%' expression     # Modulo
+            | expression '+' expression     # Addition
+            | expression '-' expression     # Subtraction
+            | expression '<<' expression    # LeftShift
+            | expression '>>' expression    # RightShift
+            | expression '&' expression     # BitwiseAnd
+            | expression '^' expression     # BitwiseXor
+            | expression '|' expression     # BitwiseOr
+            | simpleAssignment              # VariableAssignment
+            | ID                            # Variable  
+            | AWAIT functionCall            # AsyncFunctionCallExpression
+            | functionCall                  # FunctionCallExpression
+            | NUMBER                        # NumberLiteral
+            | STRING                        # StringLiteral
+            | '(' expression ')'            # ParenthesizedExpression
+            | '{' (expression (',' expression)*)? '}'  # ArrayLiteral
+            ;
 
-baseExpression: 
-            ID 
-            | functionCall 
-            | NUMBER 
-            | STRING
-            | '(' baseExpression ')' 
-            | '{' (expression (',' expression)*)? '}' ;
+functionCall: ID '(' actualInputParams ')';
 
-functionCall: ID '(' (expression (',' expression)*)? ')';
+actualInputParams: (expression (',' expression)*)? ;
 
+predicate:  '!' predicate                  # Not
+            | predicate '&&' predicate     # And
+            | predicate '||' predicate     # Or
+            | predicate '<' predicate      # LessThan
+            | predicate '<=' predicate     # LessThanOrEqual
+            | predicate '>' predicate      # GreaterThan
+            | predicate '>=' predicate     # GreaterThanOrEqual
+            | predicate '==' predicate     # Equals
+            | predicate '!=' predicate     # NotEquals
+            | '(' predicate ')'            # ParenthesizedPredicate
+            | BOOLEAN                      # BooleanLiteral
+            | expression                   # ExpressionPredicate
+            ;
+            
+ifStatement: 'if' '(' predicate ')' statementBlock ('else if' '(' predicate ')' statementBlock )* ('else' statementBlock)?;
 
-fragment LOWERCASE: [a-z];
-fragment UPPERCASE: [A-Z];
-fragment DIGIT: [0-9];
-fragment LETTER: LOWERCASE | UPPERCASE;
+whileStatement: 'while' '(' predicate ')' statementBlock;
+
+forStatement: 'for' '(' declarationAssignment ';' predicate ';' assignment ')' statementBlock;
+
+fragment LOWERCASE:             [a-z];
+fragment UPPERCASE:             [A-Z];
+fragment DIGIT:                 [0-9];
+fragment LETTER:                LOWERCASE | UPPERCASE;
 fragment DOUBLE_QUOTATION_MARK: '"' ;
 fragment SINGLE_QUOTATION_MARK: '\'' ;
 
-ARRAY_DEFINER: '[' NUMBER? ']' ;
+ARRAY_DEFINER:      '[' NUMBER? ']' ;
 
-OPERATOR: '+' | '-' | '*' | '/' ;
+ASYNC:              'async' ;
+AWAIT:              'await' ;
 
-RETURN: 'return' ;
+RETURN:             'return' ;
 
-TYPE:   'int8' | 'int16' | 'int32' | 'int64' |
-        'uint8' | 'uint16' | 'uint32' | 'uint64' |
-        'float32' | 'float64' |
-        'char' | 'string' | 'bool' ;
+TYPE:               'int8' | 'int16' | 'int32' | 'int64' |
+                    'uint8' | 'uint16' | 'uint32' | 'uint64' |
+                    'float32' | 'float64' |
+                    'char' | 'string' | 'bool' ;
+                            
+STRUCT_OR_UNION:    'struct' 
+                    | 'union' ;
+                    
+ENUM:               'enum' ;
         
-STRUCT_OR_UNION: 'struct' | 'union' ;
-ENUM: 'enum' ;
-        
-IN: 'in';
-OUT: 'out';
+IN:                 'in';
+OUT:                'out';
 
-STRING: (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? SINGLE_QUOTATION_MARK)
-        | (DOUBLE_QUOTATION_MARK ( '\\' DOUBLE_QUOTATION_MARK | . )*? DOUBLE_QUOTATION_MARK) ;
+STRING:             (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? SINGLE_QUOTATION_MARK)
+                    | (DOUBLE_QUOTATION_MARK ( '\\' DOUBLE_QUOTATION_MARK | . )*? DOUBLE_QUOTATION_MARK) ;
 
-ID: LETTER (LETTER | DIGIT)*;
+ID:                 LETTER (LETTER | DIGIT)*;
 
-NUMBER: DIGIT (DIGIT)*;
+NUMBER:             DIGIT (DIGIT)*;
+
+BOOLEAN:            'true' | 'false';
 
 WHITESPACE          : (' '|'\t')+ -> skip ;
 NEWLINE             : ('\r'? '\n' | '\r')+ -> skip ;
