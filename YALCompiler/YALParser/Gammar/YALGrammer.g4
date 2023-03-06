@@ -10,6 +10,7 @@ formalOutputParams: OUT '(' variableDeclarationFormat (',' variableDeclarationFo
 statementBlock: '{' (singleStatement ';' | blockStatement)* '}' ;
 
 singleStatement: variableDeclaration 
+                 | enumDeclaration
                  | assignment 
                  | functionCall 
                  | RETURN 
@@ -21,9 +22,9 @@ blockStatement: ifStatement
                 ;
 
 variableDeclaration: variableDeclarationFormat                              # SimpleVariableDeclarationFormat
-                    | STRUCT_OR_UNION ID ID                                 # StructOrUnionVariableDeclaration
-                    | STRUCT_OR_UNION ID '{' (variableDeclaration ';')* '}' # StructOrUnionTypeDeclaration
-                    | enumDeclaration                                       # EnumVariableDeclaration
+                    /*| STRUCT_OR_UNION ID ID                                 # StructOrUnionVariableDeclaration
+                    | STRUCT_OR_UNION ID '{' (variableDeclaration ';')* '}' # StructOrUnionTypeDeclaration*/
+                                                           /*# EnumVariableDeclaration*/
                     | tupleDeclaration                                      # TupleVariableDeclaration
                     ;
 
@@ -36,10 +37,10 @@ enumDeclaration: ENUM ID '{' ((ID (',' ID)*) | (ID '=' NUMBER (',' ID '=' NUMBER
 assignment: simpleAssignment
             | declarationAssignment
             | tupleAssignment
-            | structVariableAssignment
+            /*| structVariableAssignment*/
             ;
 
-structVariableAssignment: ID '.' ID '=' predicate;
+/*structVariableAssignment: ID '.' ID '=' predicate;*/
 
 simpleAssignment: ID '=' predicate      # IdAssignment
                 | ID '+=' expression    # IdAdditionAssignment
@@ -125,8 +126,8 @@ TYPE:               'int8' | 'int16' | 'int32' | 'int64' |
                     'float32' | 'float64' |
                     'char' | 'string' | 'bool' ;
                             
-STRUCT_OR_UNION:    'struct' 
-                    | 'union' ;
+/*STRUCT_OR_UNION:    'struct' 
+                    | 'union' ;*/
                     
 ENUM:               'enum' ;
         
