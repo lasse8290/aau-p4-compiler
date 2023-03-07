@@ -5,3 +5,7 @@
 **/**/obj/*
 
 YALCompiler/YALParser/gen/
+
+YALCompiler/YALParser/obj/
+
+YALCompiler/YALCompiler/obj/
