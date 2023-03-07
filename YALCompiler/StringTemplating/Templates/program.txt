@@ -6,9 +6,9 @@
 %%globalFunctions%%
     
 void setup() {
-    %%setup%%
+    %%setup_body%%
 }
 
 void loop() {
-    %%loop%%
+    %%loop_body%%
 }
