@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v7.0": {
       "YALCompiler/1.0.0": {
         "dependencies": {
+          "StringTemplating": "1.0.0",
           "YALParser": "1.0.0"
         },
         "runtime": {
@@ -20,6 +21,11 @@
             "assemblyVersion": "4.12.0.0",
             "fileVersion": "0.0.0.0"
           }
+        }
+      },
+      "StringTemplating/1.0.0": {
+        "runtime": {
+          "StringTemplating.dll": {}
         }
       },
       "YALParser/1.0.0": {
@@ -44,6 +50,11 @@
       "sha512": "sha512-Tz5W0b/wXdX2Q09UyzMn2wJWy9BoCK6HvX7o6jZ+NILs0vGyJU5u/hfPO6tUWgYBT6GOrzdRAz+elomdu4nDtw==",
       "path": "antlr4.runtime.standard/4.12.0",
       "hashPath": "antlr4.runtime.standard.4.12.0.nupkg.sha512"
+    },
+    "StringTemplating/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "YALParser/1.0.0": {
       "type": "project",

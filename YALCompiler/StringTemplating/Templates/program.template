@@ -1,0 +1,14 @@
+#include <Arduino.h>
+#include <pt.h>
+%%include%%
+
+%%globalVariables%%
+%%globalFunctions%%
+    
+void setup() {
+    %%setup%%
+}
+
+void loop() {
+    %%loop%%
+}

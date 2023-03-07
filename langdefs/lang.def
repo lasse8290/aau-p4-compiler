@@ -1,0 +1,78 @@
+#include <stdio.h>
+using "./myfile.yal";
+
+// this is a comment line
+
+/*  and this is a comment block
+    which can span over multiple lines */
+
+main: in (string[] args) {
+
+    int8    i1;
+    int16   i2;
+    int32   i3;   
+    int64   i64
+
+    uint8    i1;
+    uint16   i2;
+    uint32   i3;
+    uint64   u64;
+
+    float32   f32;
+    float64   f64;
+    
+    bool    b;
+
+    char    c = uint8; 
+    string  s;
+
+    struct st {
+        uint16;
+        uint16;
+    }
+    
+    union un {
+        uint64;
+        int 16;    
+    }
+
+
+
+    (string s, char c) = functionWithInputAndReturnParameters(4, 6); // deconstructs the tuple returned and declares 2 variables
+    char cc = functionWithInputAndReturnParameters(2, 3);
+    
+    (int g) = functionWithOnlyReturnParameters(); // these two are the same statement
+    int g = functionWithOnlyReturnParameters(); // ...
+
+
+
+    (string s1, char c, string s2) = functionWithInputAndReturnParameters(1,2); // assignment containing (tuple) variable declaration
+    
+    (s1, c, s2) = functionWithInputAndReturnParameters(1,2); // assignment to (tuple) variable
+
+    struct functionWithInputAndReturnParametersST {
+        string s;
+        char c; 
+        string g;
+    }
+ 
+
+}
+
+
+functionWithOnlyInputParameters in (string s) { // function implicitly has type void
+
+}
+
+functionWithOnlyReturnParameters out (int32 i) { // function has type int32
+
+}
+
+functionWithInputAndReturnParameters in (int32 u, int32 v) out (string s, char c, string g) { // function implicitly has type (string, char)
+
+} 
+
+functionThatModifies: in (ref int32 a) {
+
+     
+}

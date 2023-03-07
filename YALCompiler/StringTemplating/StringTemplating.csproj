@@ -1,15 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\StringTemplating\StringTemplating.csproj" />
-      <ProjectReference Include="..\YALParser\YALParser.csproj" />
+      <None Update="Templates\function.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Templates\if.txt" />
+      <None Include="Templates\thread.template" />
     </ItemGroup>
 
 </Project>
