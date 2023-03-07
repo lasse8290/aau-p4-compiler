@@ -1,16 +1,18 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 using Antlr4.Runtime;
-using YALParser;
-
-Console.WriteLine("Hello, World!");
+using YALCompiler;
+using YALCompiler.ErrorHandlers;
+using YALCompiler.DataTypes;
+using YALCompiler.Helpers;
 
 try {
-    string input = "";
-    StringBuilder text = new StringBuilder();
+    // string input = "";
+    // StringBuilder text = new StringBuilder();
+    //
+    // text.Append("main { func(3 + (20+3)); i32 ef; bool bb = func(3,4,fr()); ef = 6; }");
 
-    text.Append("main { func(3 + (20+3)); i32 ef; bool bb = func(3,4,fr()); ef = 6; }");
+
+    var text = File.ReadAllText("Grammar/examples.yal");
     
     /*
     // to type the EOF character and end the input: use CTRL+D, then press <enter>
@@ -23,7 +25,9 @@ try {
     CommonTokenStream commonTokenStream = new CommonTokenStream(speakLexer);
     YALGrammerParser speakParser = new YALGrammerParser(commonTokenStream);
 
-    YALGrammerVisitor visitor = new YALGrammerVisitor();
+    var errorHandler = new ErrorHandler();
+    var warningsHandler = new WarningsHandler();
+    YALGrammerVisitor visitor = new YALGrammerVisitor(errorHandler, warningsHandler);
 
 /*    IToken token;
 
@@ -38,8 +42,10 @@ try {
 
     YALGrammerParser.ProgramContext? n = speakParser.program();
 
-    visitor.Visit(n);
-
+    YALCompiler.DataTypes.Program node = (YALCompiler.DataTypes.Program)visitor.Visit(n);
+    Console.WriteLine(errorHandler.GetAsString());
+    Console.WriteLine(warningsHandler.GetAsString());
+    Console.WriteLine("Done");
 /*    speakParser.Reset();
 
     var x = visitor.VisitFunction(speakParser.function());
