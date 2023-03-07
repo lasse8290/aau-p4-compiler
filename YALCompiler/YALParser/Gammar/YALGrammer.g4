@@ -7,7 +7,7 @@ functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statem
 formalInputParams:  IN  '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
 formalOutputParams: OUT '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
 
-statementBlock: '{' (singleStatement ';' | blockStatement)* '}' ;
+statementBlock: '{' ( blockStatement | singleStatement ';' )* '}' ;
 
 singleStatement: variableDeclaration 
                  | enumDeclaration
@@ -32,7 +32,7 @@ variableDeclarationFormat: TYPE ARRAY_DEFINER ID    # ArrayDeclaration
                            | TYPE ID                # SimpleVariableDeclaration
                            ;
                     
-enumDeclaration: ENUM ID '{' ((ID (',' ID)*) | (ID '=' NUMBER (',' ID '=' NUMBER)*)) '}' ; 
+enumDeclaration: ENUM ID '{' ((ID (',' ID)*) | (ID '=' POSITIVE_NUMBER (',' ID '=' POSITIVE_NUMBER)*)) '}' ; 
 
 assignment: simpleAssignment
             | declarationAssignment
@@ -77,7 +77,7 @@ expression:  '++' expression                # PreIncrement
             | ID                            # Variable  
             | AWAIT functionCall            # AsyncFunctionCallExpression
             | functionCall                  # FunctionCallExpression
-            | NUMBER                        # NumberLiteral
+            | SIGNED_NUMBER                 # NumberLiteral
             | STRING                        # StringLiteral
             | '(' expression ')'            # ParenthesizedExpression
             | '{' (expression (',' expression)*)? '}'  # ArrayLiteral
@@ -114,7 +114,7 @@ fragment LETTER:                LOWERCASE | UPPERCASE;
 fragment DOUBLE_QUOTATION_MARK: '"' ;
 fragment SINGLE_QUOTATION_MARK: '\'' ;
 
-ARRAY_DEFINER:      '[' NUMBER? ']' ;
+ARRAY_DEFINER:      '[' POSITIVE_NUMBER? ']' ;
 
 ASYNC:              'async' ;
 AWAIT:              'await' ;
@@ -139,7 +139,10 @@ STRING:             (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? 
 
 ID:                 LETTER (LETTER | DIGIT)*;
 
-NUMBER:             DIGIT (DIGIT)*;
+
+SIGNED_NUMBER:      NEGATIVE_NUMBER | POSITIVE_NUMBER ;
+NEGATIVE_NUMBER:    '-' POSITIVE_NUMBER;
+POSITIVE_NUMBER:    DIGIT (DIGIT)*;
 
 BOOLEAN:            'true' | 'false';
 

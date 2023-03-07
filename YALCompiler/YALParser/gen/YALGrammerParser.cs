@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALParser/Gammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALParser/Gammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -42,7 +42,8 @@ public partial class YALGrammerParser : Parser {
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
 		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, ARRAY_DEFINER=37, ASYNC=38, 
 		AWAIT=39, RETURN=40, TYPE=41, ENUM=42, IN=43, OUT=44, STRING=45, ID=46, 
-		NUMBER=47, BOOLEAN=48, WHITESPACE=49, NEWLINE=50, COMMENT=51, LINE_COMMENT=52;
+		SIGNED_NUMBER=47, NEGATIVE_NUMBER=48, POSITIVE_NUMBER=49, BOOLEAN=50, 
+		WHITESPACE=51, NEWLINE=52, COMMENT=53, LINE_COMMENT=54;
 	public const int
 		RULE_program = 0, RULE_functionDeclaration = 1, RULE_formalInputParams = 2, 
 		RULE_formalOutputParams = 3, RULE_statementBlock = 4, RULE_singleStatement = 5, 
@@ -73,8 +74,8 @@ public partial class YALGrammerParser : Parser {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, "ARRAY_DEFINER", "ASYNC", "AWAIT", "RETURN", "TYPE", "ENUM", "IN", 
-		"OUT", "STRING", "ID", "NUMBER", "BOOLEAN", "WHITESPACE", "NEWLINE", "COMMENT", 
-		"LINE_COMMENT"
+		"OUT", "STRING", "ID", "SIGNED_NUMBER", "NEGATIVE_NUMBER", "POSITIVE_NUMBER", 
+		"BOOLEAN", "WHITESPACE", "NEWLINE", "COMMENT", "LINE_COMMENT"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -421,17 +422,17 @@ public partial class YALGrammerParser : Parser {
 	}
 
 	public partial class StatementBlockContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public SingleStatementContext[] singleStatement() {
-			return GetRuleContexts<SingleStatementContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public SingleStatementContext singleStatement(int i) {
-			return GetRuleContext<SingleStatementContext>(i);
-		}
 		[System.Diagnostics.DebuggerNonUserCode] public BlockStatementContext[] blockStatement() {
 			return GetRuleContexts<BlockStatementContext>();
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public BlockStatementContext blockStatement(int i) {
 			return GetRuleContext<BlockStatementContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public SingleStatementContext[] singleStatement() {
+			return GetRuleContexts<SingleStatementContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public SingleStatementContext singleStatement(int i) {
+			return GetRuleContext<SingleStatementContext>(i);
 		}
 		public StatementBlockContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -474,6 +475,14 @@ public partial class YALGrammerParser : Parser {
 				State = 96;
 				ErrorHandler.Sync(this);
 				switch (TokenStream.LA(1)) {
+				case T__31:
+				case T__34:
+				case T__35:
+					{
+					State = 92;
+					blockStatement();
+					}
+					break;
 				case T__1:
 				case T__10:
 				case T__11:
@@ -482,18 +491,10 @@ public partial class YALGrammerParser : Parser {
 				case ENUM:
 				case ID:
 					{
-					State = 92;
-					singleStatement();
 					State = 93;
+					singleStatement();
+					State = 94;
 					Match(T__5);
-					}
-					break;
-				case T__31:
-				case T__34:
-				case T__35:
-					{
-					State = 95;
-					blockStatement();
 					}
 					break;
 				default:
@@ -890,9 +891,9 @@ public partial class YALGrammerParser : Parser {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID(int i) {
 			return GetToken(YALGrammerParser.ID, i);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NUMBER() { return GetTokens(YALGrammerParser.NUMBER); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NUMBER(int i) {
-			return GetToken(YALGrammerParser.NUMBER, i);
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] POSITIVE_NUMBER() { return GetTokens(YALGrammerParser.POSITIVE_NUMBER); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode POSITIVE_NUMBER(int i) {
+			return GetToken(YALGrammerParser.POSITIVE_NUMBER, i);
 		}
 		public EnumDeclarationContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -966,7 +967,7 @@ public partial class YALGrammerParser : Parser {
 				State = 138;
 				Match(T__7);
 				State = 139;
-				Match(NUMBER);
+				Match(POSITIVE_NUMBER);
 				State = 146;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
@@ -980,7 +981,7 @@ public partial class YALGrammerParser : Parser {
 					State = 142;
 					Match(T__7);
 					State = 143;
-					Match(NUMBER);
+					Match(POSITIVE_NUMBER);
 					}
 					}
 					State = 148;
@@ -2107,7 +2108,7 @@ public partial class YALGrammerParser : Parser {
 		}
 	}
 	public partial class NumberLiteralContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NUMBER() { return GetToken(YALGrammerParser.NUMBER, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SIGNED_NUMBER() { return GetToken(YALGrammerParser.SIGNED_NUMBER, 0); }
 		public NumberLiteralContext(ExpressionContext context) { CopyFrom(context); }
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void EnterRule(IParseTreeListener listener) {
@@ -2214,7 +2215,7 @@ public partial class YALGrammerParser : Parser {
 				Context = _localctx;
 				_prevctx = _localctx;
 				State = 219;
-				Match(NUMBER);
+				Match(SIGNED_NUMBER);
 				}
 				break;
 			case 8:
@@ -3348,7 +3349,7 @@ public partial class YALGrammerParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,52,370,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
+		4,1,54,370,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
 		7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
 		2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,21,
 		2,22,7,22,1,0,5,0,48,8,0,10,0,12,0,51,9,0,1,0,1,0,1,1,3,1,56,8,1,1,1,1,
@@ -3391,12 +3392,12 @@ public partial class YALGrammerParser : Parser {
 		0,76,74,1,0,0,0,77,78,5,4,0,0,78,5,1,0,0,0,79,80,5,44,0,0,80,81,5,2,0,
 		0,81,86,3,16,8,0,82,83,5,3,0,0,83,85,3,16,8,0,84,82,1,0,0,0,85,88,1,0,
 		0,0,86,84,1,0,0,0,86,87,1,0,0,0,87,89,1,0,0,0,88,86,1,0,0,0,89,90,5,4,
-		0,0,90,7,1,0,0,0,91,98,5,5,0,0,92,93,3,10,5,0,93,94,5,6,0,0,94,97,1,0,
-		0,0,95,97,3,12,6,0,96,92,1,0,0,0,96,95,1,0,0,0,97,100,1,0,0,0,98,96,1,
-		0,0,0,98,99,1,0,0,0,99,101,1,0,0,0,100,98,1,0,0,0,101,102,5,7,0,0,102,
-		9,1,0,0,0,103,109,3,14,7,0,104,109,3,18,9,0,105,109,3,20,10,0,106,109,
-		3,34,17,0,107,109,5,40,0,0,108,103,1,0,0,0,108,104,1,0,0,0,108,105,1,0,
-		0,0,108,106,1,0,0,0,108,107,1,0,0,0,109,11,1,0,0,0,110,114,3,40,20,0,111,
+		0,0,90,7,1,0,0,0,91,98,5,5,0,0,92,97,3,12,6,0,93,94,3,10,5,0,94,95,5,6,
+		0,0,95,97,1,0,0,0,96,92,1,0,0,0,96,93,1,0,0,0,97,100,1,0,0,0,98,96,1,0,
+		0,0,98,99,1,0,0,0,99,101,1,0,0,0,100,98,1,0,0,0,101,102,5,7,0,0,102,9,
+		1,0,0,0,103,109,3,14,7,0,104,109,3,18,9,0,105,109,3,20,10,0,106,109,3,
+		34,17,0,107,109,5,40,0,0,108,103,1,0,0,0,108,104,1,0,0,0,108,105,1,0,0,
+		0,108,106,1,0,0,0,108,107,1,0,0,0,109,11,1,0,0,0,110,114,3,40,20,0,111,
 		114,3,42,21,0,112,114,3,44,22,0,113,110,1,0,0,0,113,111,1,0,0,0,113,112,
 		1,0,0,0,114,13,1,0,0,0,115,118,3,16,8,0,116,118,3,28,14,0,117,115,1,0,
 		0,0,117,116,1,0,0,0,118,15,1,0,0,0,119,120,5,41,0,0,120,121,5,37,0,0,121,
@@ -3404,8 +3405,8 @@ public partial class YALGrammerParser : Parser {
 		1,0,0,0,125,17,1,0,0,0,126,127,5,42,0,0,127,128,5,46,0,0,128,149,5,5,0,
 		0,129,134,5,46,0,0,130,131,5,3,0,0,131,133,5,46,0,0,132,130,1,0,0,0,133,
 		136,1,0,0,0,134,132,1,0,0,0,134,135,1,0,0,0,135,150,1,0,0,0,136,134,1,
-		0,0,0,137,138,5,46,0,0,138,139,5,8,0,0,139,146,5,47,0,0,140,141,5,3,0,
-		0,141,142,5,46,0,0,142,143,5,8,0,0,143,145,5,47,0,0,144,140,1,0,0,0,145,
+		0,0,0,137,138,5,46,0,0,138,139,5,8,0,0,139,146,5,49,0,0,140,141,5,3,0,
+		0,141,142,5,46,0,0,142,143,5,8,0,0,143,145,5,49,0,0,144,140,1,0,0,0,145,
 		148,1,0,0,0,146,144,1,0,0,0,146,147,1,0,0,0,147,150,1,0,0,0,148,146,1,
 		0,0,0,149,129,1,0,0,0,149,137,1,0,0,0,150,151,1,0,0,0,151,152,5,7,0,0,
 		152,19,1,0,0,0,153,157,3,22,11,0,154,157,3,24,12,0,155,157,3,26,13,0,156,
@@ -3451,7 +3452,7 @@ public partial class YALGrammerParser : Parser {
 		288,286,1,0,0,0,288,289,1,0,0,0,289,292,1,0,0,0,290,288,1,0,0,0,291,283,
 		1,0,0,0,291,292,1,0,0,0,292,37,1,0,0,0,293,294,6,19,-1,0,294,295,5,23,
 		0,0,295,303,3,38,19,12,296,297,5,2,0,0,297,298,3,38,19,0,298,299,5,4,0,
-		0,299,303,1,0,0,0,300,303,5,48,0,0,301,303,3,32,16,0,302,293,1,0,0,0,302,
+		0,299,303,1,0,0,0,300,303,5,50,0,0,301,303,3,32,16,0,302,293,1,0,0,0,302,
 		296,1,0,0,0,302,300,1,0,0,0,302,301,1,0,0,0,303,330,1,0,0,0,304,305,10,
 		11,0,0,305,306,5,24,0,0,306,329,3,38,19,12,307,308,10,10,0,0,308,309,5,
 		25,0,0,309,329,3,38,19,11,310,311,10,9,0,0,311,312,5,26,0,0,312,329,3,

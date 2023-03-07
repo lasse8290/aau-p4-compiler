@@ -15,21 +15,6 @@
     
     (int32 ii, string ss) = functionWithInputAndOutputParams(i);
     
-    struct MyStruct {
-        int32 num;
-        string str;
-    };
-    
-    struct MyStruct s1;
-    
-    s1.num = 1;
-    s1.str = "hello";
-    
-    union MyUnion {
-        int32 opt1;
-        string opt2;
-    };
-    
     if (i < 0) {
         i = 0;
     } else if (i > 0) {

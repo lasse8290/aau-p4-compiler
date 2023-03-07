@@ -2,9 +2,9 @@
 
 public class TupleType : YALType
 {
-    public List<string> Types { get; set; } = new();
+    public List<Types.ValueType> Types { get; set; } = new();
 
-    public TupleType(params string[] types)
+    public TupleType(params Types.ValueType[] types)
     {
         Types.AddRange(types);
     }

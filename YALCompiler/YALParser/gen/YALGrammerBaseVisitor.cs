@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALParser/Gammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALParser/Gammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
