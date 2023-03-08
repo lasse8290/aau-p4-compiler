@@ -1,10 +1,31 @@
-// See https://aka.ms/new-console-template for more information
-
-using System;
-using System.Collections.Generic;
 using StringTemplating;
+using Antlr4.Runtime;
+using YALCompiler;
+using YALCompiler.ErrorHandlers;
 
-Console.WriteLine("Hello, World!");
+try {
+    var text = File.ReadAllText("Grammar/examples.yal");
+    
+    AntlrInputStream inputStream = new AntlrInputStream(text.ToString());
+    YALGrammerLexer speakLexer = new YALGrammerLexer(inputStream);
+    CommonTokenStream commonTokenStream = new CommonTokenStream(speakLexer);
+    YALGrammerParser speakParser = new YALGrammerParser(commonTokenStream);
+
+    var errorHandler = new ErrorHandler();
+    var warningsHandler = new WarningsHandler();
+    YALGrammerVisitor visitor = new YALGrammerVisitor(errorHandler, warningsHandler);
+
+    YALGrammerParser.ProgramContext? n = speakParser.program();
+
+    YALCompiler.DataTypes.Program node = (YALCompiler.DataTypes.Program)visitor.Visit(n);
+    Console.WriteLine(errorHandler.GetAsString());
+    Console.WriteLine(warningsHandler.GetAsString());
+    Console.WriteLine("Done");
+
+} catch (Exception e) {
+    Console.WriteLine(e);
+}
+
 
 IEnumerable<string> names = Template.LoadTemplates("Templates", "txt");
 
