@@ -512,20 +512,6 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitArrayLiteral([NotNull] YALGrammerParser.ArrayLiteralContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>AsyncFunctionCallExpression</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterAsyncFunctionCallExpression([NotNull] YALGrammerParser.AsyncFunctionCallExpressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>AsyncFunctionCallExpression</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitAsyncFunctionCallExpression([NotNull] YALGrammerParser.AsyncFunctionCallExpressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionCallExpression</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

@@ -15,9 +15,9 @@
     
     (int32 ii, string ss) = functionWithInputAndOutputParams(i);
     
-    if (i < 0) {
+    if (x == (i < 0)) {
         i = 0;
-    } else if (i > 0) {
+    } else if (i == await hi(expr1(i, -9), expr2)) {
         i = 1;
     } else {
         i = 2;
@@ -44,7 +44,7 @@ functionWithOneOutputParam: out (int32 o) {
     return;
 }
 
-functionWithInputAndOutputParams: in (int32 i) out (int32 o, string s) {
+functionWithInputAndOutputParams: in (int32 i) out (int32 i, string s) {
     return;
 }
 

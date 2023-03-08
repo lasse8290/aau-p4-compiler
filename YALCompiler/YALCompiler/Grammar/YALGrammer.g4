@@ -77,7 +77,6 @@ expression:  '++' expression                # PreIncrement
             | expression '|' expression     # BitwiseOr
             | simpleAssignment              # VariableAssignment
             | ID                            # Variable  
-            | AWAIT functionCall            # AsyncFunctionCallExpression
             | functionCall                  # FunctionCallExpression
             | SIGNED_NUMBER                 # NumberLiteral
             | STRING                        # StringLiteral
@@ -85,7 +84,7 @@ expression:  '++' expression                # PreIncrement
             | '{' (expression (',' expression)*)? '}'  # ArrayLiteral
             ;
 
-functionCall: ID '(' actualInputParams ')';
+functionCall: AWAIT? ID '(' actualInputParams ')';
 
 actualInputParams: (expression (',' expression)*)? ;
 

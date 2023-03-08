@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -208,13 +209,20 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitIfStatement(YALGrammerParser.IfStatementContext context)
     {
         var ifStatement = new IfStatement();
-        var ifPath = new If();
-        
-        if (Visit(context.predicate()) is {} predicate)
-            ifPath.Predicate = predicate as string; //fix type
-        
+        var ifPath = new If
+        {
+            Parent = ifStatement
+        };
+
+        if (Visit(context.predicate()) is Predicate predicate)
+            ifPath.Predicate = predicate;
+
         if (Visit(context.statementBlock()) is ASTNode ifNode)
+        {
+            ifNode.Parent = ifPath;
             ifPath.Children.Add(ifNode);
+            
+        }
         
         ifStatement.Children.Add(ifPath);
         
@@ -222,13 +230,19 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             foreach (var elseIf in context.elseIfStatement())
             {
-                var elseIfPath = new ElseIf();
-                
-                if (Visit(elseIf.predicate()) is {} elseIfPredicate)
-                    ifPath.Predicate = elseIfPredicate as string; //fix type
-                
+                var elseIfPath = new ElseIf
+                {
+                    Parent = ifStatement
+                };
+
+                if (Visit(elseIf.predicate()) is Predicate elseIfPredicate)
+                    elseIfPath.Predicate = elseIfPredicate;
+
                 if (Visit(elseIf.statementBlock()) is ASTNode elseIfNode)
+                {
+                    elseIfNode.Parent = elseIfPath;
                     elseIfPath.Children.Add(elseIfNode);
+                }
 
                 ifStatement.Children.Add(elseIfPath);
             }
@@ -236,10 +250,16 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         if (context.elseStatement() != null)
         {
-            var elsePath = new Else();
-            
+            var elsePath = new Else
+            {
+                Parent = ifStatement
+            };
+
             if (Visit(context.elseStatement().statementBlock()) is ASTNode elseNode)
+            {
+                elseNode.Parent = elsePath;
                 elsePath.Children.Add(elseNode);
+            }
             
             ifStatement.Children.Add(elsePath);
         }
@@ -247,6 +267,169 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return ifStatement;
     }
 
+    #region PredicateVisitors
+
+    public override object VisitNot(YALGrammerParser.NotContext context)
+    {
+        if (Visit(context.predicate()) is not Predicate predicate) return null;
+        predicate.Negated = true;
+        return predicate;
+    }
+
+    public override object VisitAnd(YALGrammerParser.AndContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.And,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
     
+    public override object VisitOr(YALGrammerParser.OrContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.Or,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
+    
+    public override object VisitLessThan(YALGrammerParser.LessThanContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.LessThan,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
+    
+    public override object VisitLessThanOrEqual(YALGrammerParser.LessThanOrEqualContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.LessThanOrEqual,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
+    
+    public override object VisitGreaterThan(YALGrammerParser.GreaterThanContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.GreaterThan,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
+    
+    public override object VisitGreaterThanOrEqual(YALGrammerParser.GreaterThanOrEqualContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.GreaterThanOrEqual,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
+    
+    public override object VisitEquals(YALGrammerParser.EqualsContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.Equals,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
+    
+    public override object VisitNotEquals(YALGrammerParser.NotEqualsContext context)
+    {
+        var compoundPredicate = new CompoundPredicate
+        {
+            Operator = Operators.PredicateOperator.NotEquals,
+            Left = Visit(context.predicate(0)) as Expression,
+            Right = Visit(context.predicate(1)) as Expression
+        };
+        return compoundPredicate;
+    }
+
+    public override object VisitParenthesizedPredicate(YALGrammerParser.ParenthesizedPredicateContext context)
+    {
+        return Visit(context.predicate());
+    }
+
+    public override object VisitBooleanLiteral(YALGrammerParser.BooleanLiteralContext context)
+    {
+        DataTypes.Boolean boolean = new();
+        bool? val = context.BOOLEAN().GetText() switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => null
+        };
+        boolean.LiteralValue = val;
+        return boolean;
+    }
+    
+    #endregion
+    
+    #region ExpressionVisitors
+
+    public override object VisitVariable(YALGrammerParser.VariableContext context)
+    {
+        return new Identifier(context.ID().GetText());
+    }
+    
+    public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
+    {
+        if (long.TryParse(context.SIGNED_NUMBER().GetText(), out var number))
+            return new SignedNumber(number);
+        return null;
+    }
+
+    public override object VisitStringLiteral(YALGrammerParser.StringLiteralContext context)
+    {
+        return new StringLiteral(context.STRING().GetText());
+    }
+
+    public override object VisitParenthesizedExpression(YALGrammerParser.ParenthesizedExpressionContext context)
+    {
+        return Visit(context.expression());
+    }
+
+    #endregion
+
+    public override object VisitFunctionCall(YALGrammerParser.FunctionCallContext context)
+    {
+        var functionCall = new FunctionCall(context.ID().GetText(), context.AWAIT() != null);
+        functionCall.InputParameters = Visit(context.actualInputParams()) as List<Expression>;
+        
+        return functionCall;
+    }
+
+    public override object VisitActualInputParams(YALGrammerParser.ActualInputParamsContext context)
+    {
+        List<Expression> actualInputParams = new();
+        foreach (var expression in context.expression())
+        {
+            if (Visit(expression) is Expression expr)
+                actualInputParams.Add(expr);
+        }
+
+        return actualInputParams;
+    }
+
+
     
 } 
