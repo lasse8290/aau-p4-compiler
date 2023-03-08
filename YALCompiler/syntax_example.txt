@@ -1,0 +1,27 @@
+main: { 
+    struct ok {
+        int32 l;
+        int64 k;
+    };
+    
+    int32[5] k = {5, func(4, (2-8), f2("test"))};
+    
+    enum e {P, A, X};
+    enum l {L = 1, R = 2, G=6};
+    
+    
+    
+    (string s, char cc, string q) = functionWithInputAndReturnParameters(1, 2);
+}
+
+functionWithOnlyInputParameters: in (string s) { // function implicitly has type void
+    return;
+}
+
+functionWithOnlyReturnParameters: out (int32 i) { // function has type int32
+
+}
+
+functionWithInputAndReturnParameters: in (int32 u, int32 v) out (string s, char c, string g) { // function implicitly has type (string, char)
+
+} 

@@ -1,4 +1,10 @@
 **/.vscode/
+*.cache
+*.user
+obj/
+.idea/
+.vs/
+.antlr/
 
 *.user
 
@@ -9,3 +15,7 @@ YALCompiler/YALParser/gen/
 YALCompiler/YALParser/obj/
 
 YALCompiler/YALCompiler/obj/
+
+YALCompiler/YALCompiler/bin/Debug/net7.0/
+
+YALCompiler/YALCompiler/bin/Debug/
