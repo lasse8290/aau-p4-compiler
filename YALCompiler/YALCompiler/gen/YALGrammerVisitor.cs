@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -141,33 +141,54 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitIdSubtractionAssignment([NotNull] YALGrammerParser.IdSubtractionAssignmentContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>IdPostIncrement</c>
+	/// Visit a parse tree produced by the <c>IdMultiplicationAssignment</c>
 	/// labeled alternative in <see cref="YALGrammerParser.simpleAssignment"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdPostIncrement([NotNull] YALGrammerParser.IdPostIncrementContext context);
+	Result VisitIdMultiplicationAssignment([NotNull] YALGrammerParser.IdMultiplicationAssignmentContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>IdPostDecrement</c>
+	/// Visit a parse tree produced by the <c>IdDivisionAssignment</c>
 	/// labeled alternative in <see cref="YALGrammerParser.simpleAssignment"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdPostDecrement([NotNull] YALGrammerParser.IdPostDecrementContext context);
+	Result VisitIdDivisionAssignment([NotNull] YALGrammerParser.IdDivisionAssignmentContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>IdPreDecrement</c>
+	/// Visit a parse tree produced by the <c>IdModuloAssignment</c>
 	/// labeled alternative in <see cref="YALGrammerParser.simpleAssignment"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdPreDecrement([NotNull] YALGrammerParser.IdPreDecrementContext context);
+	Result VisitIdModuloAssignment([NotNull] YALGrammerParser.IdModuloAssignmentContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>IdPreIncrement</c>
+	/// Visit a parse tree produced by the <c>IdPostIncrementAssignment</c>
 	/// labeled alternative in <see cref="YALGrammerParser.simpleAssignment"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdPreIncrement([NotNull] YALGrammerParser.IdPreIncrementContext context);
+	Result VisitIdPostIncrementAssignment([NotNull] YALGrammerParser.IdPostIncrementAssignmentContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>IdPostDecrementAssignment</c>
+	/// labeled alternative in <see cref="YALGrammerParser.simpleAssignment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIdPostDecrementAssignment([NotNull] YALGrammerParser.IdPostDecrementAssignmentContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>IdPreDecrementAssignment</c>
+	/// labeled alternative in <see cref="YALGrammerParser.simpleAssignment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIdPreDecrementAssignment([NotNull] YALGrammerParser.IdPreDecrementAssignmentContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>IdPreIncrementAssignment</c>
+	/// labeled alternative in <see cref="YALGrammerParser.simpleAssignment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIdPreIncrementAssignment([NotNull] YALGrammerParser.IdPreIncrementAssignmentContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.declarationAssignment"/>.
 	/// </summary>
@@ -186,12 +207,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitTupleDeclaration([NotNull] YALGrammerParser.TupleDeclarationContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="YALGrammerParser.tupleId"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitTupleId([NotNull] YALGrammerParser.TupleIdContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>ParenthesizedExpression</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -248,6 +263,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitPostDecrement([NotNull] YALGrammerParser.PostDecrementContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>BitwiseUnaryNot</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBitwiseUnaryNot([NotNull] YALGrammerParser.BitwiseUnaryNotContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>RightShift</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -332,6 +354,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitPreDecrement([NotNull] YALGrammerParser.PreDecrementContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>BitwiseNot</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBitwiseNot([NotNull] YALGrammerParser.BitwiseNotContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>NumberLiteral</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.

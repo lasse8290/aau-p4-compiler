@@ -13,6 +13,37 @@ public static class Operators
         Equals,
         NotEquals,
     }
+
+    public enum ExpressionOperator
+    {
+        Multiplication,
+        Division,
+        Modulo,
+        Addition,
+        Subtraction,
+        LeftShift,
+        RightShift,
+        BitwiseAnd,
+        BitwiseXor,
+        BitwiseOr,
+        BitwiseNot,
+        InlineIncrement,
+        InlineDecrement,
+    }
+
+    public enum AssignmentOperator
+    {
+        Equals,
+        AdditionAssignment,
+        SubtractionAssignment,
+        MultiplicationAssignment,
+        DivisionAssignment,
+        ModuloAssignment,
+        PreIncrement,
+        PreDecrement,
+        PostIncrement,
+        PostDecrement,
+    }
     
     public static PredicateOperator? Match(string type)
     {

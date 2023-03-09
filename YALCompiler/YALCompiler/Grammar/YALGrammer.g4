@@ -17,7 +17,7 @@ blockStatement: ifStatement
                 ;
                 
 singleStatement: variableDeclaration 
-                 | enumDeclaration
+                 //| enumDeclaration
                  | assignment 
                  | functionCall 
                  | RETURN 
@@ -34,7 +34,7 @@ variableDeclarationFormat: TYPE ARRAY_DEFINER ID    # ArrayDeclaration
                            | TYPE ID                # SimpleVariableDeclaration
                            ;
                     
-enumDeclaration: ENUM ID '{' ((ID (',' ID)*) | (ID '=' POSITIVE_NUMBER (',' ID '=' POSITIVE_NUMBER)*)) '}' ; 
+//enumDeclaration: ENUM ID '{' ((ID (',' ID)*) | (ID '=' POSITIVE_NUMBER (',' ID '=' POSITIVE_NUMBER)*)) '}' ; 
 
 assignment: simpleAssignment
             | declarationAssignment
@@ -47,24 +47,28 @@ assignment: simpleAssignment
 simpleAssignment: ID '=' predicate      # IdAssignment
                 | ID '+=' expression    # IdAdditionAssignment
                 | ID '-=' expression    # IdSubtractionAssignment
-                | ID '++'               # IdPostIncrement
-                | ID '--'               # IdPostDecrement
-                | '--' ID               # IdPreDecrement
-                | '++' ID               # IdPreIncrement
+                | ID '*=' expression    # IdMultiplicationAssignment
+                | ID '\\=' expression   # IdDivisionAssignment
+                | ID '%=' expression    # IdModuloAssignment
+                | ID '++'               # IdPostIncrementAssignment
+                | ID '--'               # IdPostDecrementAssignment
+                | '--' ID               # IdPreDecrementAssignment
+                | '++' ID               # IdPreIncrementAssignment
                 ;
             
 declarationAssignment: variableDeclaration '=' predicate;
 
-tupleAssignment: tupleId '=' expression;
+tupleAssignment: tupleDeclaration '=' expression;
 
-tupleDeclaration: '(' TYPE ID (',' TYPE ID)* ')' ;
+tupleDeclaration: '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')' ;
 
-tupleId: '(' ID (',' ID)* ')' ;
+//tupleId: '(' ID (',' ID)* ')' ;
 
-expression:  '++' expression                # PreIncrement
+expression:   expression '++'               # PostIncrement
+            | expression '--'               # PostDecrement 
+            | '++' expression               # PreIncrement 
             | '--' expression               # PreDecrement
-            | expression '++'               # PostIncrement
-            | expression '--'               # PostDecrement  
+            | '~' expression                # BitwiseUnaryNot
             | expression '*' expression     # Multiplication 
             | expression '/' expression     # Division
             | expression '%' expression     # Modulo
@@ -75,6 +79,7 @@ expression:  '++' expression                # PreIncrement
             | expression '&' expression     # BitwiseAnd
             | expression '^' expression     # BitwiseXor
             | expression '|' expression     # BitwiseOr
+            | expression '~' expression     # BitwiseNot
             | simpleAssignment              # VariableAssignment
             | ID                            # Variable  
             | functionCall                  # FunctionCallExpression

@@ -121,9 +121,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
             }
         }
-        
-        //handle statementsBlock
-        var x = Visit(context.statementBlock());
+
+        foreach (ASTNode stmt in Visit(context.statementBlock()) as List<object>)
+        {
+            stmt.Parent = func;
+            func.Children.Add(stmt);
+        }
+            
         
         return func;
     }
@@ -204,6 +208,34 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 statements.Add(node);
         }
         return statements;
+    }
+
+    public override object VisitBlockStatement(YALGrammerParser.BlockStatementContext context)
+    {
+        if (context.ifStatement() != null)
+            return Visit(context.ifStatement());
+            
+        if (context.whileStatement() != null)
+            return Visit(context.whileStatement());
+
+        if (context.forStatement() != null)
+            return Visit(context.forStatement());
+
+        return null;
+    }
+
+    public override object VisitSingleStatement(YALGrammerParser.SingleStatementContext context)
+    {
+        if (context.variableDeclaration() != null)
+            return Visit(context.variableDeclaration());
+        
+        if (context.assignment() != null)
+            return Visit(context.assignment());
+
+        if (context.functionCall() != null)
+            return Visit(context.functionCall());
+
+        return new ReturnStatement();
     }
 
     public override object VisitIfStatement(YALGrammerParser.IfStatementContext context)
@@ -407,6 +439,177 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         return Visit(context.expression());
     }
+    
+    public override object VisitMultiplication(YALGrammerParser.MultiplicationContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.Multiplication,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitDivision(YALGrammerParser.DivisionContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.Division,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitModulo(YALGrammerParser.ModuloContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.Modulo,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitAddition(YALGrammerParser.AdditionContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.Addition,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitSubtraction(YALGrammerParser.SubtractionContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.Subtraction,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitLeftShift(YALGrammerParser.LeftShiftContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.LeftShift,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitRightShift(YALGrammerParser.RightShiftContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.RightShift,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitBitwiseAnd(YALGrammerParser.BitwiseAndContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.BitwiseAnd,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitBitwiseOr(YALGrammerParser.BitwiseOrContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.BitwiseOr,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitBitwiseXor(YALGrammerParser.BitwiseXorContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.BitwiseXor,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitBitwiseNot(YALGrammerParser.BitwiseNotContext context)
+    {
+        var compoundExpression = new CompoundExpression
+        {
+            Operator = Operators.ExpressionOperator.BitwiseNot,
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression,
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitBitwiseUnaryNot(YALGrammerParser.BitwiseUnaryNotContext context)
+    {
+        var compoundExpression = new UnaryCompoundExpression()
+        {
+            Operator = Operators.ExpressionOperator.BitwiseNot,
+            Expression = Visit(context.expression()) as Expression,
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitPostIncrement(YALGrammerParser.PostIncrementContext context)
+    {
+        var compoundExpression = new UnaryCompoundExpression()
+        {
+            Operator = Operators.ExpressionOperator.InlineIncrement,
+            Expression = Visit(context.expression()) as Expression,
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitPostDecrement(YALGrammerParser.PostDecrementContext context)
+    {
+        var compoundExpression = new UnaryCompoundExpression()
+        {
+            Operator = Operators.ExpressionOperator.InlineDecrement,
+            Expression = Visit(context.expression()) as Expression,
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitPreIncrement(YALGrammerParser.PreIncrementContext context)
+    {
+        var compoundExpression = new UnaryCompoundExpression()
+        {
+            Operator = Operators.ExpressionOperator.InlineIncrement,
+            Expression = Visit(context.expression()) as Expression,
+        };
+        return compoundExpression;
+    }
+    
+    public override object VisitPreDecrement(YALGrammerParser.PreDecrementContext context)
+    {
+        var compoundExpression = new UnaryCompoundExpression()
+        {
+            Operator = Operators.ExpressionOperator.InlineDecrement,
+            Expression = Visit(context.expression()) as Expression,
+        };
+        return compoundExpression;
+    }
 
     #endregion
 
@@ -430,6 +633,149 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return actualInputParams;
     }
 
+    #region AssignmentVisitors
 
+    public override object VisitIdAssignment(YALGrammerParser.IdAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.Equals,
+            Value = Visit(context.predicate()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdAdditionAssignment(YALGrammerParser.IdAdditionAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.AdditionAssignment,
+            Value = Visit(context.expression()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdSubtractionAssignment(YALGrammerParser.IdSubtractionAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.SubtractionAssignment,
+            Value = Visit(context.expression()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdMultiplicationAssignment(YALGrammerParser.IdMultiplicationAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.MultiplicationAssignment,
+            Value = Visit(context.expression()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdDivisionAssignment(YALGrammerParser.IdDivisionAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.DivisionAssignment,
+            Value = Visit(context.expression()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdModuloAssignment(YALGrammerParser.IdModuloAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.ModuloAssignment,
+            Value = Visit(context.expression()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdPostIncrementAssignment(YALGrammerParser.IdPostIncrementAssignmentContext context)
+    {
+        var assignment = new UnaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.PostIncrement,
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdPostDecrementAssignment(YALGrammerParser.IdPostDecrementAssignmentContext context)
+    {
+        var assignment = new UnaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.PostDecrement,
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdPreIncrementAssignment(YALGrammerParser.IdPreIncrementAssignmentContext context)
+    {
+        var assignment = new UnaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.PreIncrement,
+        };
+        return assignment;
+    }
+    
+    public override object VisitIdPreDecrementAssignment(YALGrammerParser.IdPreDecrementAssignmentContext context)
+    {
+        var assignment = new UnaryAssignment()
+        {
+            Target = context.ID().GetText(),
+            Operator = Operators.AssignmentOperator.PreDecrement,
+        };
+        return assignment;
+    }
+    
+    #endregion
+
+    public override object VisitDeclarationAssignment(YALGrammerParser.DeclarationAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = Visit(context.variableDeclaration()),
+            Operator = Operators.AssignmentOperator.Equals,
+            Value = Visit(context.predicate()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitTupleAssignment(YALGrammerParser.TupleAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = Visit(context.tupleDeclaration()),
+            Operator = Operators.AssignmentOperator.Equals,
+            Value = Visit(context.expression()) as Expression
+        };
+        return assignment;
+    }
+    
+    public override object VisitTupleDeclaration(YALGrammerParser.TupleDeclarationContext context)
+    {
+        var tupleDeclaration = new TupleDeclaration();
+        foreach (var variableDeclaration in context.variableDeclarationFormat())
+        {
+            tupleDeclaration.Variables.Add(Visit(variableDeclaration) as Symbol);
+        }
+
+        return tupleDeclaration;
+    }
+    
+    
     
 } 
