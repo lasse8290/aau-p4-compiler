@@ -6,7 +6,6 @@
 #include "./pt/pt.h"
 #include <time.h>
 
-
 struct pt pt;
 
 struct timer { int start, interval; };
