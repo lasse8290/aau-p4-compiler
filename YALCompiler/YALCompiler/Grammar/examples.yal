@@ -1,4 +1,6 @@
-﻿main: {
+﻿int32 GLOBAL_VAR;
+
+main: {
 
     // This is a line comment
     /* This is a block comment
@@ -6,6 +8,7 @@
     
     int8 f;
     f = 1;
+    int32[5] a;
     
     functionWithNoParams();
     
@@ -25,10 +28,12 @@
     
     while (i < 10) {
         i = i + 1;
+        int32 j = 0;
     }
     
     for (int32 h = 0; h < 10; h++) {
         functionWithInputAndOutputParams(h);
+        string k = "hello";
     }
 }
 
@@ -44,7 +49,7 @@ functionWithOneOutputParam: out (int32 o) {
     return;
 }
 
-functionWithInputAndOutputParams: in (int32 i) out (int32 i, string s) {
+functionWithInputAndOutputParams: in (int32 i) out (int32 k, string s) {
     return;
 }
 

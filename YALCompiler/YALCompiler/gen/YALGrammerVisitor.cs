@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -107,12 +107,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitSimpleVariableDeclaration([NotNull] YALGrammerParser.SimpleVariableDeclarationContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="YALGrammerParser.enumDeclaration"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitEnumDeclaration([NotNull] YALGrammerParser.EnumDeclarationContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.assignment"/>.
 	/// </summary>

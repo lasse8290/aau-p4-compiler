@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -187,18 +187,6 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitSimpleVariableDeclaration([NotNull] YALGrammerParser.SimpleVariableDeclarationContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="YALGrammerParser.enumDeclaration"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterEnumDeclaration([NotNull] YALGrammerParser.EnumDeclarationContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="YALGrammerParser.enumDeclaration"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitEnumDeclaration([NotNull] YALGrammerParser.EnumDeclarationContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.assignment"/>.
 	/// <para>The default implementation does nothing.</para>

@@ -8,6 +8,11 @@ public class TupleType : YALType
     {
         Types.AddRange(types);
     }
+    
+    public TupleType(params SingleType[] types)
+    {
+        Types.AddRange(types.Select(t => t.Type));
+    }
 
     public override string ToString() => "(" + string.Join(", ", Types) + ")";
 }

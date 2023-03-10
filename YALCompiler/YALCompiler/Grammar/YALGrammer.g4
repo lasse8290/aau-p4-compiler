@@ -2,7 +2,7 @@ grammar YALGrammer;
 
 program: (globalVariableDeclaration | functionDeclaration)* EOF;
 
-globalVariableDeclaration: TYPE ARRAY_DEFINER ID ';';
+globalVariableDeclaration: TYPE ARRAY_DEFINER? ID ';';
 
 functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statementBlock;
 
@@ -145,7 +145,7 @@ OUT:                'out';
 STRING:             (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? SINGLE_QUOTATION_MARK)
                     | (DOUBLE_QUOTATION_MARK ( '\\' DOUBLE_QUOTATION_MARK | . )*? DOUBLE_QUOTATION_MARK) ;
 
-ID:                 LETTER (LETTER | DIGIT)*;
+ID:                 (LETTER | '_') (LETTER | DIGIT | '_')*;
 
 
 SIGNED_NUMBER:      NEGATIVE_NUMBER | POSITIVE_NUMBER ;

@@ -41,11 +41,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             if (Visit(func) is Function f)
             {
-                f.Parent = program;
                 program.Children.Add(f);
             }
         }
-        
+        program.LinkChildrenNodesToParent();
         return program;
     }
     
@@ -62,8 +61,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _errorHandler.AddError(e, context);
         }
         
-        var s = new Symbol(id);
-        s.Type = type;
+        var symbol = new Symbol(id);
+        symbol.Type = type;
         
         if (context.ARRAY_DEFINER() != null)
         {
@@ -71,7 +70,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             bool arr = int.TryParse(text.Substring(1, text.Length - 2), out int arraySize);
             if (arr)
             {
-                s.ArraySize = arraySize;
+                symbol.ArraySize = arraySize;
             }
             else
             {
@@ -79,7 +78,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
         }
         
-        return new Symbol(id);
+        return symbol;
     }
 
     public override object VisitFunctionDeclaration(YALGrammerParser.FunctionDeclarationContext context)
@@ -98,6 +97,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 try
                 {
                     func.SymbolTable.Add(symbol);
+                    func.InputParameters.Add(symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
@@ -114,6 +114,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 try
                 {
                     func.SymbolTable.Add(symbol);
+                    func.OutputParameters.Add(symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
@@ -122,12 +123,31 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
         }
 
-        foreach (ASTNode stmt in Visit(context.statementBlock()) as List<object>)
+        if (func.OutputParameters.Count == 1)
         {
-            stmt.Parent = func;
+            func.ReturnType = func.OutputParameters[0].Type;
+        } else if (func.OutputParameters.Count > 1)
+        {
+            func.ReturnType = new TupleType(func.OutputParameters.Select(param => param.Type as SingleType).ToArray());
+        }
+
+        StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
+        foreach (ASTNode stmt in statementBlock.Statements)
+        {
             func.Children.Add(stmt);
         }
-            
+        
+        foreach (Symbol symbol in statementBlock.LocalVariables)
+        {
+            try
+            {
+                func.SymbolTable.Add(symbol);
+            }
+            catch (VariableAlreadyExistsException e)
+            {
+                _errorHandler.AddError(e, context);                    
+            }
+        }
         
         return func;
     }
@@ -137,7 +157,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var paramVars = new List<Symbol>();
         foreach (var varDecl in context.variableDeclarationFormat())
         {
-            if (Visit(varDecl) is Symbol symbol)
+            if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
             {
                 paramVars.Add(symbol);
             }
@@ -150,7 +170,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var paramVars = new List<Symbol>();
         foreach (var varDecl in context.variableDeclarationFormat())
         {
-            if (Visit(varDecl) is Symbol symbol)
+            if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
             {
                 paramVars.Add(symbol);
             }
@@ -180,7 +200,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _errorHandler.AddError(e, context);
         }
 
-        return symbol;
+        return new VariableDeclaration {Variable = symbol};
     } 
     
     public override object VisitSimpleVariableDeclaration(YALGrammerParser.SimpleVariableDeclarationContext context)
@@ -196,18 +216,36 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _errorHandler.AddError(e, context);
         }
 
-        return symbol;
+        return new VariableDeclaration {Variable = symbol};
     }
 
     public override object VisitStatementBlock(YALGrammerParser.StatementBlockContext context)
     {
-        List<object> statements = new();
+        var statementBlock = new StatementBlock();
         foreach (var statement in context.children)
         {
-            if (Visit(statement) is ASTNode node)
-                statements.Add(node);
+            var stmt = Visit(statement);
+            
+            if (stmt is ASTNode node)
+                statementBlock.Statements.Add(node);
+            
+            switch (stmt)
+            {
+                case VariableDeclaration varDecl:
+                    statementBlock.LocalVariables.Add(varDecl.Variable);
+                    break;
+                case TupleDeclaration tupleDecl:
+                    statementBlock.LocalVariables.AddRange(tupleDecl.Variables);
+                    break;
+                case BinaryAssignment { Target: VariableDeclaration variableDeclaration }:
+                    statementBlock.LocalVariables.Add(variableDeclaration.Variable);
+                    break;
+                case BinaryAssignment { Target: TupleDeclaration tupleDeclaration }:
+                    statementBlock.LocalVariables.AddRange(tupleDeclaration.Variables);
+                    break;
+            }
         }
-        return statements;
+        return statementBlock;
     }
 
     public override object VisitBlockStatement(YALGrammerParser.BlockStatementContext context)
@@ -235,45 +273,65 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (context.functionCall() != null)
             return Visit(context.functionCall());
 
-        return new ReturnStatement();
+        if (context.RETURN() != null)
+            return new ReturnStatement();
+
+        return null;
     }
 
     public override object VisitIfStatement(YALGrammerParser.IfStatementContext context)
     {
         var ifStatement = new IfStatement();
-        var ifPath = new If
-        {
-            Parent = ifStatement
-        };
+        var ifPath = new If();
 
         if (Visit(context.predicate()) is Predicate predicate)
             ifPath.Predicate = predicate;
-
-        if (Visit(context.statementBlock()) is ASTNode ifNode)
+        
+        StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
+        foreach (ASTNode stmt in statementBlock.Statements)
         {
-            ifNode.Parent = ifPath;
-            ifPath.Children.Add(ifNode);
-            
+            ifPath.Children.Add(stmt);
         }
         
+        foreach (Symbol symbol in statementBlock.LocalVariables)
+        {
+            try
+            {
+                ifPath.SymbolTable.Add(symbol);
+            }
+            catch (VariableAlreadyExistsException e)
+            {
+                _errorHandler.AddError(e, context);                    
+            }
+        }
+
         ifStatement.Children.Add(ifPath);
         
         if (context.elseIfStatement() != null)
         {
             foreach (var elseIf in context.elseIfStatement())
             {
-                var elseIfPath = new ElseIf
-                {
-                    Parent = ifStatement
-                };
+                var elseIfPath = new ElseIf();
 
                 if (Visit(elseIf.predicate()) is Predicate elseIfPredicate)
                     elseIfPath.Predicate = elseIfPredicate;
 
-                if (Visit(elseIf.statementBlock()) is ASTNode elseIfNode)
+                StatementBlock elseIfStatementBlock = Visit(context.statementBlock()) as StatementBlock;
+                foreach (ASTNode stmt in elseIfStatementBlock.Statements)
                 {
-                    elseIfNode.Parent = elseIfPath;
-                    elseIfPath.Children.Add(elseIfNode);
+                    elseIfPath.Children.Add(stmt);
+                }
+        
+                foreach (Symbol symbol in elseIfStatementBlock.LocalVariables)
+                {
+                    try
+                    {
+                        elseIfPath.SymbolTable.Add(symbol);
+                    }
+                    catch (VariableAlreadyExistsException e)
+                    {
+                        _errorHandler.AddError(e, context);                    
+                    }
                 }
 
                 ifStatement.Children.Add(elseIfPath);
@@ -282,15 +340,24 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         if (context.elseStatement() != null)
         {
-            var elsePath = new Else
-            {
-                Parent = ifStatement
-            };
+            var elsePath = new Else();
 
-            if (Visit(context.elseStatement().statementBlock()) is ASTNode elseNode)
+            StatementBlock elseStatementBlock = Visit(context.statementBlock()) as StatementBlock;
+            foreach (ASTNode stmt in elseStatementBlock.Statements)
             {
-                elseNode.Parent = elsePath;
-                elsePath.Children.Add(elseNode);
+                elsePath.Children.Add(stmt);
+            }
+        
+            foreach (Symbol symbol in elseStatementBlock.LocalVariables)
+            {
+                try
+                {
+                    elsePath.SymbolTable.Add(symbol);
+                }
+                catch (VariableAlreadyExistsException e)
+                {
+                    _errorHandler.AddError(e, context);                    
+                }
             }
             
             ifStatement.Children.Add(elsePath);
@@ -298,6 +365,69 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         return ifStatement;
     }
+
+    public override object VisitWhileStatement(YALGrammerParser.WhileStatementContext context)
+    {
+        WhileStatement whileStatement = new WhileStatement
+        {
+            Predicate = Visit(context.predicate()) as Predicate
+        };
+        
+        StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
+        foreach (ASTNode stmt in statementBlock.Statements)
+        {
+            whileStatement.Children.Add(stmt);
+        }
+        
+        foreach (Symbol symbol in statementBlock.LocalVariables)
+        {
+            try
+            {
+                whileStatement.SymbolTable.Add(symbol);
+            }
+            catch (VariableAlreadyExistsException e)
+            {
+                _errorHandler.AddError(e, context);                    
+            }
+        }
+
+        return whileStatement;
+    }
+
+    public override object VisitForStatement(YALGrammerParser.ForStatementContext context)
+    {
+        var forStatement = new ForStatement();
+        
+        BinaryAssignment declAssignment = Visit(context.declarationAssignment()) as BinaryAssignment;
+        if (declAssignment is BinaryAssignment { Target: VariableDeclaration })
+            forStatement.DeclarationAssignment = declAssignment;
+        
+        forStatement.RunCondition = Visit(context.predicate()) as Predicate;
+        
+        forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
+
+        StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
+        foreach (ASTNode stmt in statementBlock.Statements)
+        {
+            forStatement.Children.Add(stmt);
+        }
+        
+        foreach (Symbol symbol in statementBlock.LocalVariables)
+        {
+            try
+            {
+                forStatement.SymbolTable.Add(symbol);
+            }
+            catch (VariableAlreadyExistsException e)
+            {
+                _errorHandler.AddError(e, context);                    
+            }
+        }
+
+        return forStatement;
+    }
+
+
 
     #region PredicateVisitors
 
@@ -770,7 +900,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var tupleDeclaration = new TupleDeclaration();
         foreach (var variableDeclaration in context.variableDeclarationFormat())
         {
-            tupleDeclaration.Variables.Add(Visit(variableDeclaration) as Symbol);
+            if (Visit(variableDeclaration) is VariableDeclaration { Variable: Symbol symbol})
+            tupleDeclaration.Variables.Add(symbol);
         }
 
         return tupleDeclaration;

@@ -1,6 +1,6 @@
 namespace YALCompiler.DataTypes;
 
-public class Expression
+public class Expression : ASTNode
 {
     
 }
