@@ -9,6 +9,7 @@ main: {
     int8 f;
     f = 1;
     int32[5] a;
+    a[9]=1;
     
     functionWithNoParams();
     

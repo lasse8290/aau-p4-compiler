@@ -949,6 +949,34 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitForStatement([NotNull] YALGrammerParser.ForStatementContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>ArrayElementIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterArrayElementIdentifier([NotNull] YALGrammerParser.ArrayElementIdentifierContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>ArrayElementIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitArrayElementIdentifier([NotNull] YALGrammerParser.ArrayElementIdentifierContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>SimpleIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>SimpleIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

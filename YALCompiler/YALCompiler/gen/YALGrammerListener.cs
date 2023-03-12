@@ -808,4 +808,28 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitForStatement([NotNull] YALGrammerParser.ForStatementContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>ArrayElementIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterArrayElementIdentifier([NotNull] YALGrammerParser.ArrayElementIdentifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>ArrayElementIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitArrayElementIdentifier([NotNull] YALGrammerParser.ArrayElementIdentifierContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>SimpleIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>SimpleIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context);
 }

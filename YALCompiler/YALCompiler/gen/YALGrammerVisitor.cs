@@ -488,4 +488,18 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitForStatement([NotNull] YALGrammerParser.ForStatementContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>ArrayElementIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitArrayElementIdentifier([NotNull] YALGrammerParser.ArrayElementIdentifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>SimpleIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context);
 }

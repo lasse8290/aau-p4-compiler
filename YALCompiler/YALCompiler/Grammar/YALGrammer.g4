@@ -9,7 +9,7 @@ functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statem
 formalInputParams:  IN  '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
 formalOutputParams: OUT '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
 
-statementBlock: '{' ( blockStatement | singleStatement ';' )* '}' ;
+statementBlock: '{' ( blockStatement | singleStatement ';'+ )* '}' ;
 
 blockStatement: ifStatement
                 | whileStatement
@@ -17,43 +17,35 @@ blockStatement: ifStatement
                 ;
                 
 singleStatement: variableDeclaration 
-                 //| enumDeclaration
                  | assignment 
                  | functionCall 
                  | RETURN 
                  ;
 
-variableDeclaration: variableDeclarationFormat                              # SimpleVariableDeclarationFormat
-                    /*| STRUCT_OR_UNION ID ID                                 # StructOrUnionVariableDeclaration
-                    | STRUCT_OR_UNION ID '{' (variableDeclaration ';')* '}' # StructOrUnionTypeDeclaration*/
-                                                           /*# EnumVariableDeclaration*/
-                    | tupleDeclaration                                      # TupleVariableDeclaration
+variableDeclaration: variableDeclarationFormat  # SimpleVariableDeclarationFormat
+                    | tupleDeclaration          # TupleVariableDeclaration
                     ;
 
 variableDeclarationFormat: TYPE ARRAY_DEFINER ID    # ArrayDeclaration 
                            | TYPE ID                # SimpleVariableDeclaration
                            ;
                     
-//enumDeclaration: ENUM ID '{' ((ID (',' ID)*) | (ID '=' POSITIVE_NUMBER (',' ID '=' POSITIVE_NUMBER)*)) '}' ; 
-
 assignment: simpleAssignment
             | declarationAssignment
             | tupleAssignment
-            /*| structVariableAssignment*/
             ;
 
-/*structVariableAssignment: ID '.' ID '=' predicate;*/
 
-simpleAssignment: ID '=' predicate      # IdAssignment
-                | ID '+=' expression    # IdAdditionAssignment
-                | ID '-=' expression    # IdSubtractionAssignment
-                | ID '*=' expression    # IdMultiplicationAssignment
-                | ID '\\=' expression   # IdDivisionAssignment
-                | ID '%=' expression    # IdModuloAssignment
-                | ID '++'               # IdPostIncrementAssignment
-                | ID '--'               # IdPostDecrementAssignment
-                | '--' ID               # IdPreDecrementAssignment
-                | '++' ID               # IdPreIncrementAssignment
+simpleAssignment: identifier '=' predicate      # IdAssignment
+                | identifier '+=' expression    # IdAdditionAssignment
+                | identifier '-=' expression    # IdSubtractionAssignment
+                | identifier '*=' expression    # IdMultiplicationAssignment
+                | identifier '\\=' expression   # IdDivisionAssignment
+                | identifier '%=' expression    # IdModuloAssignment
+                | identifier '++'               # IdPostIncrementAssignment
+                | identifier '--'               # IdPostDecrementAssignment
+                | '--' identifier               # IdPreDecrementAssignment
+                | '++' identifier               # IdPreIncrementAssignment
                 ;
             
 declarationAssignment: variableDeclaration '=' predicate;
@@ -61,8 +53,6 @@ declarationAssignment: variableDeclaration '=' predicate;
 tupleAssignment: tupleDeclaration '=' expression;
 
 tupleDeclaration: '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')' ;
-
-//tupleId: '(' ID (',' ID)* ')' ;
 
 expression:   expression '++'               # PostIncrement
             | expression '--'               # PostDecrement 
@@ -81,7 +71,7 @@ expression:   expression '++'               # PostIncrement
             | expression '|' expression     # BitwiseOr
             | expression '~' expression     # BitwiseNot
             | simpleAssignment              # VariableAssignment
-            | ID                            # Variable  
+            | identifier                    # Variable  
             | functionCall                  # FunctionCallExpression
             | SIGNED_NUMBER                 # NumberLiteral
             | STRING                        # StringLiteral
@@ -115,6 +105,10 @@ whileStatement: 'while' '(' predicate ')' statementBlock;
 
 forStatement: 'for' '(' declarationAssignment ';' predicate ';' assignment ')' statementBlock;
 
+identifier:  ID '[' expression ']'  # ArrayElementIdentifier
+            | ID                    # SimpleIdentifier
+            ;
+
 fragment LOWERCASE:             [a-z];
 fragment UPPERCASE:             [A-Z];
 fragment DIGIT:                 [0-9];
@@ -133,16 +127,11 @@ TYPE:               'int8' | 'int16' | 'int32' | 'int64' |
                     'uint8' | 'uint16' | 'uint32' | 'uint64' |
                     'float32' | 'float64' |
                     'char' | 'string' | 'bool' ;
-                            
-/*STRUCT_OR_UNION:    'struct' 
-                    | 'union' ;*/
-                    
-ENUM:               'enum' ;
         
 IN:                 'in';
 OUT:                'out';
 
-STRING:             (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? SINGLE_QUOTATION_MARK)
+STRING:               (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? SINGLE_QUOTATION_MARK)
                     | (DOUBLE_QUOTATION_MARK ( '\\' DOUBLE_QUOTATION_MARK | . )*? DOUBLE_QUOTATION_MARK) ;
 
 ID:                 (LETTER | '_') (LETTER | DIGIT | '_')*;

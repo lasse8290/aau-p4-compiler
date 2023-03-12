@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -550,7 +549,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitVariable(YALGrammerParser.VariableContext context)
     {
-        return new Identifier(context.ID().GetText());
+        return Visit(context.identifier());
     }
     
     public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
@@ -769,7 +768,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.Equals,
             Value = Visit(context.predicate()) as Expression
         };
@@ -780,7 +779,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.AdditionAssignment,
             Value = Visit(context.expression()) as Expression
         };
@@ -791,7 +790,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.SubtractionAssignment,
             Value = Visit(context.expression()) as Expression
         };
@@ -802,7 +801,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.MultiplicationAssignment,
             Value = Visit(context.expression()) as Expression
         };
@@ -813,7 +812,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.DivisionAssignment,
             Value = Visit(context.expression()) as Expression
         };
@@ -824,7 +823,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.ModuloAssignment,
             Value = Visit(context.expression()) as Expression
         };
@@ -835,7 +834,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new UnaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.PostIncrement,
         };
         return assignment;
@@ -845,7 +844,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new UnaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.PostDecrement,
         };
         return assignment;
@@ -855,7 +854,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new UnaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.PreIncrement,
         };
         return assignment;
@@ -865,7 +864,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new UnaryAssignment()
         {
-            Target = context.ID().GetText(),
+            Target = Visit(context.identifier()) as Identifier,
             Operator = Operators.AssignmentOperator.PreDecrement,
         };
         return assignment;
@@ -906,7 +905,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
         return tupleDeclaration;
     }
-    
+
+    public override object VisitSimpleIdentifier(YALGrammerParser.SimpleIdentifierContext context)
+    {
+        return new Identifier(context.ID().GetText());
+    }
+
+    public override object VisitArrayElementIdentifier(YALGrammerParser.ArrayElementIdentifierContext context)
+    {
+        return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression);
+    }
+
     
     
 } 
