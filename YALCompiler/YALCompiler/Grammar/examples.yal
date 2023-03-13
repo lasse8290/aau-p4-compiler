@@ -1,4 +1,5 @@
-﻿int32 GLOBAL_VAR;
+﻿external <"stdio.h"> 
+printf: in (string format, string text) out (int32 res); 
 
 main: {
 
@@ -8,9 +9,9 @@ main: {
     
     int8 f;
     f = 1;
-    int32[5] a;
-    a[9]=1;
-    
+    int32 f;
+    int32[6] ape;
+    a[5]=p;
     functionWithNoParams();
     
     functionWithInputParams(1, "hello");

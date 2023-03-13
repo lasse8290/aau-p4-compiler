@@ -2,7 +2,6 @@ using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
 using YALCompiler.Helpers;
-using static YALCompiler.Helpers.Utilities;
 
 namespace YALCompiler;
 
@@ -27,11 +26,26 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
-                    program.SymbolTable.Add(symbol);
+                    program.AddSymbolOrFunction(symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
                     _errorHandler.AddError(e, gvd);                    
+                }
+            }
+        }
+        
+        foreach (var func in context.externalFunctionDeclaration())
+        {
+            if (Visit(func) is ExternalFunction f)
+            {
+                try
+                {
+                    program.AddSymbolOrFunction(f);
+                }
+                catch (VariableAlreadyExistsException e)
+                {
+                    _errorHandler.AddError(e, func);                    
                 }
             }
         }
@@ -41,6 +55,15 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             if (Visit(func) is Function f)
             {
                 program.Children.Add(f);
+                
+                try
+                {
+                    program.AddSymbolOrFunction(f);
+                }
+                catch (VariableAlreadyExistsException e)
+                {
+                    _errorHandler.AddError(e, func);                    
+                }
             }
         }
         program.LinkChildrenNodesToParent();
@@ -62,22 +85,67 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         var symbol = new Symbol(id);
         symbol.Type = type;
-        
-        if (context.ARRAY_DEFINER() != null)
+
+        if (context.POSITIVE_NUMBER() != null && int.TryParse(context.POSITIVE_NUMBER().GetText(), out int size))
         {
-            var text = context.ARRAY_DEFINER().GetText();
-            bool arr = int.TryParse(text.Substring(1, text.Length - 2), out int arraySize);
-            if (arr)
-            {
-                symbol.ArraySize = arraySize;
-            }
-            else
-            {
-                //unable to parse array size
-            }
+            symbol.ArraySize = size;
         }
         
         return symbol;
+    }
+
+    public override object VisitExternalFunctionDeclaration(YALGrammerParser.ExternalFunctionDeclarationContext context)
+    {
+        var func = new ExternalFunction
+        {
+            LibraryName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2),
+            Id = context.ID().GetText(),
+            
+        };
+
+        //handle input params
+        if (context.formalInputParams() != null && Visit(context.formalInputParams()) is List<Symbol> inSymbols)
+        {
+            foreach (var symbol in inSymbols)
+            {
+                try
+                {
+                    func.AddSymbolOrFunction(symbol);
+                    func.InputParameters.Add(symbol);
+                }
+                catch (VariableAlreadyExistsException e)
+                {
+                    _errorHandler.AddError(e, context);                    
+                }
+            }
+        }
+        
+        //handle output params
+        if (context.formalOutputParams() != null && Visit(context.formalOutputParams()) is List<Symbol> outSymbols)
+        {
+            foreach (var symbol in outSymbols)
+            {
+                try
+                {
+                    func.AddSymbolOrFunction(symbol);
+                    func.OutputParameters.Add(symbol);
+                }
+                catch (VariableAlreadyExistsException e)
+                {
+                    _errorHandler.AddError(e, context);                    
+                }
+            }
+        }
+
+        if (func.OutputParameters.Count == 1)
+        {
+            func.ReturnType = func.OutputParameters[0].Type;
+        } else if (func.OutputParameters.Count > 1)
+        {
+            func.ReturnType = new TupleType(func.OutputParameters.Select(param => param.Type as SingleType).ToArray());
+        }
+        
+        return func;
     }
 
     public override object VisitFunctionDeclaration(YALGrammerParser.FunctionDeclarationContext context)
@@ -95,7 +163,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
-                    func.SymbolTable.Add(symbol);
+                    func.AddSymbolOrFunction(symbol);
                     func.InputParameters.Add(symbol);
                 }
                 catch (VariableAlreadyExistsException e)
@@ -112,7 +180,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
-                    func.SymbolTable.Add(symbol);
+                    func.AddSymbolOrFunction(symbol);
                     func.OutputParameters.Add(symbol);
                 }
                 catch (VariableAlreadyExistsException e)
@@ -140,7 +208,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                func.SymbolTable.Add(symbol);
+                func.AddSymbolOrFunction(symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -189,14 +257,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             _errorHandler.AddError(e, context);
         }
-        
-        try
+
+        if (int.TryParse(context.POSITIVE_NUMBER().GetText(), out int size))
         {
-            symbol.ArraySize = GetArraySizeFromDefiner(context.ARRAY_DEFINER().GetText());
-        }
-        catch (ArraySizeNotRecognizedException e)
-        {
-            _errorHandler.AddError(e, context);
+            symbol.ArraySize = size;
         }
 
         return new VariableDeclaration {Variable = symbol};
@@ -551,10 +615,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         return Visit(context.identifier());
     }
-    
-    public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
+
+    public override object VisitPositiveNumberLiteral(YALGrammerParser.PositiveNumberLiteralContext context)
     {
-        if (long.TryParse(context.SIGNED_NUMBER().GetText(), out var number))
+        if (long.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
+            return new SignedNumber(number);
+        return null;
+    }
+
+    public override object VisitNegativeNumberLiteral(YALGrammerParser.NegativeNumberLiteralContext context)
+    {
+        if (long.TryParse(context.NEGATIVE_NUMBER().GetText(), out var number))
             return new SignedNumber(number);
         return null;
     }

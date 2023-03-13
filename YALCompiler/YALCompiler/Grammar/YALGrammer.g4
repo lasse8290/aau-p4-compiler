@@ -1,8 +1,10 @@
 grammar YALGrammer;
 
-program: (globalVariableDeclaration | functionDeclaration)* EOF;
+program: (externalFunctionDeclaration | globalVariableDeclaration | functionDeclaration)* EOF;
 
-globalVariableDeclaration: TYPE ARRAY_DEFINER? ID ';';
+globalVariableDeclaration: TYPE ('[' POSITIVE_NUMBER ']')? ID ';';
+
+externalFunctionDeclaration: EXTERNAL '<' STRING '>' ID ':' formalInputParams? formalOutputParams? ';';
 
 functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statementBlock;
 
@@ -26,8 +28,8 @@ variableDeclaration: variableDeclarationFormat  # SimpleVariableDeclarationForma
                     | tupleDeclaration          # TupleVariableDeclaration
                     ;
 
-variableDeclarationFormat: TYPE ARRAY_DEFINER ID    # ArrayDeclaration 
-                           | TYPE ID                # SimpleVariableDeclaration
+variableDeclarationFormat: TYPE '[' POSITIVE_NUMBER? ']' ID     # ArrayDeclaration 
+                           | TYPE ID                            # SimpleVariableDeclaration
                            ;
                     
 assignment: simpleAssignment
@@ -73,7 +75,8 @@ expression:   expression '++'               # PostIncrement
             | simpleAssignment              # VariableAssignment
             | identifier                    # Variable  
             | functionCall                  # FunctionCallExpression
-            | SIGNED_NUMBER                 # NumberLiteral
+            | POSITIVE_NUMBER                 # PositiveNumberLiteral
+            | NEGATIVE_NUMBER                 # NegativeNumberLiteral
             | STRING                        # StringLiteral
             | '(' expression ')'            # ParenthesizedExpression
             | '{' (expression (',' expression)*)? '}'  # ArrayLiteral
@@ -116,7 +119,8 @@ fragment LETTER:                LOWERCASE | UPPERCASE;
 fragment DOUBLE_QUOTATION_MARK: '"' ;
 fragment SINGLE_QUOTATION_MARK: '\'' ;
 
-ARRAY_DEFINER:      '[' POSITIVE_NUMBER? ']' ;
+
+EXTERNAL:           'external' ;
 
 ASYNC:              'async' ;
 AWAIT:              'await' ;
@@ -136,8 +140,6 @@ STRING:               (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*
 
 ID:                 (LETTER | '_') (LETTER | DIGIT | '_')*;
 
-
-SIGNED_NUMBER:      NEGATIVE_NUMBER | POSITIVE_NUMBER ;
 NEGATIVE_NUMBER:    '-' POSITIVE_NUMBER;
 POSITIVE_NUMBER:    DIGIT (DIGIT)*;
 

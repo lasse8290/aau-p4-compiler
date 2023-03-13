@@ -2,7 +2,7 @@
 
 namespace YALCompiler.DataTypes;
 
-public class Function : ASTNode
+public class Function : ASTNode, ISymbol
 {
     public bool IsAsync { get; set; }
     public string Id { get; set; }

@@ -1,29 +1,25 @@
 ﻿using YALCompiler.Exceptions;
 
-namespace YALCompiler.Helpers;
+namespace YALCompiler.DataTypes;
 
-public class SymbolTable
+public class Table<T> where T : ISymbol
 {
-    private readonly Dictionary<string, Symbol> _symbols = new ();
+    private readonly Dictionary<string, T> _symbols = new ();
     
-    public Symbol this[string id]
+    public T this[string id]
     {
         get => _symbols[id];
         set {
-            if (value is Symbol)
+            if (value is T)
             {
                 _symbols[id] = value;
-            }
-            else
-            {
-                _symbols[id] = new Symbol(id, value);
             }
         }
     }
 
-    public void Add(Symbol symbol)
+    public void Add(T item)
     {
-        Add(symbol.Id, symbol);
+        Add(item.Id, item);
     }
     
     public bool ContainsKey(string id)
@@ -31,7 +27,7 @@ public class SymbolTable
         return _symbols.ContainsKey(id);
     }
     
-    public void Add(string id, Symbol symbol)
+    public void Add(string id, T symbol)
     {
         if (_symbols.ContainsKey(id))
         {

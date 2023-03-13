@@ -1,6 +1,8 @@
-﻿namespace YALCompiler.Helpers;
+﻿using YALCompiler.DataTypes;
 
-public class Symbol
+namespace YALCompiler.Helpers;
+
+public class Symbol : ISymbol
 {
     public string Id { get; set; }
     public object? Value { get; set; }

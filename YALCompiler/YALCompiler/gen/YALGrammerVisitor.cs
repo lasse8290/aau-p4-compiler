@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -43,6 +43,12 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitGlobalVariableDeclaration([NotNull] YALGrammerParser.GlobalVariableDeclarationContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="YALGrammerParser.externalFunctionDeclaration"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitExternalFunctionDeclaration([NotNull] YALGrammerParser.ExternalFunctionDeclarationContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.functionDeclaration"/>.
 	/// </summary>
@@ -216,6 +222,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPreIncrement([NotNull] YALGrammerParser.PreIncrementContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>NegativeNumberLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNegativeNumberLiteral([NotNull] YALGrammerParser.NegativeNumberLiteralContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>Multiplication</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -278,6 +291,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLeftShift([NotNull] YALGrammerParser.LeftShiftContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>PositiveNumberLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPositiveNumberLiteral([NotNull] YALGrammerParser.PositiveNumberLiteralContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>ArrayLiteral</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -355,13 +375,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitBitwiseNot([NotNull] YALGrammerParser.BitwiseNotContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.functionCall"/>.
 	/// </summary>

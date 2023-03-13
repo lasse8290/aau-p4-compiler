@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -59,6 +59,18 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitGlobalVariableDeclaration([NotNull] YALGrammerParser.GlobalVariableDeclarationContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="YALGrammerParser.externalFunctionDeclaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterExternalFunctionDeclaration([NotNull] YALGrammerParser.ExternalFunctionDeclarationContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="YALGrammerParser.externalFunctionDeclaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitExternalFunctionDeclaration([NotNull] YALGrammerParser.ExternalFunctionDeclarationContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.functionDeclaration"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -404,6 +416,20 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitPreIncrement([NotNull] YALGrammerParser.PreIncrementContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>NegativeNumberLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterNegativeNumberLiteral([NotNull] YALGrammerParser.NegativeNumberLiteralContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>NegativeNumberLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitNegativeNumberLiteral([NotNull] YALGrammerParser.NegativeNumberLiteralContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>Multiplication</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -529,6 +555,20 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLeftShift([NotNull] YALGrammerParser.LeftShiftContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>PositiveNumberLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPositiveNumberLiteral([NotNull] YALGrammerParser.PositiveNumberLiteralContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PositiveNumberLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPositiveNumberLiteral([NotNull] YALGrammerParser.PositiveNumberLiteralContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ArrayLiteral</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -683,20 +723,6 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBitwiseNot([NotNull] YALGrammerParser.BitwiseNotContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.functionCall"/>.
 	/// <para>The default implementation does nothing.</para>
