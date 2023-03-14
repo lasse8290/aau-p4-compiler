@@ -14,6 +14,8 @@ main: {
     a[5]=p;
     functionWithNoParams();
     
+    int32 r = printf("%s", "hello world");
+    
     functionWithInputParams(1, "hello");
     
     int32 i = functionWithOneOutputParam();
@@ -37,6 +39,9 @@ main: {
         functionWithInputAndOutputParams(h);
         string k = "hello";
     }
+    
+    l = function2(p);
+    
 }
 
 functionWithNoParams: {
@@ -52,6 +57,12 @@ functionWithOneOutputParam: out (int32 o) {
 }
 
 functionWithInputAndOutputParams: in (int32 i) out (int32 k, string s) {
+    string s = "hello" + k;
+    return;
+}
+
+function2: in (int32 i) out (int32 i) {
+    i = i + 1;
     return;
 }
 

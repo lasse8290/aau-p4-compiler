@@ -61,13 +61,13 @@ expression:   expression '++'               # PostIncrement
             | '++' expression               # PreIncrement 
             | '--' expression               # PreDecrement
             | '~' expression                # BitwiseUnaryNot
-            | expression '*' expression     # Multiplication 
-            | expression '/' expression     # Division
-            | expression '%' expression     # Modulo
-            | expression '+' expression     # Addition
-            | expression '-' expression     # Subtraction
-            | expression '<<' expression    # LeftShift
-            | expression '>>' expression    # RightShift
+            | expression operator=('*' | '/' | '%') expression     # MultiplicationDivisionModulo 
+            //| expression '/' expression     # Division
+            //| expression '%' expression     # Modulo
+            | expression operator=('+' | '-') expression     # AdditionSubtraction
+            //| expression '-' expression     # Subtraction
+            | expression operator=('<<' | '>>') expression    # LeftRightShift
+            //| expression '>>' expression    # RightShift
             | expression '&' expression     # BitwiseAnd
             | expression '^' expression     # BitwiseXor
             | expression '|' expression     # BitwiseOr
@@ -144,6 +144,14 @@ NEGATIVE_NUMBER:    '-' POSITIVE_NUMBER;
 POSITIVE_NUMBER:    DIGIT (DIGIT)*;
 
 BOOLEAN:            'true' | 'false';
+
+TIMES:             '*' ;
+DIV:               '/' ;
+MOD:               '%' ;
+PLUS:              '+' ;
+MINUS:             '-' ;
+LSHIFT:            '<<' ;
+RSHIFT:            '>>' ;
 
 WHITESPACE          : (' '|'\t')+ -> skip ;
 NEWLINE             : ('\r'? '\n' | '\r')+ -> skip ;

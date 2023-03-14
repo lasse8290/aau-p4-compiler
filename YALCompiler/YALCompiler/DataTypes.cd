@@ -8,9 +8,9 @@
     </TypeIdentifier>
   </Class>
   <Class Name="YALCompiler.DataTypes.ASTNode">
-    <Position X="28.25" Y="0.5" Width="1.5" />
+    <Position X="27.75" Y="0.5" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAEQAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAgAEQAAAAAAAAACAAAAAAAAACAA=</HashCode>
       <FileName>DataTypes\ASTNode.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -58,14 +58,6 @@
   </Class>
   <Class Name="YALCompiler.DataTypes.Expression">
     <Position X="34.25" Y="6.5" Width="1.5" />
-    <InheritanceLine Type="YALCompiler.DataTypes.ASTNode" ManuallyRouted="true">
-      <Path>
-        <Point X="29" Y="1.988" />
-        <Point X="29" Y="5.907" />
-        <Point X="35" Y="5.907" />
-        <Point X="35" Y="6.5" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DataTypes\Expression.cs</FileName>
@@ -84,6 +76,7 @@
       <HashCode>AAACAAABAAAAAAQAAAAAAAAAAAAAAAAAAAAAAIAEAAA=</HashCode>
       <FileName>DataTypes\Function.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="YALCompiler.DataTypes.FunctionCall">
     <Position X="38.75" Y="8" Width="1.5" />
@@ -142,7 +135,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="YALCompiler.DataTypes.StatementBlock">
-    <Position X="21" Y="6" Width="1.5" />
+    <Position X="22.25" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAABAAAAAA=</HashCode>
       <FileName>DataTypes\StatementBlock.cs</FileName>
@@ -188,6 +181,27 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DataTypes\WhileStatement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="YALCompiler.DataTypes.ArrayElementIdentifier">
+    <Position X="27.25" Y="11" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>DataTypes\ArrayElementIdentifier.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="YALCompiler.DataTypes.ExternalFunction">
+    <Position X="38" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataTypes\ExternalFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="YALCompiler.DataTypes.Table&lt;T&gt;">
+    <Position X="31.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAEAAAACAAAAAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>DataTypes\Table.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
