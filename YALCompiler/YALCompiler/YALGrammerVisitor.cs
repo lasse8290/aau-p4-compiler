@@ -223,7 +223,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 _errorHandler.AddError(e, context);                    
             }
         }
-        
+
+        func.LineNumber = context.Start.Line;
         return func;
     }
     
@@ -321,33 +322,41 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitBlockStatement(YALGrammerParser.BlockStatementContext context)
     {
+        ASTNode node = null;
         if (context.ifStatement() != null)
-            return Visit(context.ifStatement());
+            node = Visit(context.ifStatement()) as ASTNode;
             
         if (context.whileStatement() != null)
-            return Visit(context.whileStatement());
+            node = Visit(context.whileStatement()) as ASTNode;
 
         if (context.forStatement() != null)
-            return Visit(context.forStatement());
+            node = Visit(context.forStatement()) as ASTNode;
 
-        return null;
+        if (node is not null)
+            node.LineNumber = context.Start.Line;
+        
+        return node;
     }
 
     public override object VisitSingleStatement(YALGrammerParser.SingleStatementContext context)
     {
+        ASTNode node = null;
         if (context.variableDeclaration() != null)
-            return Visit(context.variableDeclaration());
+            node = Visit(context.variableDeclaration()) as ASTNode;
         
         if (context.assignment() != null)
-            return Visit(context.assignment());
+            node = Visit(context.assignment()) as ASTNode;
 
         if (context.functionCall() != null)
-            return Visit(context.functionCall());
+            node = Visit(context.functionCall()) as ASTNode;
 
         if (context.RETURN() != null)
-            return new ReturnStatement();
-
-        return null;
+            node = new ReturnStatement();
+        
+        if (node is not null)
+            node.LineNumber = context.Start.Line;
+        
+        return node;
     }
 
     public override object VisitIfStatement(YALGrammerParser.IfStatementContext context)
@@ -375,7 +384,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 _errorHandler.AddError(e, context);                    
             }
         }
-
+        ifPath.LineNumber = context.Start.Line;
         ifStatement.Children.Add(ifPath);
         
         if (context.elseIfStatement() != null)
@@ -387,7 +396,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 if (Visit(elseIf.predicate()) is Predicate elseIfPredicate)
                     elseIfPath.Predicate = elseIfPredicate;
 
-                StatementBlock elseIfStatementBlock = Visit(context.statementBlock()) as StatementBlock;
+                StatementBlock elseIfStatementBlock = Visit(elseIf.statementBlock()) as StatementBlock;
                 foreach (ASTNode stmt in elseIfStatementBlock.Statements)
                 {
                     elseIfPath.Children.Add(stmt);
@@ -404,7 +413,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                         _errorHandler.AddError(e, context);                    
                     }
                 }
-
+                elseIfPath.LineNumber = elseIf.Start.Line;
                 ifStatement.Children.Add(elseIfPath);
             }
         }
@@ -413,7 +422,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             var elsePath = new Else();
 
-            StatementBlock elseStatementBlock = Visit(context.statementBlock()) as StatementBlock;
+            StatementBlock elseStatementBlock = Visit(context.elseStatement().statementBlock()) as StatementBlock;
             foreach (ASTNode stmt in elseStatementBlock.Statements)
             {
                 elsePath.Children.Add(stmt);
@@ -430,7 +439,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                     _errorHandler.AddError(e, context);                    
                 }
             }
-            
+            elsePath.LineNumber = context.elseStatement().Start.Line;
             ifStatement.Children.Add(elsePath);
         }
         

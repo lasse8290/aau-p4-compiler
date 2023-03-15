@@ -9,6 +9,7 @@ public abstract class ASTNode
     public ASTNode? Parent { get; set; } = default;
     public Table<Symbol> SymbolTable { get; } = new();   
     public Table<Function> FunctionTable { get; } = new();
+    public int LineNumber { get; set; }
 
     public void AddSymbolOrFunction(Symbol symbol)
     {
