@@ -1,11 +1,10 @@
-﻿external <"stdio.h"> 
-printf: in (string format, string text) out (int32 res); 
-
-main: {
+﻿main: {
 
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
+    
+    bool bbb = 5 > 3;
     
     int8 f;
     f = 1;

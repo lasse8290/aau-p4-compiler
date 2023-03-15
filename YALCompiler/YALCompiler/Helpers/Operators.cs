@@ -27,8 +27,10 @@ public static class Operators
         BitwiseXor,
         BitwiseOr,
         BitwiseNot,
-        InlineIncrement,
-        InlineDecrement,
+        PreIncrement,
+        PreDecrement,
+        PostIncrement,
+        PostDecrement,
     }
 
     public enum AssignmentOperator
