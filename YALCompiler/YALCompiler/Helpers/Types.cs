@@ -70,6 +70,24 @@ public static class Types
         return target == source || AssignableTypes.Contains((target, source));
     }
     
+    public static bool CheckTypesAreAssignable(ValueType[] target, ValueType[] source)
+    {
+        if (target.Length != source.Length)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < target.Length; i++)
+        {
+            if (!CheckTypesAreAssignable(target[i], source[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
     public static bool CheckTypesAreAssignable(YALType? target, YALType? source)
     {
         if (target is null || source is null)
@@ -81,15 +99,21 @@ public static class Types
         {
             return CheckTypesAreAssignable(targetSingleType.Type, sourceSingleType.Type);
         }
-        
+
         if (target is TupleType targetTupleType && source is SingleType sourceSingleType2)
         {
-            return targetTupleType.Types.Count == 1 && CheckTypesAreAssignable(targetTupleType.Types[0], sourceSingleType2.Type);
+            return targetTupleType.Types.Count == 1 && CheckTypesAreAssignable(targetTupleType.Types[0].Type, sourceSingleType2.Type);
         }
         
         if (target is SingleType targetSingleType2 && source is TupleType sourceTupleType)
         {
-            return sourceTupleType.Types.Count == 1 && CheckTypesAreAssignable(targetSingleType2.Type, sourceTupleType.Types[0]);
+            return sourceTupleType.Types.Count == 1 && CheckTypesAreAssignable(targetSingleType2.Type, sourceTupleType.Types[0].Type);
+        }
+        
+        if (target is TupleType targetSingleType3 && source is TupleType sourceTupleType3)
+        {
+            return CheckTypesAreAssignable(targetSingleType3.Types.Select(t => t.Type).ToArray(), 
+                sourceTupleType3.Types.Select(t => t.Type).ToArray());
         }
         
         return false;

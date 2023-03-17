@@ -34,7 +34,7 @@ variableDeclarationFormat: TYPE '[' POSITIVE_NUMBER? ']' ID     # ArrayDeclarati
                     
 assignment: simpleAssignment
             | declarationAssignment
-            | tupleAssignment
+            //| tupleAssignment
             ;
 
 
@@ -45,7 +45,7 @@ simpleAssignment: identifier operator=('=' | '+=' | '-=' | '*=' | '\\=' | '%=') 
             
 declarationAssignment:  variableDeclaration '=' predicate;
 
-tupleAssignment:        tupleDeclaration '=' expression;
+//tupleAssignment:        tupleDeclaration '=' expression;
 
 tupleDeclaration:       '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')' ;
 
@@ -120,13 +120,14 @@ OUT:                    'out';
 STRING:                   (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? SINGLE_QUOTATION_MARK)
                         | (DOUBLE_QUOTATION_MARK ( '\\' DOUBLE_QUOTATION_MARK | . )*? DOUBLE_QUOTATION_MARK) ;
     
+BOOLEAN:                'true' | 'false';
+
 ID:                     (LETTER | '_') (LETTER | DIGIT | '_')*;
     
 POSITIVE_NUMBER:        DIGIT (DIGIT)*;
     
 FLOAT:                  DIGIT (DIGIT)* '.' DIGIT (DIGIT)*;
 
-BOOLEAN:                'true' | 'false';
 
 TIMES:                  '*' ;
 DIV:                    '/' ;
@@ -150,6 +151,9 @@ MULTIPLY_EQUAL:         '*=' ;
 DIVIDE_EQUAL:           '\\=' ;
 MODULO_EQUAL:           '%=' ;
 BITWISE_NOT:            '~' ;
+
+LBRACKET:               '[' ;
+RBRACKET:               ']' ;
 
 
 WHITESPACE              : (' '|'\t')+ -> skip ;

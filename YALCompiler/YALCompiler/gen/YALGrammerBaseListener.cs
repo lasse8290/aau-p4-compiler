@@ -266,18 +266,6 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitDeclarationAssignment([NotNull] YALGrammerParser.DeclarationAssignmentContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.tupleDeclaration"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

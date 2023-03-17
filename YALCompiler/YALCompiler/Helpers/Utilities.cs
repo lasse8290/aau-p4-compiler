@@ -39,7 +39,7 @@ public static class Utilities
         Function? function = null;
         while (function is null && node is not null)
         {
-            if (node.SymbolTable.ContainsKey(identifier))
+            if (node.FunctionTable.ContainsKey(identifier))
             {
                 function = node.FunctionTable[identifier];
                 break;

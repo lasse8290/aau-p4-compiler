@@ -147,12 +147,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDeclarationAssignment([NotNull] YALGrammerParser.DeclarationAssignmentContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.tupleDeclaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

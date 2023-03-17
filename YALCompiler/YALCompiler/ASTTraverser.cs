@@ -28,6 +28,7 @@ public abstract class ASTTraverser
     internal virtual object? visit(StatementBlock node) => node;
     internal virtual object? visit(UnaryAssignment node) => node;
     internal virtual object? visit(BinaryAssignment node) => node;
+    internal virtual object? visit(IfStatement node) => node;
     internal virtual object? visit(If node) => node;
     internal virtual object? visit(Else node) => node;
     internal virtual object? visit(ElseIf node) => node;
@@ -37,46 +38,65 @@ public abstract class ASTTraverser
     internal virtual object? visit(FunctionCall node) => node;
     internal virtual object? visit(ExternalFunction node) => node;
     internal virtual object? visit(ArrayElementIdentifier node) => node;
+    internal virtual object? visit(CompoundExpression node) => node;
     internal virtual object? visit(Expression node) => node;
-
-    internal virtual object? visit(ASTNode node)
-    {
-        
-        // Type objType = node.GetType();
-        //
-        // dynamic specializedObj = Convert.ChangeType(node, objType);
-        //
-        // return visit(specializedObj);
-
-        // Type nodeType = node.GetType();
-        // MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
-        // dynamic specializedObj = Convert.ChangeType(node, nodeType);
-        //
-        // if (visitMethod != null)
-        // {
-        //     return visitMethod.Invoke(this, new object[] { specializedObj });
-        // }
-        // else
-        // {
-        //     throw new ArgumentException($"No matching Visit method found for type {nodeType.Name}");
-        // }
-
-        return node;
-    }
+    internal virtual object? visit(Program node) => node;
+    internal virtual object? visit(ASTNode node) => node;
 
     public void BeginTraverse()
     {
-        _traverse(_startNode);
+        traverse(_startNode);
     }
     
+    private void traverse(ASTNode root)
+    {
+        if (root == null) {
+            return;
+        }
+
+        Stack<ASTNode> stack = new Stack<ASTNode>();
+        stack.Push(root);
+
+        while (stack.Count > 0) {
+            ASTNode node = stack.Pop();
+            
+            var s = node
+                .GetType()
+                .GetProperties()
+                .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
+                .ToList();
+            
+            foreach (PropertyInfo p in s)
+            {
+                var pp = p.GetValue(node);
+                if (pp is ASTNode astNode)
+                    astNode.Parent = node;
+            }
+            
+            callVisitor(node);
+
+            if (node.Children != null) {
+                for (int i = node.Children.Count - 1; i >= 0; i--) {
+                    ASTNode child = node.Children[i];
+                    child.Parent = node; // Set the child's parent to the current node
+                    stack.Push(child);
+                }
+            }
+        }
+    }
     private void _traverse(ASTNode node)
     {
         foreach (var child in node.Children)
         {
+           callVisitor(child);
             
-           //visit(child);
+            _traverse(child);
+        }
+    }
 
-            switch (child)
+    private void callVisitor(ASTNode node)
+    {
+        switch (node)
             {
                 case Boolean booleanNode:
                     visit(booleanNode);
@@ -120,6 +140,9 @@ public abstract class ASTTraverser
                 case BinaryAssignment binaryAssignmentNode:
                     visit(binaryAssignmentNode);
                     break;
+                case IfStatement ifStmt:
+                    visit(ifStmt);
+                    break;
                 case If ifNode:
                     visit(ifNode);
                     break;
@@ -141,14 +164,17 @@ public abstract class ASTTraverser
                 case FunctionCall functionCallNode:
                     visit(functionCallNode);
                     break;
+                case CompoundExpression compoundExpressionNode:
+                    visit(compoundExpressionNode);
+                    break;
                 case Expression expressionNode:
                     visit(expressionNode);
+                    break;
+                case DataTypes.Program program:
+                    visit(program);
                     break;
                 default:
                     throw new ArgumentException("Invalid child type");
             }
-            
-            _traverse(child);
-        }
     }
 }

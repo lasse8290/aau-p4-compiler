@@ -7,20 +7,6 @@ using YALCompiler.Helpers;
 
 try
 {
-
-    bool intAdd = YALCompiler.Helpers.Operators.CheckOperationIsValid(Types.ValueType.int32,
-        YALCompiler.Helpers.Operators.ExpressionOperator.Addition);
-    bool intMultiply = YALCompiler.Helpers.Operators.CheckOperationIsValid(Types.ValueType.int8,
-        YALCompiler.Helpers.Operators.ExpressionOperator.Multiplication);
-    bool floatDiv = YALCompiler.Helpers.Operators.CheckOperationIsValid(Types.ValueType.float64,
-        YALCompiler.Helpers.Operators.ExpressionOperator.Division);
-    bool charAdd = YALCompiler.Helpers.Operators.CheckOperationIsValid(Types.ValueType.@char,
-        YALCompiler.Helpers.Operators.ExpressionOperator.Addition);
-    bool stringAddAssignment = YALCompiler.Helpers.Operators.CheckOperationIsValid(Types.ValueType.@string,
-        YALCompiler.Helpers.Operators.AssignmentOperator.AdditionAssignment);
-    bool stringMultiplyAssignment = YALCompiler.Helpers.Operators.CheckOperationIsValid(Types.ValueType.@string,
-        YALCompiler.Helpers.Operators.AssignmentOperator.MultiplicationAssignment);
-
     var text = File.ReadAllText("Grammar/examples.yal");
     
     AntlrInputStream inputStream = new AntlrInputStream(text.ToString());

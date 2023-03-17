@@ -6,11 +6,11 @@
     
     //bool bbb = 5 > 3;
     
-    float32 f;
-    f = 1;
-    int32 ff;
-    int32[6] ape;
-    a[5]=p;
+    //float32 f;
+    //f = 1;
+    //int32 ff;
+    /*int32[6] a;
+    a[6]=functionWithOneOutputParam();
     functionWithNoParams();
     
     int32 r = printf("%s", "hello world");
@@ -18,6 +18,8 @@
     functionWithInputParams(1, "hello");
     
     int32 i = functionWithOneOutputParam();
+    
+    int32 i = 6;
     
     (int32 ii, string ss) = functionWithInputAndOutputParams(i);
     
@@ -27,8 +29,8 @@
         i = 1;
     } else {
         i = 2;
-    }
-    
+    }*/
+    int32 i = 1;
     while (i < 10) {
         i = i + 1;
         int32 j = 0;

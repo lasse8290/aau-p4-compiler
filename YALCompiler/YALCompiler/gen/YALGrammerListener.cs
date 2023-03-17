@@ -225,16 +225,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitDeclarationAssignment([NotNull] YALGrammerParser.DeclarationAssignmentContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.tupleDeclaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

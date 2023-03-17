@@ -68,7 +68,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
             }
         }
-        program.LinkChildrenNodesToParent();
         return program;
     }
     
@@ -86,12 +85,18 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
         
         var symbol = new Symbol(id);
-        symbol.Type = type;
 
-        if (context.POSITIVE_NUMBER() != null && int.TryParse(context.POSITIVE_NUMBER().GetText(), out int size))
+        if (context.LBRACKET() != null && context.RBRACKET() != null)
         {
-            symbol.ArraySize = size;
+            type.IsArray = true;
+            
+            if (context.POSITIVE_NUMBER() != null && int.TryParse(context.POSITIVE_NUMBER().GetText(), out int size))
+            {
+                symbol.ArraySize = size;
+            }
         }
+        
+        symbol.Type = type;
         
         if (context.predicate() != null && Visit(context.predicate()) is Predicate predicate)
         {
@@ -260,7 +265,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         try
         {
-            symbol.Type = new SingleType(context.TYPE().GetText());
+            symbol.Type = new SingleType(context.TYPE().GetText()) {IsArray = true};
         }
         catch (TypeNotRecognizedException e)
         {
@@ -771,7 +776,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var functionCall = new FunctionCall(context.ID().GetText(), context.AWAIT() != null);
         functionCall.InputParameters = Visit(context.actualInputParams()) as List<Expression>;
-        
+        foreach (var inputParameter in functionCall.InputParameters)
+        {
+            inputParameter.Parent = functionCall;
+        }
         return functionCall;
     }
 
@@ -796,6 +804,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Target = Visit(context.identifier()) as Identifier,
             Value = Visit(context.predicate()) as Expression
         };
+        
+        if (assignment.Target is not null)
+            ((Identifier)assignment.Target).Parent = assignment;
+        
+        if (assignment.Value is not null)
+            assignment.Value.Parent = assignment;
+        
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.EQUAL:
@@ -862,23 +877,31 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = Visit(context.variableDeclaration()),
+            Target = Visit(context.variableDeclaration()) as ASTNode,
             Operator = Operators.AssignmentOperator.Equals,
             Value = Visit(context.predicate()) as Expression
         };
+
         return assignment;
     }
     
-    public override object VisitTupleAssignment(YALGrammerParser.TupleAssignmentContext context)
-    {
-        var assignment = new BinaryAssignment()
-        {
-            Target = Visit(context.tupleDeclaration()),
-            Operator = Operators.AssignmentOperator.Equals,
-            Value = Visit(context.expression()) as Expression
-        };
-        return assignment;
-    }
+    // public override object VisitTupleAssignment(YALGrammerParser.TupleAssignmentContext context)
+    // {
+    //     var assignment = new BinaryAssignment()
+    //     {
+    //         Target = Visit(context.tupleDeclaration()),
+    //         Operator = Operators.AssignmentOperator.Equals,
+    //         Value = Visit(context.expression()) as Expression
+    //     };
+    //     
+    //     if (assignment.Target is not null)
+    //         ((Identifier)assignment.Target).Parent = assignment;
+    //     
+    //     if (assignment.Value is not null)
+    //         assignment.Value.Parent = assignment;
+    //     
+    //     return assignment;
+    // }
     
     public override object VisitTupleDeclaration(YALGrammerParser.TupleDeclarationContext context)
     {

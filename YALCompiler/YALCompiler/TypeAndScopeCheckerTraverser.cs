@@ -20,6 +20,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     internal override object? visit(BinaryAssignment node)
     {
         YALType? targetType = null;
+        YALType? targetParentArrayType = null;
         YALType? valueType = null;
         
         switch (node.Target)
@@ -28,6 +29,18 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 if (Utilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
                 {
                     targetType = symbol.Type;
+                    if (identifier is ArrayElementIdentifier arrayElementIdentifier)
+                    {
+                        targetParentArrayType = symbol.Type;
+                        ((SingleType)targetType).IsArray = false;
+                        if (symbol.ArraySize is not null && 
+                            arrayElementIdentifier.Index is SignedNumber index && 
+                            index.Value > (ulong)symbol.ArraySize!)
+                        {
+                            _errorHandler.AddError(new ArrayIndexOutOfBoundsException(
+                                index.Value, symbol.ArraySize.Value), node.LineNumber);
+                        }
+                    }
                 }
                 else
                 {
@@ -47,7 +60,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
         if (!Types.CheckTypesAreAssignable(targetType, valueType))
         {
-            _errorHandler.AddError(new TypeMismatchException(valueType?.ToString() ?? "null", targetType.ToString()), node.LineNumber);
+            _errorHandler.AddError(new TypeMismatchException(valueType?.ToString() ?? "null",
+                targetType?.ToString() ?? "null"), node.LineNumber);
         }
 
         switch (targetType)
@@ -127,7 +141,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         
         for (int i = 0; i < function.InputParameters.Count; i++)
         {
-            if (function.InputParameters[i].Type != visit(node.InputParameters[i]))
+            if ((YALType)function.InputParameters[i].Type != (YALType)visit(node.InputParameters[i]))
             {
                 _errorHandler.AddError(
                     new InvalidFunctionCallInputParameters(
@@ -207,5 +221,39 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             throw new ArgumentException($"No matching Visit method found for type {nodeType.Name}");
         }
     }
+
+    internal override object? visit(Identifier node)
+    {
+        if (Utilities.FindSymbol(node.IdValue, node) is Symbol symbol)
+        {
+            return symbol.Type;
+        } else if (Utilities.FindFunction(node.IdValue, node) is Function function)
+        {
+            return function.ReturnType;
+        }
+        else
+        {
+            _errorHandler.AddError(new IdentifierNotFoundException(node.IdValue), node.LineNumber);
+            return null;
+        }
+    }
+
+    internal override object? visit(CompoundExpression node)
+    {
+        SingleType? leftType = visit(node.Left) as SingleType;
+        SingleType? rightType = visit(node.Right) as SingleType;
+
+        if (!Operators.CheckOperationIsValid(leftType.Type, node.Operator))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftType.Type), node.LineNumber);
+        } else if (!Operators.CheckOperationIsValid(rightType.Type, node.Operator))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightType.Type), node.LineNumber);
+        }
+
+        node.Type = rightType;
+        return node.Type;
+    }
+
 
 }
