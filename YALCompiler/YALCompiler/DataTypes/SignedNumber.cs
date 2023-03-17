@@ -2,11 +2,13 @@ namespace YALCompiler.DataTypes;
 
 public class SignedNumber : Expression
 {
-    public long Value { get; }
+    public UInt64 Value { get; }
+    public bool Negative { get; set; }
 
-    public SignedNumber(long value)
+    public SignedNumber(UInt64 value, bool isNegative)
     {
         Value = value;
+        Negative = isNegative;
     }
 
     public override string ToString()

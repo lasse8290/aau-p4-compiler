@@ -54,7 +54,7 @@ public abstract class YALType: IEquatable<YALType>
     public static bool operator !=(YALType first, YALType second)
     {
         if (first is null || second is null)
-            return false;
+            return true;
         
         return !first.Equals(second);
     }

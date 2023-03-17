@@ -600,15 +600,15 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
     {
-        if (long.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
-            return new SignedNumber(context.MINUS() == null ? number : -number);
+        if (UInt64.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
+            return new SignedNumber(number, context.MINUS() == null);
         return null;
     }
     
     public override object VisitFloatLiteral(YALGrammerParser.FloatLiteralContext context)
     {
-        if (float.TryParse(context.FLOAT().GetText(), out var number))
-            return new SignedFloat(context.MINUS() == null ? number : -number);
+        if (double.TryParse(context.FLOAT().GetText(), out var number))
+            return new SignedFloat(number, context.MINUS() == null);
         return null;
     }
 
