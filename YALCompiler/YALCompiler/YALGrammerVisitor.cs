@@ -601,14 +601,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
     {
         if (UInt64.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
-            return new SignedNumber(number, context.MINUS() == null);
+            return new SignedNumber(number, context.MINUS() != null);
         return null;
     }
     
     public override object VisitFloatLiteral(YALGrammerParser.FloatLiteralContext context)
     {
-        if (double.TryParse(context.FLOAT().GetText(), out var number))
-            return new SignedFloat(number, context.MINUS() == null);
+        if (double.TryParse(context.MINUS() == null ? context.FLOAT().GetText() : "-" + context.FLOAT().GetText(), out var number))
+            return new SignedFloat(number);
         return null;
     }
 
@@ -895,6 +895,11 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitSimpleIdentifier(YALGrammerParser.SimpleIdentifierContext context)
     {
         return new Identifier(context.ID().GetText());
+    }
+    
+    public override object VisitParenthesizedIdentifier(YALGrammerParser.ParenthesizedIdentifierContext context)
+    {
+        return Visit(context.identifier());
     }
 
     public override object VisitArrayElementIdentifier(YALGrammerParser.ArrayElementIdentifierContext context)

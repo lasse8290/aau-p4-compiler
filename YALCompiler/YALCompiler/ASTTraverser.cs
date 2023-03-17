@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Reflection;
 using YALCompiler.DataTypes;
 using Boolean = YALCompiler.DataTypes.Boolean;
 
@@ -18,22 +19,18 @@ public abstract class ASTTraverser
     internal virtual object? visit(SignedFloat node) => node;
     internal virtual object? visit(SignedNumber node) => node;
     internal virtual object? visit(Identifier node) => node;
+    internal virtual object? visit(CompoundPredicate node) => node;
     internal virtual object? visit(Predicate node) => node;
     internal virtual object? visit(StringLiteral node) => node;
-    internal virtual object? visit(ISymbol node) => node;
     internal virtual object? visit(TupleDeclaration node) => node;
     internal virtual object? visit(UnaryCompoundExpression node) => node;
     internal virtual object? visit(VariableDeclaration node) => node;
-
     internal virtual object? visit(StatementBlock node) => node;
-
     internal virtual object? visit(UnaryAssignment node) => node;
     internal virtual object? visit(BinaryAssignment node) => node;
-    
     internal virtual object? visit(If node) => node;
     internal virtual object? visit(Else node) => node;
     internal virtual object? visit(ElseIf node) => node;
-    
     internal virtual object? visit(ForStatement node) => node;
     internal virtual object? visit(WhileStatement node) => node;
     internal virtual object? visit(ReturnStatement node) => node;
@@ -42,7 +39,30 @@ public abstract class ASTTraverser
     internal virtual object? visit(ArrayElementIdentifier node) => node;
     internal virtual object? visit(Expression node) => node;
 
-    //internal virtual object? visit(ASTNode node) => node;
+    internal virtual object? visit(ASTNode node)
+    {
+        
+        // Type objType = node.GetType();
+        //
+        // dynamic specializedObj = Convert.ChangeType(node, objType);
+        //
+        // return visit(specializedObj);
+
+        // Type nodeType = node.GetType();
+        // MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+        // dynamic specializedObj = Convert.ChangeType(node, nodeType);
+        //
+        // if (visitMethod != null)
+        // {
+        //     return visitMethod.Invoke(this, new object[] { specializedObj });
+        // }
+        // else
+        // {
+        //     throw new ArgumentException($"No matching Visit method found for type {nodeType.Name}");
+        // }
+
+        return node;
+    }
 
     public void BeginTraverse()
     {
@@ -53,10 +73,9 @@ public abstract class ASTTraverser
     {
         foreach (var child in node.Children)
         {
-            //visit(child);
-
-            //generate a switch statement which will call the visit() method depending on the type of child
             
+           //visit(child);
+
             switch (child)
             {
                 case Boolean booleanNode:
@@ -80,11 +99,11 @@ public abstract class ASTTraverser
                 case Predicate predicateNode:
                     visit(predicateNode);
                     break;
+                case Function function:
+                    visit(function);
+                    break;
                 case StringLiteral stringLiteralNode:
                     visit(stringLiteralNode);
-                    break;
-                case ISymbol iSymbolNode:
-                    visit(iSymbolNode);
                     break;
                 case TupleDeclaration tupleDeclarationNode:
                     visit(tupleDeclarationNode);

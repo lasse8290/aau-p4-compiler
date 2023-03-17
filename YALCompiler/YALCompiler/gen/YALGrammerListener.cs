@@ -626,4 +626,16 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>ParenthesizedIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>ParenthesizedIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context);
 }

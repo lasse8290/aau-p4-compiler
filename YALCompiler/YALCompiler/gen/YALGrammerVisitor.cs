@@ -382,4 +382,11 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>ParenthesizedIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context);
 }

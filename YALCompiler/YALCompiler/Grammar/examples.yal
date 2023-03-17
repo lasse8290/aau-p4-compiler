@@ -4,11 +4,11 @@
     /* This is a block comment
        which can span across multiple lines */
     
-    bool bbb = 5 > 3;
+    //bool bbb = 5 > 3;
     
-    int8 f;
+    float32 f;
     f = 1;
-    int32 f;
+    int32 ff;
     int32[6] ape;
     a[5]=p;
     functionWithNoParams();
@@ -56,11 +56,11 @@ functionWithOneOutputParam: out (int32 o) {
 }
 
 functionWithInputAndOutputParams: in (int32 i) out (int32 k, string s) {
-    string s = "hello" + k;
+    string sh = "hello" + k;
     return;
 }
 
-function2: in (int32 i) out (int32 i) {
+function2: in (int32 i) out (int32 ix) {
     i = i + 1;
     return;
 }

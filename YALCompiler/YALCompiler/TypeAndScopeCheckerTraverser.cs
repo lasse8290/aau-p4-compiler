@@ -1,4 +1,6 @@
-﻿using YALCompiler.DataTypes;
+﻿using System.ComponentModel;
+using System.Reflection;
+using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
 using YALCompiler.Helpers;
@@ -43,25 +45,167 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
         valueType = visit(node.Value) as YALType;
 
-        if (targetType != valueType)
+        if (!Types.CheckTypesAreAssignable(targetType, valueType))
         {
             _errorHandler.AddError(new TypeMismatchException(valueType?.ToString() ?? "null", targetType.ToString()), node.LineNumber);
         }
-        
+
+        switch (targetType)
+        {
+            case SingleType singleType:
+                if (!Operators.CheckOperationIsValid(singleType.Type, node.Operator))
+                {
+                    _errorHandler.AddError(new InvalidOperatorException(node.Operator, singleType.Type), node.LineNumber);
+                }
+                
+                break;
+            case TupleType tupleType:
+                if (node.Operator != Operators.AssignmentOperator.Equals)
+                {
+                    _errorHandler.AddError(new InvalidOperatorException(node.Operator, tupleType), node.LineNumber);
+                }
+
+                break;
+        }
+
         return valueType;
 
     }
 
+    internal override object? visit(UnaryAssignment node)
+    {
+        YALType? targetType = null;
+        if (node.Target is Identifier identifier)
+        {
+            if (Utilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
+            {
+                targetType = symbol.Type;
+                switch (targetType)
+                {
+                    case SingleType singleType:
+                        if (!Operators.CheckOperationIsValid(singleType.Type, node.Operator))
+                        {
+                            _errorHandler.AddError(new InvalidOperatorException(node.Operator, singleType.Type), node.LineNumber);
+                        }
+
+                        break;
+                    case TupleType tupleType:
+                        _errorHandler.AddError(new InvalidOperatorException(node.Operator, tupleType), node.LineNumber);
+                        break;
+                }
+            }
+            else
+            {
+                _errorHandler.AddError(new IdentifierNotFoundException(identifier.IdValue), node.LineNumber);
+            }
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidAssignment(node), node.LineNumber);
+        }
+
+        return targetType;
+    }
+
+    internal override object? visit(FunctionCall node)
+    {
+        Function? function = Utilities.FindFunction(node.Identifier, node);
+        if (function == null)
+        {
+            _errorHandler.AddError(new IdentifierNotFoundException(node.Identifier), node.LineNumber);
+            return null;
+        }
+        
+        //check input params are correct too
+        if (function.InputParameters.Count != node.InputParameters.Count)
+        {
+            _errorHandler.AddError(
+                new InvalidFunctionCallInputParameters(
+                    function.InputParameters.Count, node.InputParameters.Count),
+                node.LineNumber);
+        }
+        
+        for (int i = 0; i < function.InputParameters.Count; i++)
+        {
+            if (function.InputParameters[i].Type != visit(node.InputParameters[i]))
+            {
+                _errorHandler.AddError(
+                    new InvalidFunctionCallInputParameters(
+                        function.InputParameters.Select(s => s.Type as SingleType).ToList(),
+                        node.InputParameters.Select(s => visit(s) as SingleType).ToList()),
+                    node.LineNumber);
+                break;
+            }
+        }
+        
+        return function.ReturnType;
+    }
 
 
-
-
-    internal override object? visit(SignedNumber signedNumber)
+    internal override object? visit(SignedNumber node)
+    {
+        SingleType type = node.Negative switch
+        {
+            true => node.Value switch
+            {
+                <= sbyte.MaxValue + 1 => new SingleType(Types.ValueType.int8),
+                <= short.MaxValue + 1 => new SingleType(Types.ValueType.int16),
+                <= (ulong)int.MaxValue + 1 => new SingleType(Types.ValueType.int32),
+                <= (ulong)long.MaxValue + 1 => new SingleType(Types.ValueType.int64),
+            },
+            _ => node.Value switch
+            {
+                <= byte.MaxValue => new SingleType(Types.ValueType.uint8),
+                <= ushort.MaxValue => new SingleType(Types.ValueType.uint16),
+                <= uint.MaxValue => new SingleType(Types.ValueType.uint32),
+                <= ulong.MaxValue => new SingleType(Types.ValueType.uint64),
+            }
+        };
+        return type;
+    }
+    
+    internal override object? visit(SignedFloat node)
     {
         SingleType type;
-        if (signedNumber.Negative)
+        
+        if (node.Value <= float.MaxValue && node.Value >= float.MinValue)
         {
-            
+            type = new SingleType(Types.ValueType.float32);
+        }
+        else
+        {
+            type = new SingleType(Types.ValueType.float64);
+        }
+        
+        return type;
+    }
+    
+    // internal override object? visit(Expression node) => node switch
+    // {
+    //     ArrayElementIdentifier arrayElementIdentifier => visit(arrayElementIdentifier),
+    //     BinaryAssignment binaryAssignment => visit(binaryAssignment),
+    //     
+    //     SignedNumber signedNumber => visit(signedNumber),
+    //     SignedFloat signedFloat => visit(signedFloat),
+    //     Identifier identifier => visit(identifier),
+    //     FunctionCall functionCall => visit(functionCall),
+    //     UnaryAssignment unaryAssignment => visit(unaryAssignment),
+    //     
+    // };
+    
+    internal override object? visit(Expression node)
+    {
+        Type nodeType = node.GetType();
+        MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+
+        if (visitMethod != null)
+        {
+            return visitMethod.Invoke(this, new object[] { node });
+        }
+        else
+        {
+            throw new ArgumentException($"No matching Visit method found for type {nodeType.Name}");
         }
     }
+
 }

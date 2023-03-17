@@ -91,6 +91,7 @@ forStatement:       'for' '(' declarationAssignment ';' predicate ';' assignment
 
 identifier:  ID '[' expression ']'  # ArrayElementIdentifier
             | ID                    # SimpleIdentifier
+            | '(' identifier ')'    # ParenthesizedIdentifier
             ;
 
 fragment LOWERCASE:             [a-z];
