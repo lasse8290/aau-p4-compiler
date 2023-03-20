@@ -22,6 +22,9 @@ try
 
     YALCompiler.DataTypes.Program node = (YALCompiler.DataTypes.Program)visitor.Visit(n);
 
+    LinkerASTTraverser linker = new(node);
+    linker.BeginTraverse();
+    
     TypeAndScopeCheckerTraverser traverser = new(node, errorHandler, warningsHandler);
     traverser.BeginTraverse();
     

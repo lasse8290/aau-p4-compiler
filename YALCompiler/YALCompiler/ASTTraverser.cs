@@ -41,140 +41,27 @@ public abstract class ASTTraverser
     internal virtual object? visit(CompoundExpression node) => node;
     internal virtual object? visit(Expression node) => node;
     internal virtual object? visit(Program node) => node;
-    internal virtual object? visit(ASTNode node) => node;
+    internal virtual object? visit(ASTNode node) {
+        Type nodeType = node.GetType();
+        MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+
+        if (visitMethod != null)
+            return visitMethod.Invoke(this, new object[] { node });
+
+        return node;
+    }
 
     public void BeginTraverse()
     {
-        traverse(_startNode);
-    }
-    
-    private void traverse(ASTNode root)
-    {
-        if (root == null) {
-            return;
-        }
+        var stack = new Stack<ASTNode>();
+        stack.Push(_startNode);
 
-        Stack<ASTNode> stack = new Stack<ASTNode>();
-        stack.Push(root);
-
-        while (stack.Count > 0) {
-            ASTNode node = stack.Pop();
-            
-            var s = node
-                .GetType()
-                .GetProperties()
-                .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
-                .ToList();
-            
-            foreach (PropertyInfo p in s)
-            {
-                var pp = p.GetValue(node);
-                if (pp is ASTNode astNode)
-                    astNode.Parent = node;
-            }
-            
-            callVisitor(node);
-
-            if (node.Children != null) {
-                for (int i = node.Children.Count - 1; i >= 0; i--) {
-                    ASTNode child = node.Children[i];
-                    child.Parent = node; // Set the child's parent to the current node
-                    stack.Push(child);
-                }
-            }
-        }
-    }
-    private void _traverse(ASTNode node)
-    {
-        foreach (var child in node.Children)
+        while (stack.Count > 0)
         {
-           callVisitor(child);
-            
-            _traverse(child);
+            var node = stack.Pop();
+            visit(node);
+            foreach (var child in node.Children)
+                stack.Push(child);
         }
-    }
-
-    private void callVisitor(ASTNode node)
-    {
-        switch (node)
-            {
-                case Boolean booleanNode:
-                    visit(booleanNode);
-                    break;
-                case SignedFloat signedFloatNode:
-                    visit(signedFloatNode);
-                    break;
-                case SignedNumber signedNumberNode:
-                    visit(signedNumberNode);
-                    break;
-                case ExternalFunction externalFunctionNode:
-                    visit(externalFunctionNode);
-                    break;
-                case ArrayElementIdentifier arrayElementIdentifierNode:
-                    visit(arrayElementIdentifierNode);
-                    break;
-                case Identifier identifierNode:
-                    visit(identifierNode);
-                    break;
-                case Predicate predicateNode:
-                    visit(predicateNode);
-                    break;
-                case Function function:
-                    visit(function);
-                    break;
-                case StringLiteral stringLiteralNode:
-                    visit(stringLiteralNode);
-                    break;
-                case TupleDeclaration tupleDeclarationNode:
-                    visit(tupleDeclarationNode);
-                    break;
-                case UnaryCompoundExpression unaryCompoundExpressionNode:
-                    visit(unaryCompoundExpressionNode);
-                    break;
-                case VariableDeclaration variableDeclarationNode:
-                    visit(variableDeclarationNode);
-                    break;
-                case UnaryAssignment unaryAssignmentNode:
-                    visit(unaryAssignmentNode);
-                    break;
-                case BinaryAssignment binaryAssignmentNode:
-                    visit(binaryAssignmentNode);
-                    break;
-                case IfStatement ifStmt:
-                    visit(ifStmt);
-                    break;
-                case If ifNode:
-                    visit(ifNode);
-                    break;
-                case Else elseNode:
-                    visit(elseNode);
-                    break;
-                case ElseIf elseIfNode:
-                    visit(elseIfNode);
-                    break;
-                case ForStatement forStatementNode:
-                    visit(forStatementNode);
-                    break;
-                case WhileStatement whileStatementNode:
-                    visit(whileStatementNode);
-                    break;
-                case ReturnStatement returnStatementNode:
-                    visit(returnStatementNode);
-                    break;
-                case FunctionCall functionCallNode:
-                    visit(functionCallNode);
-                    break;
-                case CompoundExpression compoundExpressionNode:
-                    visit(compoundExpressionNode);
-                    break;
-                case Expression expressionNode:
-                    visit(expressionNode);
-                    break;
-                case DataTypes.Program program:
-                    visit(program);
-                    break;
-                default:
-                    throw new ArgumentException("Invalid child type");
-            }
     }
 }

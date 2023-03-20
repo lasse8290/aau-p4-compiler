@@ -1,5 +1,5 @@
 ﻿main: {
-
+    
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
@@ -19,9 +19,9 @@
     
     int32 i = functionWithOneOutputParam();
     
-    int32 i = 6;
+    (int32 ii, string ss) = functionWithInputAndOutputParams(i);*/
     
-    (int32 ii, string ss) = functionWithInputAndOutputParams(i);
+    int32 i = 6;
     
     if (x == (i < 0)) {
         i = 0;
@@ -29,8 +29,8 @@
         i = 1;
     } else {
         i = 2;
-    }*/
-    int32 i = 1;
+    }
+    
     while (i < 10) {
         i = i + 1;
         int32 j = 0;
@@ -41,7 +41,7 @@
         string k = "hello";
     }
     
-    l = function2(p);
+    //l = function2(p);
     
 }
 

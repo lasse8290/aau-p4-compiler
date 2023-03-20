@@ -35,7 +35,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                         ((SingleType)targetType).IsArray = false;
                         if (symbol.ArraySize is not null && 
                             arrayElementIdentifier.Index is SignedNumber index && 
-                            index.Value > (ulong)symbol.ArraySize!)
+                            index.Value > symbol.ArraySize!)
                         {
                             _errorHandler.AddError(new ArrayIndexOutOfBoundsException(
                                 index.Value, symbol.ArraySize.Value), node.LineNumber);
@@ -240,20 +240,31 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
     internal override object? visit(CompoundExpression node)
     {
-        SingleType? leftType = visit(node.Left) as SingleType;
-        SingleType? rightType = visit(node.Right) as SingleType;
+        YALType? leftType = visit(node.Left) as YALType;
+        YALType? rightType = visit(node.Right) as YALType;
 
-        if (!Operators.CheckOperationIsValid(leftType.Type, node.Operator))
+        if (!Types.CheckCompoundExpressionTypesAreValid(leftType, rightType))
         {
-            _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftType.Type), node.LineNumber);
-        } else if (!Operators.CheckOperationIsValid(rightType.Type, node.Operator))
-        {
-            _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightType.Type), node.LineNumber);
+            _errorHandler.AddError(new TypeMismatchException(leftType.ToString(), rightType.ToString()), node.LineNumber);
         }
+        
+        SingleType leftSingleType = (SingleType)leftType;
+        SingleType rightSingleType = (SingleType)rightType;
 
-        node.Type = rightType;
+        if (!Operators.CheckOperationIsValid(leftSingleType.Type, node.Operator))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftSingleType.Type), node.LineNumber);
+        } else if (!Operators.CheckOperationIsValid(rightSingleType.Type, node.Operator))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightSingleType.Type), node.LineNumber);
+        }
+        
+        node.Type = Types.GetLeastAssignableType(leftSingleType, rightSingleType);
         return node.Type;
     }
 
-
+    internal override object? visit(StringLiteral node)
+    {
+        return new SingleType(Types.ValueType.@string);
+    }
 }
