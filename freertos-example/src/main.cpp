@@ -2,74 +2,70 @@
 
 TaskHandle_t Handle_aTask;
 TaskHandle_t Handle_bTask;
+QueueHandle_t queue;
 
-typedef struct
+typedef struct {
+  int arg1;
+  int arg2;
+} inputTuple;
+
+inputTuple _inputTuple;
+
+typedef struct {
+  int output1;
+  int output2;
+} outputTuple;
+
+void ThreadA(void *pvParameters)
 {
-    int param1;
-    float param2;
-} TaskParams;
+  inputTuple *params = (inputTuple *)pvParameters;
+  outputTuple output;
 
-TaskParams params;
+  queue = xQueueCreate(5, sizeof(outputTuple));
+  
+  while (1) {
+    Serial.printf("Param 1: %d, param 2: %d\n", params->arg1, params->arg2);
 
-static void ThreadA(void *pvParameters)
-{
-    TaskParams *params = (TaskParams *)pvParameters;
+    output.output1 = params->arg1 * 10;
+    output.output2 = params->arg2 + 20;
 
-    Serial.println("Thread A: Started");
+    xQueueSend(queue, &output, (TickType_t)0);
 
-    while (1)
-    {
-        int param1 = params->param1;
-        float param2 = params->param2;
-
-        Serial.println("Hello World!");
-
-        Serial.print("Param 1: ");
-        Serial.println(param1);
-        Serial.print("Param 2: ");
-        Serial.println(param2);
-
-        delay(1000);
-    }
+    vTaskDelay(1000 / portTICK_RATE_MS);
+  }
 }
 
-static void ThreadB(void *pvParameters)
+void ThreadB(void *pvParameters)
 {
-    Serial.println("Thread B: Started");
+  outputTuple threada_data;
 
-    for (int i = 0; i < 10; i++)
+  while (1)
+  {
+    if (xQueueReceive(queue, &threada_data, (TickType_t)5) == pdTRUE)
     {
-        Serial.println("---This is Thread B---");
-        delay(2000);
+      printf("Data from ThreadA: %d %d\n", threada_data.output1, threada_data.output2);
     }
-    Serial.println("Thread B: Deleting");
-    vTaskDelete(NULL);
+  }
 }
 
 void setup()
 {
-    Serial.begin(115200);
-    while (!Serial)
-        ; // Wait for Serial terminal to open port before starting program
+  Serial.begin(115200);
+  while (!Serial);
 
-    Serial.println("");
-    Serial.println("******************************");
-    Serial.println("        Program start         ");
-    Serial.println("******************************");
+  Serial.println("");
+  Serial.println("******************************");
+  Serial.println("        Program start         ");
+  Serial.println("******************************");
 
-    /*parameter params = {1, 2};
+  _inputTuple.arg1 = 1;
+  _inputTuple.arg2 = 2;
 
-    Serial.print((long)&params, DEC);*/
-
-    params = *(TaskParams *)pvPortMalloc(sizeof(TaskParams));
-    params.param1 = 42;
-    params.param2 = 3.14;
-
-    xTaskCreate(ThreadA, "Task A", 1000, &params, tskIDLE_PRIORITY + 2, &Handle_aTask);
-    xTaskCreate(ThreadB, "Task B", 1000, &params, tskIDLE_PRIORITY + 1, &Handle_bTask);
+  xTaskCreate(ThreadA, "Task A", 4096, &_inputTuple, 10, &Handle_aTask);
+  xTaskCreate(ThreadB, "Task B", 4096, NULL, 10, &Handle_bTask);
 }
 
 void loop()
 {
-    // NOTHING
+  // NOTHING
 }
