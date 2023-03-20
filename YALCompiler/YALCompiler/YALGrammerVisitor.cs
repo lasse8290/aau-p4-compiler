@@ -371,7 +371,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitIfStatement(YALGrammerParser.IfStatementContext context)
     {
-        var ifStatement = new IfStatement();
+        var ifStatement = new IfStatement() { LineNumber = context.Start.Line};
         var ifPath = new If();
 
         if (Visit(context.predicate()) is Predicate predicate)
@@ -490,7 +490,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 _errorHandler.AddError(e, context);                    
             }
         }
-
+        whileStatement.LineNumber = context.Start.Line;
         return whileStatement;
     }
 
@@ -529,7 +529,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 _errorHandler.AddError(e, context);                    
             }
         }
-
+        forStatement.LineNumber = context.Start.Line;
         return forStatement;
     }
 
@@ -541,6 +541,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         if (Visit(context.predicate()) is not Predicate predicate) return null;
         predicate.Negated = true;
+        predicate.LineNumber = context.Start.Line;
         return predicate;
     }
 
@@ -552,6 +553,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Left = Visit(context.predicate(0)) as Expression,
             Right = Visit(context.predicate(1)) as Expression
         };
+        compoundPredicate.LineNumber = context.Start.Line;
         return compoundPredicate;
     }
     
@@ -563,6 +565,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Left = Visit(context.predicate(0)) as Expression,
             Right = Visit(context.predicate(1)) as Expression
         };
+        compoundPredicate.LineNumber = context.Start.Line;
         return compoundPredicate;
     }
 
@@ -594,6 +597,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 compoundPredicate.Operator = Operators.PredicateOperator.NotEquals;
                 break;
         }
+        compoundPredicate.LineNumber = context.Start.Line;
         return compoundPredicate;
     }
 
@@ -612,6 +616,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _ => null
         };
         boolean.LiteralValue = val;
+        boolean.LineNumber = context.Start.Line;
         return boolean;
     }
     
@@ -627,20 +632,20 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
     {
         if (UInt64.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
-            return new SignedNumber(number, context.MINUS() != null);
+            return new SignedNumber(number, context.MINUS() != null) { LineNumber = context.Start.Line};
         return null;
     }
     
     public override object VisitFloatLiteral(YALGrammerParser.FloatLiteralContext context)
     {
         if (double.TryParse(context.MINUS() == null ? context.FLOAT().GetText() : "-" + context.FLOAT().GetText(), out var number))
-            return new SignedFloat(number);
+            return new SignedFloat(number) { LineNumber = context.Start.Line};
         return null;
     }
 
     public override object VisitStringLiteral(YALGrammerParser.StringLiteralContext context)
     {
-        return new StringLiteral(context.STRING().GetText());
+        return new StringLiteral(context.STRING().GetText()) { LineNumber = context.Start.Line};
     }
 
     public override object VisitParenthesizedExpression(YALGrammerParser.ParenthesizedExpressionContext context)
@@ -667,6 +672,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 compoundExpression.Operator = Operators.ExpressionOperator.Modulo;
                 break;
         }
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
     
@@ -686,6 +692,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 compoundExpression.Operator = Operators.ExpressionOperator.Subtraction;
                 break;
         }
+
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
 
@@ -705,6 +713,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 compoundExpression.Operator = Operators.ExpressionOperator.LeftShift;
                 break;
         }
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
 
@@ -716,6 +725,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Left = Visit(context.expression(0)) as Expression,
             Right = Visit(context.expression(1)) as Expression
         };
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
     
@@ -727,6 +737,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Left = Visit(context.expression(0)) as Expression,
             Right = Visit(context.expression(1)) as Expression
         };
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
     
@@ -738,6 +749,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Left = Visit(context.expression(0)) as Expression,
             Right = Visit(context.expression(1)) as Expression
         };
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
     
@@ -749,6 +761,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Left = Visit(context.expression(0)) as Expression,
             Right = Visit(context.expression(1)) as Expression,
         };
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
 
@@ -767,6 +780,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 compoundExpression.Operator = Operators.ExpressionOperator.PostDecrement;
                 break;
         }
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
     
@@ -788,6 +802,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 compoundExpression.Operator = Operators.ExpressionOperator.BitwiseNot;
                 break;
         }
+        compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
 
@@ -801,6 +816,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             inputParameter.Parent = functionCall;
         }
+
+        functionCall.LineNumber = context.Start.Line;
         return functionCall;
     }
 

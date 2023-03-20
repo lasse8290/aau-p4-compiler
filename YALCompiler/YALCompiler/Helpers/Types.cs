@@ -33,6 +33,7 @@ public static class Types
         ( ValueType.float32, ValueType.uint8 ),
         ( ValueType.float32, ValueType.uint16 ),
 
+        ( ValueType.float64, ValueType.float32 ),
         ( ValueType.float64, ValueType.int8 ),
         ( ValueType.float64, ValueType.int16 ),
         ( ValueType.float64, ValueType.int32 ),
@@ -45,19 +46,19 @@ public static class Types
     };
     public enum ValueType
     {
-        int8,
-        int16,
-        int32,
-        int64,
-        uint8,
-        uint16,
-        uint32,
-        uint64,
-        float32,
-        float64,
-        @char,
         @string,
         @bool,
+        float64,
+        float32,
+        int64,
+        int32,
+        int16,
+        int8,
+        uint64,
+        uint32,
+        uint16,
+        uint8,
+        @char,
     }
 
     public static ValueType? Match(string type)
@@ -118,5 +119,20 @@ public static class Types
         
         return false;
         
+    }
+
+    public static bool CheckCompoundExpressionTypesAreValid(YALType leftType, YALType rightType)
+    {
+        if (leftType is SingleType && rightType is SingleType)
+        {
+            return CheckTypesAreAssignable(leftType, rightType) || CheckTypesAreAssignable(rightType, leftType);
+        }
+
+        return false;
+    }
+
+    public static SingleType? GetLeastAssignableType(SingleType leftType, SingleType rightType)
+    {
+        return new SingleType(leftType.Type < rightType.Type ? leftType.Type : rightType.Type);
     }
 }

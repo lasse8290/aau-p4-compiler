@@ -1,5 +1,5 @@
 ﻿main: {
-
+    
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
@@ -41,7 +41,7 @@
         string k = "hello";
     }
     
-    l = function2(p);
+    //l = function2(p);
     
 }
 

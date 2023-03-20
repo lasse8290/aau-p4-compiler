@@ -73,7 +73,7 @@ public abstract class ASTTraverser
             //         astNode.Parent = node;
             // }
 
-            callVisitor(node);
+            callVisitorReflective(node);
 
             if (node.Children != null) {
                 for (int i = node.Children.Count - 1; i >= 0; i--) {
@@ -84,6 +84,24 @@ public abstract class ASTTraverser
             }
         }
     }
+
+    private object? callVisitorReflective(ASTNode node)
+    {
+        Type nodeType = node.GetType();
+        MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+
+        if (visitMethod != null)
+        {
+            return visitMethod.Invoke(this, new object[] { node });
+        }
+        else
+        {
+            //throw new ArgumentException($"No matching Visit method found for type {nodeType.Name}");
+            Console.WriteLine($"No matching Visit method found for type {nodeType.Name}");
+            return node;
+        }
+    }
+    
     private void _traverse(ASTNode node)
     {
         foreach (var child in node.Children)
