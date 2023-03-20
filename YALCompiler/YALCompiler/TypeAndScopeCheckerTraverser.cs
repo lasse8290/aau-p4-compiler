@@ -35,7 +35,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                         ((SingleType)targetType).IsArray = false;
                         if (symbol.ArraySize is not null && 
                             arrayElementIdentifier.Index is SignedNumber index && 
-                            index.Value > (ulong)symbol.ArraySize!)
+                            index.Value > symbol.ArraySize!)
                         {
                             _errorHandler.AddError(new ArrayIndexOutOfBoundsException(
                                 index.Value, symbol.ArraySize.Value), node.LineNumber);

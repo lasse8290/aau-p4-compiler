@@ -48,7 +48,7 @@ public abstract class ASTTraverser
         traverse(_startNode);
     }
     
-    private void traverse(ASTNode root)
+    protected virtual void traverse(ASTNode root)
     {
         if (root == null) {
             return;
@@ -60,25 +60,25 @@ public abstract class ASTTraverser
         while (stack.Count > 0) {
             ASTNode node = stack.Pop();
             
-            var s = node
-                .GetType()
-                .GetProperties()
-                .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
-                .ToList();
-            
-            foreach (PropertyInfo p in s)
-            {
-                var pp = p.GetValue(node);
-                if (pp is ASTNode astNode)
-                    astNode.Parent = node;
-            }
-            
+            // var s = node
+            //     .GetType()
+            //     .GetProperties()
+            //     .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
+            //     .ToList();
+            //
+            // foreach (PropertyInfo p in s)
+            // {
+            //     var pp = p.GetValue(node);
+            //     if (pp is ASTNode astNode)
+            //         astNode.Parent = node;
+            // }
+
             callVisitor(node);
 
             if (node.Children != null) {
                 for (int i = node.Children.Count - 1; i >= 0; i--) {
                     ASTNode child = node.Children[i];
-                    child.Parent = node; // Set the child's parent to the current node
+                    //child.Parent = node; // Set the child's parent to the current node
                     stack.Push(child);
                 }
             }
@@ -94,7 +94,7 @@ public abstract class ASTTraverser
         }
     }
 
-    private void callVisitor(ASTNode node)
+    protected void callVisitor(ASTNode node)
     {
         switch (node)
             {
@@ -172,6 +172,9 @@ public abstract class ASTTraverser
                     break;
                 case DataTypes.Program program:
                     visit(program);
+                    break;
+                case ASTNode astNode:
+                    visit(astNode);
                     break;
                 default:
                     throw new ArgumentException("Invalid child type");

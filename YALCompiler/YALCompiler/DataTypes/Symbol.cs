@@ -8,7 +8,7 @@ public class Symbol : ISymbol
     public object? Value { get; set; }
     public YALType? Type { get; set; } = null;
     public bool Initialized { get; set; } = false;
-    public int? ArraySize { get; set; }
+    public ulong? ArraySize { get; set; }
 
     public Symbol(string id)
     {
