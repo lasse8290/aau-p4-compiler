@@ -4,24 +4,20 @@
     /* This is a block comment
        which can span across multiple lines */
     
-    //bool bbb = 5 > 3;
+    bool bbb = 5 > 3;
     
-    //float32 f;
-    //f = 1;
-    //int32 ff;
-    /*int32[6] a;
+    /*float32 f;
+    f = 1;
+    int32 ff;
+    int32[6] a;
     a[6]=functionWithOneOutputParam();
     functionWithNoParams();
-    
-    int32 r = printf("%s", "hello world");
     
     functionWithInputParams(1, "hello");
     
     int32 i = functionWithOneOutputParam();
     
-    (int32 ii, string ss) = functionWithInputAndOutputParams(i);*/
-    
-    int32 i = 6;
+    (int32 ii, string ss) = functionWithInputAndOutputParams(i);
     
     if (x == (i < 0)) {
         i = 0;
@@ -39,7 +35,7 @@
     for (int32 h = 0; h < 10; h++) {
         functionWithInputAndOutputParams(h);
         string k = "hello";
-    }
+    }*/
     
     //l = function2(p);
     
@@ -58,17 +54,11 @@ functionWithOneOutputParam: out (int32 o) {
 }
 
 functionWithInputAndOutputParams: in (int32 i) out (int32 k, string s) {
-    string sh = "hello" + k;
+    s = "hello" + i;
     return;
 }
 
 function2: in (int32 i) out (int32 ix) {
     i = i + 1;
-    return;
-}
-
-async functionEx: out (int32 o) {
-    longFunctionDontWait();
-    o = await longFunction();
     return;
 }

@@ -2,10 +2,10 @@ namespace YALCompiler.DataTypes;
 
 public class SignedNumber : Expression
 {
-    public UInt64 Value { get; }
+    public ulong Value { get; }
     public bool Negative { get; set; }
 
-    public SignedNumber(UInt64 value, bool isNegative)
+    public SignedNumber(ulong value, bool isNegative)
     {
         Value = value;
         Negative = isNegative;

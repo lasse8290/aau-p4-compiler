@@ -52,8 +52,8 @@ public abstract class ASTTraverser
         {
             var node = stack.Pop();
             InvokeVisitor(node);
-            foreach (var child in node.Children)
-                stack.Push(child);
+            for (int i = node.Children.Count - 1; i >= 0; i--)
+                stack.Push(node.Children[i]);
         }
     }
 

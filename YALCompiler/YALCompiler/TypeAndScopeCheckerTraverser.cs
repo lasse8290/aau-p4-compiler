@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
+﻿using System.Reflection;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -158,7 +157,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
     internal override object? Visit(SignedNumber node)
     {
-        SingleType type = node.Negative switch
+        SingleType? type = node.Negative switch
         {
             true => node.Value switch
             {
@@ -166,6 +165,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 <= short.MaxValue + 1 => new SingleType(Types.ValueType.int16),
                 <= (ulong)int.MaxValue + 1 => new SingleType(Types.ValueType.int32),
                 <= (ulong)long.MaxValue + 1 => new SingleType(Types.ValueType.int64),
+                _ => null,
             },
             _ => node.Value switch
             {
@@ -175,6 +175,10 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 <= ulong.MaxValue => new SingleType(Types.ValueType.uint64),
             }
         };
+        
+        if (type is null)
+            _errorHandler.AddError(new SignedLongOutOfRangeException(node.Value), node.LineNumber);
+        
         return type;
     }
     
@@ -194,23 +198,10 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return type;
     }
     
-    // internal override object? visit(Expression node) => node switch
-    // {
-    //     ArrayElementIdentifier arrayElementIdentifier => visit(arrayElementIdentifier),
-    //     BinaryAssignment binaryAssignment => visit(binaryAssignment),
-    //     
-    //     SignedNumber signedNumber => visit(signedNumber),
-    //     SignedFloat signedFloat => visit(signedFloat),
-    //     Identifier identifier => visit(identifier),
-    //     FunctionCall functionCall => visit(functionCall),
-    //     UnaryAssignment unaryAssignment => visit(unaryAssignment),
-    //     
-    // };
-    
     internal override object? Visit(Expression node)
     {
         Type nodeType = node.GetType();
-        MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+        MethodInfo? visitMethod = GetType().GetMethod(nameof(Visit), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
 
         if (visitMethod != null)
         {
@@ -218,7 +209,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
         else
         {
-            throw new ArgumentException($"No matching Visit method found for type {nodeType.Name}");
+            //throw new ArgumentException($"No matching Visit method found for type {nodeType.Name}");
+            return null;
         }
     }
 
