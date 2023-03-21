@@ -3,7 +3,7 @@
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
-    
+    if (true) {}
     bool bbb = 5 > 3;
     
     /*float32 f;
