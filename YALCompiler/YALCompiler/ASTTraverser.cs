@@ -8,7 +8,7 @@ namespace YALCompiler;
 
 public abstract class ASTTraverser
 {
-    private ASTNode _startNode;
+    protected ASTNode _startNode;
 
     public ASTTraverser(ASTNode node)
     {
@@ -41,17 +41,9 @@ public abstract class ASTTraverser
     internal virtual object? visit(CompoundExpression node) => node;
     internal virtual object? visit(Expression node) => node;
     internal virtual object? visit(Program node) => node;
-    internal virtual object? visit(ASTNode node) {
-        Type nodeType = node.GetType();
-        MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+    internal virtual object? visit(ASTNode node) => node;
 
-        if (visitMethod != null)
-            return visitMethod.Invoke(this, new object[] { node });
-
-        return node;
-    }
-
-    public void BeginTraverse()
+    public virtual void BeginTraverse()
     {
         var stack = new Stack<ASTNode>();
         stack.Push(_startNode);
@@ -59,9 +51,18 @@ public abstract class ASTTraverser
         while (stack.Count > 0)
         {
             var node = stack.Pop();
-            visit(node);
+            callVisitor(node);
             foreach (var child in node.Children)
                 stack.Push(child);
         }
+    }
+
+    public virtual void callVisitor(ASTNode node)
+    {
+        Type nodeType = node.GetType();
+        MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+
+        if (visitMethod != null)
+            visitMethod.Invoke(this, new object[] { node });
     }
 }

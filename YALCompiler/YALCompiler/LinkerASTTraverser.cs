@@ -9,14 +9,14 @@ public class LinkerASTTraverser : ASTTraverser
     {
     }
     
-    protected override void traverse(ASTNode root)
+    public override void BeginTraverse()
     {
-        if (root == null) {
+        if (_startNode == null) {
             return;
         }
 
         Stack<ASTNode> stack = new Stack<ASTNode>();
-        stack.Push(root);
+        stack.Push(_startNode);
 
         while (stack.Count > 0) {
             ASTNode node = stack.Pop();
@@ -36,8 +36,6 @@ public class LinkerASTTraverser : ASTTraverser
                     stack.Push(astNode);
                 }
             }
-
-            callVisitor(node);
 
             if (node.Children != null) {
                 for (int i = node.Children.Count - 1; i >= 0; i--) {
