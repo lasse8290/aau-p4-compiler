@@ -17,7 +17,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         _warningsHandler = warningsHandler;
     }
     
-    internal override object? visit(BinaryAssignment node)
+    internal override object? Visit(BinaryAssignment node)
     {
         YALType? targetType = null;
         YALType? targetParentArrayType = null;
@@ -56,7 +56,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 break;
         }
 
-        valueType = visit(node.Value) as YALType;
+        valueType = Visit(node.Value) as YALType;
 
         if (!Types.CheckTypesAreAssignable(targetType, valueType))
         {
@@ -86,7 +86,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
     }
 
-    internal override object? visit(UnaryAssignment node)
+    internal override object? Visit(UnaryAssignment node)
     {
         YALType? targetType = null;
         if (node.Target is Identifier identifier)
@@ -121,7 +121,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return targetType;
     }
 
-    internal override object? visit(FunctionCall node)
+    internal override object? Visit(FunctionCall node)
     {
         Function? function = Utilities.FindFunction(node.Identifier, node);
         if (function == null)
@@ -141,12 +141,12 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         
         for (int i = 0; i < function.InputParameters.Count; i++)
         {
-            if ((YALType)function.InputParameters[i].Type != (YALType)visit(node.InputParameters[i]))
+            if ((YALType)function.InputParameters[i].Type != (YALType)Visit(node.InputParameters[i]))
             {
                 _errorHandler.AddError(
                     new InvalidFunctionCallInputParameters(
                         function.InputParameters.Select(s => s.Type as SingleType).ToList(),
-                        node.InputParameters.Select(s => visit(s) as SingleType).ToList()),
+                        node.InputParameters.Select(s => Visit(s) as SingleType).ToList()),
                     node.LineNumber);
                 break;
             }
@@ -156,7 +156,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     }
 
 
-    internal override object? visit(SignedNumber node)
+    internal override object? Visit(SignedNumber node)
     {
         SingleType type = node.Negative switch
         {
@@ -178,7 +178,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return type;
     }
     
-    internal override object? visit(SignedFloat node)
+    internal override object? Visit(SignedFloat node)
     {
         SingleType type;
         
@@ -207,7 +207,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     //     
     // };
     
-    internal override object? visit(Expression node)
+    internal override object? Visit(Expression node)
     {
         Type nodeType = node.GetType();
         MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
@@ -222,7 +222,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
     }
 
-    internal override object? visit(Identifier node)
+    internal override object? Visit(Identifier node)
     {
         if (Utilities.FindSymbol(node.IdValue, node) is Symbol symbol)
         {
@@ -238,10 +238,10 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
     }
 
-    internal override object? visit(CompoundExpression node)
+    internal override object? Visit(CompoundExpression node)
     {
-        YALType? leftType = visit(node.Left) as YALType;
-        YALType? rightType = visit(node.Right) as YALType;
+        YALType? leftType = Visit(node.Left) as YALType;
+        YALType? rightType = Visit(node.Right) as YALType;
 
         if (!Types.CheckCompoundExpressionTypesAreValid(leftType, rightType))
         {
@@ -263,7 +263,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return node.Type;
     }
 
-    internal override object? visit(StringLiteral node)
+    internal override object? Visit(StringLiteral node)
     {
         return new SingleType(Types.ValueType.@string);
     }

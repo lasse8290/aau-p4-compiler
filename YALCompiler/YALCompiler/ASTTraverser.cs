@@ -15,33 +15,33 @@ public abstract class ASTTraverser
         _startNode = node;
     }
 
-    internal virtual object? visit(Boolean node) => node;
-    internal virtual object? visit(SignedFloat node) => node;
-    internal virtual object? visit(SignedNumber node) => node;
-    internal virtual object? visit(Identifier node) => node;
-    internal virtual object? visit(CompoundPredicate node) => node;
-    internal virtual object? visit(Predicate node) => node;
-    internal virtual object? visit(StringLiteral node) => node;
-    internal virtual object? visit(TupleDeclaration node) => node;
-    internal virtual object? visit(UnaryCompoundExpression node) => node;
-    internal virtual object? visit(VariableDeclaration node) => node;
-    internal virtual object? visit(StatementBlock node) => node;
-    internal virtual object? visit(UnaryAssignment node) => node;
-    internal virtual object? visit(BinaryAssignment node) => node;
-    internal virtual object? visit(IfStatement node) => node;
-    internal virtual object? visit(If node) => node;
-    internal virtual object? visit(Else node) => node;
-    internal virtual object? visit(ElseIf node) => node;
-    internal virtual object? visit(ForStatement node) => node;
-    internal virtual object? visit(WhileStatement node) => node;
-    internal virtual object? visit(ReturnStatement node) => node;
-    internal virtual object? visit(FunctionCall node) => node;
-    internal virtual object? visit(ExternalFunction node) => node;
-    internal virtual object? visit(ArrayElementIdentifier node) => node;
-    internal virtual object? visit(CompoundExpression node) => node;
-    internal virtual object? visit(Expression node) => node;
-    internal virtual object? visit(Program node) => node;
-    internal virtual object? visit(ASTNode node) => node;
+    internal virtual object? Visit(Boolean node) => node;
+    internal virtual object? Visit(SignedFloat node) => node;
+    internal virtual object? Visit(SignedNumber node) => node;
+    internal virtual object? Visit(Identifier node) => node;
+    internal virtual object? Visit(CompoundPredicate node) => node;
+    internal virtual object? Visit(Predicate node) => node;
+    internal virtual object? Visit(StringLiteral node) => node;
+    internal virtual object? Visit(TupleDeclaration node) => node;
+    internal virtual object? Visit(UnaryCompoundExpression node) => node;
+    internal virtual object? Visit(VariableDeclaration node) => node;
+    internal virtual object? Visit(StatementBlock node) => node;
+    internal virtual object? Visit(UnaryAssignment node) => node;
+    internal virtual object? Visit(BinaryAssignment node) => node;
+    internal virtual object? Visit(IfStatement node) => node;
+    internal virtual object? Visit(If node) => node;
+    internal virtual object? Visit(Else node) => node;
+    internal virtual object? Visit(ElseIf node) => node;
+    internal virtual object? Visit(ForStatement node) => node;
+    internal virtual object? Visit(WhileStatement node) => node;
+    internal virtual object? Visit(ReturnStatement node) => node;
+    internal virtual object? Visit(FunctionCall node) => node;
+    internal virtual object? Visit(ExternalFunction node) => node;
+    internal virtual object? Visit(ArrayElementIdentifier node) => node;
+    internal virtual object? Visit(CompoundExpression node) => node;
+    internal virtual object? Visit(Expression node) => node;
+    internal virtual object? Visit(Program node) => node;
+    internal virtual object? Visit(ASTNode node) => node;
 
     public virtual void BeginTraverse()
     {
@@ -51,13 +51,13 @@ public abstract class ASTTraverser
         while (stack.Count > 0)
         {
             var node = stack.Pop();
-            callVisitor(node);
+            InvokeVisitor(node);
             foreach (var child in node.Children)
                 stack.Push(child);
         }
     }
 
-    public virtual void callVisitor(ASTNode node)
+    public virtual void InvokeVisitor(ASTNode node)
     {
         Type nodeType = node.GetType();
         MethodInfo visitMethod = GetType().GetMethod("visit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
