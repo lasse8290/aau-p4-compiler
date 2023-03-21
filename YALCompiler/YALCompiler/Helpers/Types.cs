@@ -44,6 +44,24 @@ public static class Types
         ( ValueType.@char, ValueType.uint8 ),
         ( ValueType.@string, ValueType.@char ),
     };
+    
+    public static Dictionary<ValueType, string> TypesInC = new()
+    {
+        { ValueType.@string, "char*" },
+        { ValueType.@bool, "bool" },
+        { ValueType.float64, "double" },
+        { ValueType.float32, "float" },
+        { ValueType.int64, "long" },
+        { ValueType.int32, "int" },
+        { ValueType.int16, "short" },
+        { ValueType.int8, "char" },
+        { ValueType.uint64, "unsigned long" },
+        { ValueType.uint32, "unsigned int" },
+        { ValueType.uint16, "unsigned short" },
+        { ValueType.uint8, "unsigned char" },
+        { ValueType.@char, "char" },
+    };
+
     public enum ValueType
     {
         @string,
@@ -134,5 +152,17 @@ public static class Types
     public static SingleType? GetLeastAssignableType(SingleType leftType, SingleType rightType)
     {
         return new SingleType(leftType.Type < rightType.Type ? leftType.Type : rightType.Type);
+    }
+
+    public static string? ToCType(this YALType? type)
+    {
+        if (type is SingleType singleType)
+        {
+            string? cType = null;
+            TypesInC.TryGetValue(singleType.Type, out cType);
+            return cType;
+        }
+
+        return null;
     }
 }
