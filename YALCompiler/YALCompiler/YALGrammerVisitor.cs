@@ -590,7 +590,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             case YALGrammerLexer.GREATER_THAN_OR_EQUAL:
                 compoundPredicate.Operator = Operators.PredicateOperator.GreaterThanOrEqual;
                 break;
-            case YALGrammerLexer.EQUAL:
+            case YALGrammerLexer.EQUALS:
                 compoundPredicate.Operator = Operators.PredicateOperator.Equals;
                 break;
             case YALGrammerLexer.NOT_EQUAL:

@@ -3,17 +3,18 @@
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
-    if (true) {}
-    bool bbb = 5 > 3;
     
-    /*float32 f;
+    bool bbb = true;
+    bool bbbb = !bbb;
+    
+    float32 f;
     f = 1;
     int32 ff;
     int32[6] a;
     a[6]=functionWithOneOutputParam();
     functionWithNoParams();
     
-    functionWithInputParams(1, "hello");
+    //functionWithInputParams(1, "hello");
     
     int32 i = functionWithOneOutputParam();
     
@@ -35,7 +36,7 @@
     for (int32 h = 0; h < 10; h++) {
         functionWithInputAndOutputParams(h);
         string k = "hello";
-    }*/
+    }
     
     //l = function2(p);
     
@@ -54,7 +55,7 @@ functionWithOneOutputParam: out (int32 o) {
 }
 
 functionWithInputAndOutputParams: in (int32 i) out (int32 k, string s) {
-    s = "hello" + i;
+    s = "hello";
     return;
 }
 

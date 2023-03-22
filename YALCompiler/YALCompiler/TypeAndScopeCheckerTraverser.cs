@@ -259,4 +259,39 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     {
         return new SingleType(Types.ValueType.@string);
     }
+    
+    internal override object? Visit(CompoundPredicate node)
+    {
+        YALType? leftType = Visit(node.Left) as YALType;
+        YALType? rightType = Visit(node.Right) as YALType;
+
+        if (leftType == null || rightType == null)
+        {
+            _errorHandler.AddError(new TypeMismatchException(leftType?.ToString() ?? "null", rightType?.ToString() ?? "null"), node.LineNumber);
+            return null;
+        }
+
+        if (!Types.CheckCompoundExpressionTypesAreValid(leftType, rightType))
+        {
+            _errorHandler.AddError(new TypeMismatchException(leftType.ToString(), rightType.ToString()), node.LineNumber);
+        }
+        
+        SingleType leftSingleType = (SingleType)leftType;
+        SingleType rightSingleType = (SingleType)rightType;
+
+        if (!Operators.CheckOperationIsValid(leftSingleType.Type, node.Operator))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftSingleType.Type), node.LineNumber);
+            return null;
+        } else if (!Operators.CheckOperationIsValid(rightSingleType.Type, node.Operator))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightSingleType.Type), node.LineNumber);
+            return null;
+        }
+        return new SingleType(Types.ValueType.@bool);
+    }
+
+    internal override object? Visit(DataTypes.Boolean node) => new SingleType(Types.ValueType.@bool);
+    internal override object? Visit(Predicate node) => new SingleType(Types.ValueType.@bool);
+
 }

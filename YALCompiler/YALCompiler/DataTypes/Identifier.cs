@@ -1,6 +1,6 @@
 namespace YALCompiler.DataTypes;
 
-public class Identifier : Expression
+public class Identifier : Predicate
 {
     public string IdValue { get; }
 
