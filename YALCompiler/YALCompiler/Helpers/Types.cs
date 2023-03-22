@@ -116,23 +116,31 @@ public static class Types
         
         if (target is SingleType targetSingleType && source is SingleType sourceSingleType)
         {
-            return CheckTypesAreAssignable(targetSingleType.Type, sourceSingleType.Type);
+            return CheckTypesAreAssignable(targetSingleType.Type, sourceSingleType.Type) &&
+                   targetSingleType.IsArray == sourceSingleType.IsArray;
         }
 
         if (target is TupleType targetTupleType && source is SingleType sourceSingleType2)
         {
-            return targetTupleType.Types.Count == 1 && CheckTypesAreAssignable(targetTupleType.Types[0].Type, sourceSingleType2.Type);
+            return targetTupleType.Types.Count == 1 && 
+                   CheckTypesAreAssignable(targetTupleType.Types[0].Type, sourceSingleType2.Type)
+                   && targetTupleType.Types[0].IsArray == sourceSingleType2.IsArray;
         }
         
         if (target is SingleType targetSingleType2 && source is TupleType sourceTupleType)
         {
-            return sourceTupleType.Types.Count == 1 && CheckTypesAreAssignable(targetSingleType2.Type, sourceTupleType.Types[0].Type);
+            return sourceTupleType.Types.Count == 1 && 
+                   CheckTypesAreAssignable(targetSingleType2.Type, sourceTupleType.Types[0].Type)
+                   && sourceTupleType.Types[0].IsArray == targetSingleType2.IsArray;
         }
         
         if (target is TupleType targetSingleType3 && source is TupleType sourceTupleType3)
         {
-            return CheckTypesAreAssignable(targetSingleType3.Types.Select(t => t.Type).ToArray(), 
-                sourceTupleType3.Types.Select(t => t.Type).ToArray());
+            return CheckTypesAreAssignable(
+                targetSingleType3.Types.Select(t => t.Type).ToArray(), 
+                sourceTupleType3.Types.Select(t => t.Type).ToArray())
+                && targetSingleType3.Types.Select(t => t.IsArray).
+                    SequenceEqual(sourceTupleType3.Types.Select(t => t.IsArray));
         }
         
         return false;

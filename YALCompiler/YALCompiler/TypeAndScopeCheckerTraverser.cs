@@ -294,4 +294,21 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     internal override object? Visit(DataTypes.Boolean node) => new SingleType(Types.ValueType.@bool);
     internal override object? Visit(Predicate node) => new SingleType(Types.ValueType.@bool);
 
+    internal override object? Visit(ArrayLiteral node)
+    {
+        if (node.Values.Count == 0)
+        {
+            return null;
+        }
+        SingleType leastAssignableType = (SingleType)Visit(node.Values[0]);
+        for (int i = 1; i < node.Values.Count; i++)
+        {
+            SingleType type = (SingleType)Visit(node.Values[i]);
+            leastAssignableType = Types.GetLeastAssignableType(leastAssignableType, type);
+        }
+
+        leastAssignableType.IsArray = true;
+        return leastAssignableType;
+    }
+
 }

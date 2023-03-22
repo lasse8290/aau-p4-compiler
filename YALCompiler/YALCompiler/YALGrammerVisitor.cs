@@ -277,7 +277,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _errorHandler.AddError(e, context);
         }
 
-        if (ulong.TryParse(context.POSITIVE_NUMBER().GetText(), out ulong size))
+        if (context.POSITIVE_NUMBER() != null && ulong.TryParse(context.POSITIVE_NUMBER().GetText(), out ulong size))
         {
             symbol.ArraySize = size;
         }
@@ -968,6 +968,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression);
     }
 
-    
+    public override object VisitArrayLiteral(YALGrammerParser.ArrayLiteralContext context)
+    {
+        ArrayLiteral arrayLiteral = new();
+        foreach (var expression in context.expression())
+        {
+            if (Visit(expression) is Expression expr)
+                arrayLiteral.Values.Add(expr);
+        }
+
+        return arrayLiteral;
+    }
+
     
 } 

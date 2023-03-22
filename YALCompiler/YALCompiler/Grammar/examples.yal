@@ -3,7 +3,10 @@
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
-    
+       
+    (int32[] arri, string s) = arrFunc();   
+       
+    int32[5] arr = {1, 5, 2, 4, 2};
     bool bbb = true;
     bool bbbb = !bbb;
     
@@ -40,6 +43,10 @@
     
     //l = function2(p);
     
+}
+
+arrFunc: out (int32[] k, string s) {
+    return;
 }
 
 functionWithNoParams: {
