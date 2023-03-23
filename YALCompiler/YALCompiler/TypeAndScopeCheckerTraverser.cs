@@ -154,7 +154,6 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return function.ReturnType;
     }
 
-
     internal override object? Visit(SignedNumber node)
     {
         SingleType? type = node.Negative switch
@@ -292,6 +291,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     }
 
     internal override object? Visit(DataTypes.Boolean node) => new SingleType(Types.ValueType.@bool);
+    
     internal override object? Visit(Predicate node) => new SingleType(Types.ValueType.@bool);
 
     internal override object? Visit(ArrayLiteral node)
