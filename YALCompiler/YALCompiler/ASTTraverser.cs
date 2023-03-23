@@ -45,7 +45,7 @@ public abstract class ASTTraverser
     internal virtual object? Visit(ASTNode                 node) => node;
     internal virtual object? Visit(Function                node) => node;
 
-    public virtual void BeginTraverse()
+    public virtual void BeginTraverse() 
     {
         var stack = new Stack<ASTNode>();
         stack.Push(_startNode);

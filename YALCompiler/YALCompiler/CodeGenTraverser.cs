@@ -39,7 +39,7 @@ public class CodeGenTraverser : ASTTraverser
             new("boolean", boolean.LiteralValue == true ? "1" : "0")
         });
 
-        return template.ReplacePlaceholders();
+        return (boolean.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
     internal override object? Visit(If ifNode)
@@ -108,7 +108,10 @@ public class CodeGenTraverser : ASTTraverser
     {
         var stringBuilder = new StringBuilder();
         foreach (var child in function.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child));
+        {
+            stringBuilder.Append((string)InvokeVisitor(child));
+            stringBuilder.AppendLine(";");
+        }
 
         var template = new Template("function");
         template.SetKeys(new List<Tuple<string, string>>
@@ -146,7 +149,7 @@ public class CodeGenTraverser : ASTTraverser
             new("right", right)
         });
 
-        return template.ReplacePlaceholders();
+        return (compoundPredicate.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
     internal override object? Visit(SignedNumber signedNumber)
@@ -164,7 +167,10 @@ public class CodeGenTraverser : ASTTraverser
     {
         var stringBuilder = new StringBuilder();
         foreach (var child in whileLoop.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child));
+        {
+            stringBuilder.Append((string)InvokeVisitor(child));
+            stringBuilder.AppendLine(";");
+        }
 
         var template = new Template("while");
         template.SetKeys(new List<Tuple<string, string>>
@@ -183,7 +189,10 @@ public class CodeGenTraverser : ASTTraverser
         var loopAssignment        = (string)InvokeVisitor(forStatement.LoopAssignment);
         var stringBuilder         = new StringBuilder();
         foreach (var child in forStatement.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child));
+        {
+            stringBuilder.Append((string)InvokeVisitor(child));
+            stringBuilder.AppendLine(";");
+        }
 
 
         var template = new Template("for_statement");
@@ -242,7 +251,7 @@ public class CodeGenTraverser : ASTTraverser
             new("name", identifier.IdValue)
         });
 
-        return template.ReplacePlaceholders();
+        return (identifier.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
     internal override object? Visit(UnaryAssignment unaryAssignment)
@@ -300,7 +309,7 @@ public class CodeGenTraverser : ASTTraverser
             new("index", (string)InvokeVisitor(arrayElementIdentifier.Index))
         });
 
-        return template.ReplacePlaceholders();
+        return (arrayElementIdentifier.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
     internal override object? Visit(FunctionCall functionCall)
@@ -365,7 +374,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("return_statement");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("return_statement", "return;")
+            new("return_statement", "return")
         });
 
         return template.ReplacePlaceholders();
