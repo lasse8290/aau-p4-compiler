@@ -41,7 +41,7 @@ public abstract class ASTTraverser
     internal virtual object? Visit(ArrayElementIdentifier  node) => node;
     internal virtual object? Visit(CompoundExpression      node) => node;
     internal virtual object? Visit(Expression              node) => node;
-    internal virtual object? Visit(Program                 node) => node;
+    internal virtual object? Visit(YALCompiler.DataTypes.Program                 node) => node;
     internal virtual object? Visit(ASTNode                 node) => node;
     internal virtual object? Visit(Function                node) => node;
 
@@ -77,8 +77,9 @@ public abstract class ASTTraverser
 
     protected virtual object? InvokeVisitor(ASTNode node)
     {
-        Type        nodeType    = node.GetType();
-        MethodInfo? visitMethod = GetVisitMethodForNodeType(nodeType);
+        Type nodeType = node.GetType();
+        MethodInfo? visitMethod = GetType().GetMethod(nameof(Visit), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+
         if (visitMethod != null)
             return visitMethod.Invoke(this, new object[] { node });
 

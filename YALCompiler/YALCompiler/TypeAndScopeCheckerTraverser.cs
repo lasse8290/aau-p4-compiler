@@ -25,7 +25,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         switch (node.Target)
         {
             case Identifier identifier:
-                if (Utilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
+                if (CompilerUtilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
                 {
                     targetType = symbol.Type;
                     if (identifier is ArrayElementIdentifier arrayElementIdentifier)
@@ -90,7 +90,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType? targetType = null;
         if (node.Target is Identifier identifier)
         {
-            if (Utilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
+            if (CompilerUtilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
             {
                 targetType = symbol.Type;
                 switch (targetType)
@@ -122,7 +122,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
     internal override object? Visit(FunctionCall node)
     {
-        Function? function = Utilities.FindFunction(node.Identifier, node);
+        Function? function = CompilerUtilities.FindFunction(node.Identifier, node);
         if (function == null)
         {
             _errorHandler.AddError(new IdentifierNotFoundException(node.Identifier), node.LineNumber);
@@ -215,10 +215,10 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
     internal override object? Visit(Identifier node)
     {
-        if (Utilities.FindSymbol(node.IdValue, node) is Symbol symbol)
+        if (CompilerUtilities.FindSymbol(node.IdValue, node) is Symbol symbol)
         {
             return symbol.Type;
-        } else if (Utilities.FindFunction(node.IdValue, node) is Function function)
+        } else if (CompilerUtilities.FindFunction(node.IdValue, node) is Function function)
         {
             return function.ReturnType;
         }
