@@ -3,6 +3,11 @@
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
+    
+    string h;
+    if((h = "123") == "123") {
+        
+    }
        
     (int32[] arri, string s) = arrFunc();   
        
@@ -22,10 +27,10 @@
     int32 i = functionWithOneOutputParam();
     
     (int32 ii, string ss) = functionWithInputAndOutputParams(i);
-    
+    int32 x = 0;
     if (x == (i < 0)) {
         i = 0;
-    } else if (i == await hi(expr1(i, -9), expr2)) {
+    } else if (x > 2) {
         i = 1;
     } else {
         i = 2;

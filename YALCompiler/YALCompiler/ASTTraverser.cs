@@ -53,6 +53,23 @@ public abstract class ASTTraverser
         {
             var node = stack.Pop();
             InvokeVisitor(node);
+            
+            var s = node
+                .GetType()
+                .GetProperties()
+                .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
+                .ToList();
+
+            foreach (var p in s)
+            {
+                var pp = p.GetValue(node);
+                if (pp is ASTNode astNode)
+                {
+                    astNode.Parent = node;
+                    stack.Push(astNode);
+                }
+            }
+
             for (int i = node.Children.Count - 1; i >= 0; i--)
                 stack.Push(node.Children[i]);
         }

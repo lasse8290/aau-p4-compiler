@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Antlr4.Runtime.Atn;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -282,7 +283,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             symbol.ArraySize = size;
         }
 
-        return new VariableDeclaration {Variable = symbol};
+        return new VariableDeclaration {Variable = symbol, LineNumber = context.Start.Line};
     } 
     
     public override object VisitSimpleVariableDeclaration(YALGrammerParser.SimpleVariableDeclarationContext context)
@@ -298,7 +299,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _errorHandler.AddError(e, context);
         }
 
-        return new VariableDeclaration {Variable = symbol};
+        return new VariableDeclaration {Variable = symbol, LineNumber = context.Start.Line};
     }
 
     public override object VisitStatementBlock(YALGrammerParser.StatementBlockContext context)
@@ -374,8 +375,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var ifStatement = new IfStatement() { LineNumber = context.Start.Line};
         var ifPath = new If();
 
-        if (Visit(context.predicate()) is Predicate predicate)
+        if (Visit(context.predicate()) is Predicate predicate) {
             ifPath.Predicate = predicate;
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), context);
+        }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
         ifPath.Children.Add(new ScopeStart());
@@ -405,8 +411,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 var elseIfPath = new ElseIf();
 
-                if (Visit(elseIf.predicate()) is Predicate elseIfPredicate)
+                if (Visit(elseIf.predicate()) is Predicate elseIfPredicate){
                     elseIfPath.Predicate = elseIfPredicate;
+                }
+                else
+                {
+                    _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), elseIf);
+                }
                 
                 StatementBlock elseIfStatementBlock = Visit(elseIf.statementBlock()) as StatementBlock;
                 elseIfPath.Children.Add(new ScopeStart());
@@ -465,10 +476,16 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitWhileStatement(YALGrammerParser.WhileStatementContext context)
     {
-        WhileStatement whileStatement = new WhileStatement
+        WhileStatement whileStatement = new WhileStatement();
+
+        if (Visit(context.predicate()) is Predicate predicate)
         {
-            Predicate = Visit(context.predicate()) as Predicate
-        };
+            whileStatement.Predicate = predicate;
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), context);
+        }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
 
@@ -504,9 +521,16 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             forStatement.DeclarationAssignment = declAssignment;
             forStatement.SymbolTable.Add(varDecl.Variable);
         }
-        
-        forStatement.RunCondition = Visit(context.predicate()) as Predicate;
-        
+
+        if (Visit(context.predicate()) is Predicate predicate)
+        {
+            forStatement.RunCondition = predicate;
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), context);
+        }
+
         forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
 
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;

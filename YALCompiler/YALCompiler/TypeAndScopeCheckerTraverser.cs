@@ -265,17 +265,17 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType? leftType = Visit(node.Left) as YALType;
         YALType? rightType = Visit(node.Right) as YALType;
 
-        if (leftType == null || rightType == null)
+        if (leftType is null || rightType is null)
         {
             _errorHandler.AddError(new TypeMismatchException(leftType?.ToString() ?? "null", rightType?.ToString() ?? "null"), node.LineNumber);
             return null;
         }
 
-        if (!Types.CheckCompoundExpressionTypesAreValid(leftType, rightType))
-        {
-            _errorHandler.AddError(new TypeMismatchException(leftType.ToString(), rightType.ToString()), node.LineNumber);
-        }
-        
+        // if (!Types.CheckCompoundExpressionTypesAreValid(leftType, rightType))
+        // {
+        //     _errorHandler.AddError(new TypeMismatchException(leftType?.ToString() ?? "null", rightType?.ToString() ?? "null"), node.LineNumber);
+        // }
+
         SingleType leftSingleType = (SingleType)leftType;
         SingleType rightSingleType = (SingleType)rightType;
 
