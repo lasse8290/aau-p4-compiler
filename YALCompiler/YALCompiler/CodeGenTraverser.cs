@@ -42,6 +42,16 @@ public class CodeGenTraverser : ASTTraverser
         return (boolean.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
+    internal override object? Visit(IfStatement ifStatementNode)
+    {
+        StringBuilder sb = new();
+
+        foreach (ASTNode node in ifStatementNode.Children)
+            sb.Append((string)InvokeVisitor(node));
+
+        return sb.ToString();
+    }
+    
     internal override object? Visit(If ifNode)
     {
         // Visit the predicate of the if statement
@@ -62,46 +72,39 @@ public class CodeGenTraverser : ASTTraverser
         return template.ReplacePlaceholders();
     }
 
-    internal override object? Visit(IfStatement ifStatementNode)
-    {
-        // Visit the If node of the IfStatement
-        var ifCode = (string)InvokeVisitor(ifStatementNode.Children[0]);
-
-        // Visit ElseIf and Else nodes, if any
-        var elseIfElseBuilder = new StringBuilder();
-        for (var i = 1; i < ifStatementNode.Children.Count; i++) elseIfElseBuilder.AppendLine((string)InvokeVisitor(ifStatementNode.Children[i]));
-
-        // Concatenate the code for the If, ElseIf, and Else nodes
-        var ifStatementCode = $"{ifCode}{elseIfElseBuilder}";
-
-        return ifStatementCode;
-    }
-
     internal override object? Visit(ElseIf elseIfNode)
     {
         // Visit the Predicate of the ElseIf node
         var predicateCode = (string)InvokeVisitor(elseIfNode.Predicate);
 
         // Visit the children of the ElseIf node
-        var childrenCodeBuilder = new StringBuilder();
-        foreach (var child in elseIfNode.Children) childrenCodeBuilder.AppendLine((string)InvokeVisitor(child));
+        StringBuilder body = new();
+        foreach (var child in elseIfNode.Children) body.AppendLine((string)InvokeVisitor(child));
 
-        // Create the ElseIf code
-        var elseIfCode = $"else if ({predicateCode}) {{\n{childrenCodeBuilder}}}";
 
-        return elseIfCode;
+        var template = new Template("else_if");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("predicate", predicateCode),
+            new("body", body.ToString())
+        });
+
+        return template.ReplacePlaceholders();
+
     }
 
     internal override object? Visit(Else elseNode)
     {
-        // Visit the children of the Else node
-        var childrenCodeBuilder = new StringBuilder();
-        foreach (var child in elseNode.Children) childrenCodeBuilder.AppendLine((string)InvokeVisitor(child));
+        StringBuilder body = new();
+        foreach (var child in elseNode.Children) body.AppendLine((string)InvokeVisitor(child));
 
-        // Create the Else code
-        var elseCode = $"else {{\n{childrenCodeBuilder}}}";
+        var template = new Template("else");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("body", body.ToString())
+        });
 
-        return elseCode;
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(Function function)
@@ -280,7 +283,6 @@ public class CodeGenTraverser : ASTTraverser
 
         return template.ReplacePlaceholders(true);
     }
-
 
     internal override object? Visit(ArrayLiteral arrayLiteral)
     {
