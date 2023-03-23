@@ -216,12 +216,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
 
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
-        func.Children.Add(new ScopeStart());
         foreach (ASTNode stmt in statementBlock.Statements)
         {
             func.Children.Add(stmt);
         }
-        func.Children.Add(new ScopeEnd());
         
         foreach (Symbol symbol in statementBlock.LocalVariables)
         {
@@ -384,12 +382,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
-        ifPath.Children.Add(new ScopeStart());
         foreach (ASTNode stmt in statementBlock.Statements)
         {
             ifPath.Children.Add(stmt);
         }
-        ifPath.Children.Add(new ScopeEnd());
         
         foreach (Symbol symbol in statementBlock.LocalVariables)
         {
@@ -420,12 +416,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 
                 StatementBlock elseIfStatementBlock = Visit(elseIf.statementBlock()) as StatementBlock;
-                elseIfPath.Children.Add(new ScopeStart());
                 foreach (ASTNode stmt in elseIfStatementBlock.Statements)
                 {
                     elseIfPath.Children.Add(stmt);
                 }
-                elseIfPath.Children.Add(new ScopeEnd());
         
                 foreach (Symbol symbol in elseIfStatementBlock.LocalVariables)
                 {
@@ -449,12 +443,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
             StatementBlock elseStatementBlock = Visit(context.elseStatement().statementBlock()) as StatementBlock;
 
-            elsePath.Children.Add(new ScopeStart());
             foreach (ASTNode stmt in elseStatementBlock.Statements)
             {
                 elsePath.Children.Add(stmt);
             }
-            elsePath.Children.Add(new ScopeEnd());
         
             foreach (Symbol symbol in elseStatementBlock.LocalVariables)
             {
@@ -489,12 +481,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
 
-        whileStatement.Children.Add(new ScopeStart());
         foreach (ASTNode stmt in statementBlock.Statements)
         {
             whileStatement.Children.Add(stmt);
         }
-        whileStatement.Children.Add(new ScopeEnd());
         
         foreach (Symbol symbol in statementBlock.LocalVariables)
         {
@@ -535,12 +525,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
 
-        forStatement.Children.Add(new ScopeStart());
         foreach (ASTNode stmt in statementBlock.Statements)
         {
             forStatement.Children.Add(stmt);
         }
-        forStatement.Children.Add(new ScopeEnd());
         
         foreach (Symbol symbol in statementBlock.LocalVariables)
         {

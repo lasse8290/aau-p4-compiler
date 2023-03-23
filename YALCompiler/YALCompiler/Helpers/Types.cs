@@ -45,9 +45,9 @@ public static class Types
         ( ValueType.@string, ValueType.@char ),
     };
     
-    public static Dictionary<ValueType, string> TypesInC = new()
+    public static Dictionary<ValueType, string> TypesInCPP = new()
     {
-        { ValueType.@string, "char*" },
+        { ValueType.@string, "string" },
         { ValueType.@bool, "bool" },
         { ValueType.float64, "double" },
         { ValueType.float32, "float" },
@@ -162,12 +162,12 @@ public static class Types
         return new SingleType(leftType.Type < rightType.Type ? leftType.Type : rightType.Type);
     }
 
-    public static string? ToCType(this YALType? type)
+    public static string? ToCPPType(this YALType? type)
     {
         if (type is SingleType singleType)
         {
             string? cType = null;
-            TypesInC.TryGetValue(singleType.Type, out cType);
+            TypesInCPP.TryGetValue(singleType.Type, out cType);
             return cType;
         }
 
