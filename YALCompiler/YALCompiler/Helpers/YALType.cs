@@ -9,20 +9,20 @@ public abstract class YALType: IEquatable<YALType>
             case (null):
                 return false;
             case SingleType st:
-                if (this is SingleType st2 && st.Type == st2.Type)
+                if (this is SingleType st2 && st.Type == st2.Type && st.IsArray == st2.IsArray)
                 {
                     return true;
                 }
                 else if (this is TupleType tt)
                 {
-                    return tt.Types.Count == 1 && tt.Types[0] == st.Type;
+                    return tt.Types.Count == 1 && tt.Types[0].Type == st.Type && tt.Types[0].IsArray == st.IsArray;
                 }
 
                 break;
             case TupleType tt:
                 if (this is SingleType st1)
                 {
-                    return tt.Types.Count == 1 && tt.Types[0] == st1.Type;
+                    return tt.Types.Count == 1 && tt.Types[0].Type == st1.Type && tt.Types[0].IsArray == st1.IsArray;
                 }
                 else if (this is TupleType tt2)
                 {
@@ -54,7 +54,7 @@ public abstract class YALType: IEquatable<YALType>
     public static bool operator !=(YALType first, YALType second)
     {
         if (first is null || second is null)
-            return false;
+            return true;
         
         return !first.Equals(second);
     }

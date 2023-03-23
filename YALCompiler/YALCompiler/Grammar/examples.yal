@@ -1,23 +1,31 @@
 ﻿main: {
-
+    
     // This is a line comment
     /* This is a block comment
        which can span across multiple lines */
+       
+    (int32[] arri, string s) = arrFunc();   
+       
+    int32[5] arr = {1, 5, 2, 4, 2};
+    bool bbb = true;
+    bool bbbb = !bbb;
     
-    int8 f;
+    float32 f;
     f = 1;
-    
+    int32 ff;
+    int32[6] a;
+    a[6]=functionWithOneOutputParam();
     functionWithNoParams();
     
-    functionWithInputParams(1, "hello");
+    //functionWithInputParams(1, "hello");
     
     int32 i = functionWithOneOutputParam();
     
     (int32 ii, string ss) = functionWithInputAndOutputParams(i);
     
-    if (i < 0) {
+    if (x == (i < 0)) {
         i = 0;
-    } else if (i > 0) {
+    } else if (i == await hi(expr1(i, -9), expr2)) {
         i = 1;
     } else {
         i = 2;
@@ -25,11 +33,20 @@
     
     while (i < 10) {
         i = i + 1;
+        int32 j = 0;
     }
     
     for (int32 h = 0; h < 10; h++) {
         functionWithInputAndOutputParams(h);
+        string k = "hello";
     }
+    
+    //l = function2(p);
+    
+}
+
+arrFunc: out (int32[] k, string s) {
+    return;
 }
 
 functionWithNoParams: {
@@ -44,12 +61,12 @@ functionWithOneOutputParam: out (int32 o) {
     return;
 }
 
-functionWithInputAndOutputParams: in (int32 i) out (int32 o, string s) {
+functionWithInputAndOutputParams: in (int32 i) out (int32 k, string s) {
+    s = "hello";
     return;
 }
 
-async functionEx: out (int32 o) {
-    longFunctionDontWait();
-    o = await longFunction();
+function2: in (int32 i) out (int32 ix) {
+    i = i + 1;
     return;
 }

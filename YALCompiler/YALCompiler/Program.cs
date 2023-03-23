@@ -1,9 +1,12 @@
 using StringTemplating;
 using Antlr4.Runtime;
+using Microsoft.VisualBasic.CompilerServices;
 using YALCompiler;
 using YALCompiler.ErrorHandlers;
+using YALCompiler.Helpers;
 
-try {
+try
+{
     var text = File.ReadAllText("Grammar/examples.yal");
     
     AntlrInputStream inputStream = new AntlrInputStream(text.ToString());
@@ -18,6 +21,13 @@ try {
     YALGrammerParser.ProgramContext? n = speakParser.program();
 
     YALCompiler.DataTypes.Program node = (YALCompiler.DataTypes.Program)visitor.Visit(n);
+
+    LinkerASTTraverser linker = new(node);
+    linker.BeginTraverse();
+    
+    TypeAndScopeCheckerTraverser traverser = new(node, errorHandler, warningsHandler);
+    traverser.BeginTraverse();
+    
     Console.WriteLine(errorHandler.GetAsString());
     Console.WriteLine(warningsHandler.GetAsString());
     Console.WriteLine("Done");

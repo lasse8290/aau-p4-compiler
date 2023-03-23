@@ -1,4 +1,5 @@
-﻿using YALCompiler.Exceptions;
+﻿using YALCompiler.DataTypes;
+using YALCompiler.Exceptions;
 
 namespace YALCompiler.Helpers;
 
@@ -14,5 +15,39 @@ public static class Utilities
         {
             throw new ArraySizeNotRecognizedException(definer);
         }
+    }
+
+    public static Symbol? FindSymbol(string identifier, ASTNode node)
+    {
+        Symbol? symbol = null;
+        while (symbol is null && node is not null)
+        {
+            if (node.SymbolTable.ContainsKey(identifier))
+            {
+                symbol = node.SymbolTable[identifier];
+                break;
+            }
+
+            node = node.Parent;
+        }
+
+        return symbol;
+    }
+    
+    public static Function? FindFunction(string identifier, ASTNode node)
+    {
+        Function? function = null;
+        while (function is null && node is not null)
+        {
+            if (node.FunctionTable.ContainsKey(identifier))
+            {
+                function = node.FunctionTable[identifier];
+                break;
+            }
+
+            node = node.Parent;
+        }
+
+        return function;
     }
 }

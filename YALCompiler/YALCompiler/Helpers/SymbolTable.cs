@@ -26,6 +26,11 @@ public class SymbolTable
         Add(symbol.Id, symbol);
     }
     
+    public bool ContainsKey(string id)
+    {
+        return _symbols.ContainsKey(id);
+    }
+    
     public void Add(string id, Symbol symbol)
     {
         if (_symbols.ContainsKey(id))
