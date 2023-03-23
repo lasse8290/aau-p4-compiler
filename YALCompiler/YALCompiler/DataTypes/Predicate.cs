@@ -2,6 +2,5 @@ namespace YALCompiler.DataTypes;
 
 public class Predicate : Expression
 {
-    public bool Negated { get; set; } = false;
-    
+    public  bool  Negated { get; set; } = false;
 }
