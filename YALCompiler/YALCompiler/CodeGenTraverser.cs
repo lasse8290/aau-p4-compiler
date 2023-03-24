@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using StringTemplating;
 using YALCompiler.DataTypes;
@@ -9,6 +10,7 @@ namespace YALCompiler;
 public class CodeGenTraverser : ASTTraverser
 {
     private readonly Template _template = new("program");
+    private readonly StringBuilder _declarationsBuilder = new();
 
     public CodeGenTraverser(ASTNode node) : base(node)
     {
@@ -27,6 +29,7 @@ public class CodeGenTraverser : ASTTraverser
 
         _template.SetKeys(new List<Tuple<string, string>>
         {
+            new("declarations", _declarationsBuilder.ToString()),
             new("program", stringBuilder.ToString())
         });
     }
@@ -109,19 +112,42 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(Function function)
     {
-        var stringBuilder = new StringBuilder();
+        var declarationInputParametersBuilder = new StringBuilder();
+        foreach (var symbol in function.InputParameters)
+            declarationInputParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id};");
+        
+        var declarationOutputParametersBuilder = new StringBuilder();
+        foreach (var symbol in function.OutputParameters)
+            declarationOutputParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id};");
+        
+        var declarationTemplate = new Template("function_declaration");
+        declarationTemplate.SetKeys(new List<Tuple<string, string>>
+        {
+            new("name", function.Id),
+            new("input_parameters", declarationInputParametersBuilder.ToString()),
+            new("output_parameters", declarationOutputParametersBuilder.ToString()),
+        });
+        _declarationsBuilder.AppendLine(declarationTemplate.ReplacePlaceholders());
+            
+        var parametersBuilder = new StringBuilder();
+        foreach (var symbol in function.InputParameters)
+            parametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = COMPILER_parameters->input->{symbol.Id};");
+        foreach (var symbol in function.OutputParameters)
+            parametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = COMPILER_parameters->output->{symbol.Id};");
+        
+        var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
         {
-            stringBuilder.Append((string)InvokeVisitor(child));
-            stringBuilder.AppendLine(";");
+            bodyBuilder.Append((string)InvokeVisitor(child));
+            bodyBuilder.AppendLine(";");
         }
 
         var template = new Template("function");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("type", "void"),
             new("name", function.Id),
-            new("body", stringBuilder.ToString())
+            new("parameters", parametersBuilder.ToString()),
+            new("body", bodyBuilder.ToString())
         });
 
         return template.ReplacePlaceholders();

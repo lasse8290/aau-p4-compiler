@@ -8,6 +8,7 @@ using YALCompiler.Helpers;
 try
 {
     Template.LoadTemplates("Templates", "txt");
+    
     var                 text            = File.ReadAllText("Grammar/examples.yal");
     var                 errorHandler    = new ErrorHandler();
     var                 warningsHandler = new WarningsHandler();
