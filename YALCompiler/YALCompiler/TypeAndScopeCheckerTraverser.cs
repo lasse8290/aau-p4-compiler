@@ -140,7 +140,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         
         for (int i = 0; i < function.InputParameters.Count; i++)
         {
-            if ((YALType)function.InputParameters[i].Type != (YALType)Visit(node.InputParameters[i]))
+            if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, Visit(node.InputParameters[i]) as YALType))
             {
                 _errorHandler.AddError(
                     new InvalidFunctionCallInputParameters(
