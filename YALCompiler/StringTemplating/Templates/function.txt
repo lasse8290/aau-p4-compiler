@@ -1,3 +1,6 @@
-%%type%% %%name%% () {
+void %%name%% (void *pvParameters) {
+    COMPILER_PARAMS_%%name%% *COMPILER_parameters = (COMPILER_PARAMS_%%name%%*) pvParameters;
+    %%parameters%%
+    
     %%body%%
 }

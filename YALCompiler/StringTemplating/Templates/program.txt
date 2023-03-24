@@ -1,4 +1,14 @@
-#include <Arduino.h>
-#include <pt.h>
 #include <string>
+#include <Arduino.h>
+
+struct EMPTY { };
+template <typename I, typename O>
+struct PARAMETERS { 
+  TaskHandle_t taskHandle;
+  I *input;
+  O *output;
+};
+
+%%declarations%%
+
 %%program%%

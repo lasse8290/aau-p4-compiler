@@ -7,6 +7,7 @@ using YALCompiler;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Helpers;
 
+
 namespace YALCompiler;
 public static class Program {
     public static void Main() {
