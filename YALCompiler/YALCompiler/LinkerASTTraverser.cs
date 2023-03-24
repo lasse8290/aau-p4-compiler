@@ -5,9 +5,7 @@ namespace YALCompiler;
 
 public class LinkerASTTraverser : ASTTraverser
 {
-    public LinkerASTTraverser(ASTNode node) : base(node)
-    {
-    }
+    public LinkerASTTraverser(ASTNode node) : base(node) { }
     
     public override void BeginTraverse()
     {
@@ -21,19 +19,15 @@ public class LinkerASTTraverser : ASTTraverser
         while (stack.Count > 0) {
             ASTNode node = stack.Pop();
             
-            var s = node
-                .GetType()
-                .GetProperties()
-                .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
-                .ToList();
-            
-            foreach (PropertyInfo p in s)
+            var properties = GetNodeChildProperties(node.GetType());
+
+            foreach (PropertyInfo p in properties)
             {
-                var pp = p.GetValue(node);
-                if (pp is ASTNode astNode)
+                var pp = p.GetValue(node) as ASTNode;
+                if (pp != null)
                 {
-                    astNode.Parent = node;
-                    stack.Push(astNode);
+                    pp.Parent = node;
+                    stack.Push(pp);
                 }
             }
 

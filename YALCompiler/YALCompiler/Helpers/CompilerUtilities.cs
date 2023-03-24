@@ -3,7 +3,7 @@ using YALCompiler.Exceptions;
 
 namespace YALCompiler.Helpers;
 
-public static class Utilities
+public static class CompilerUtilities
 {
     public static int GetArraySizeFromDefiner(string definer)
     {

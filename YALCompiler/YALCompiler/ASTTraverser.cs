@@ -41,10 +41,13 @@ public abstract class ASTTraverser
     internal virtual object? Visit(ArrayElementIdentifier  node) => node;
     internal virtual object? Visit(CompoundExpression      node) => node;
     internal virtual object? Visit(Expression              node) => node;
-    internal virtual object? Visit(Program                 node) => node;
+    internal virtual object? Visit(YALCompiler.DataTypes.Program                 node) => node;
     internal virtual object? Visit(ASTNode                 node) => node;
     internal virtual object? Visit(Function                node) => node;
 
+    private static readonly Dictionary<Type, List<PropertyInfo>> _propertyCache    = new();
+    private readonly        Dictionary<Type, MethodInfo?>        _visitMethodCache = new();
+    
     public virtual void BeginTraverse() 
     {
         var stack = new Stack<ASTNode>();
@@ -54,20 +57,16 @@ public abstract class ASTTraverser
         {
             var node = stack.Pop();
             InvokeVisitor(node);
-            
-            var s = node
-                .GetType()
-                .GetProperties()
-                .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
-                .ToList();
 
-            foreach (var p in s)
+            var properties = GetNodeChildProperties(node.GetType());
+
+            foreach (var property in properties)
             {
-                var pp = p.GetValue(node);
-                if (pp is ASTNode astNode)
+                var childNode = property.GetValue(node) as ASTNode;
+                if (childNode != null)
                 {
-                    astNode.Parent = node;
-                    stack.Push(astNode);
+                    childNode.Parent = node;
+                    stack.Push(childNode);
                 }
             }
 
@@ -86,4 +85,31 @@ public abstract class ASTTraverser
 
         return node;
     }
+    
+    private MethodInfo? GetVisitMethodForNodeType(Type nodeType)
+    {
+        if (!_visitMethodCache.TryGetValue(nodeType, out var visitMethod))
+        {
+            visitMethod                 = GetType().GetMethod(nameof(Visit), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
+            _visitMethodCache[nodeType] = visitMethod;
+        }
+
+        return visitMethod;
+    }
+    
+    internal static List<PropertyInfo> GetNodeChildProperties(Type nodeType)
+    {
+        if (!_propertyCache.TryGetValue(nodeType, out var properties))
+        {
+            properties = nodeType
+                         .GetProperties()
+                         .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
+                         .ToList();
+
+            _propertyCache[nodeType] = properties;
+        }
+
+        return properties;
+    }
+
 }

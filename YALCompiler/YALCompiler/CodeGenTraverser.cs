@@ -15,12 +15,7 @@ public class CodeGenTraverser : ASTTraverser
     public CodeGenTraverser(ASTNode node) : base(node)
     {
     }
-
-    public string GetGeneratedCode()
-    {
-        return _template.ReplacePlaceholders();
-    }
-
+    
     public override void BeginTraverse()
     {
         var stringBuilder = new StringBuilder();
@@ -32,6 +27,11 @@ public class CodeGenTraverser : ASTTraverser
             new("declarations", _declarationsBuilder.ToString()),
             new("program", stringBuilder.ToString())
         });
+    }
+    
+    public string GetGeneratedCode()
+    {
+        return _template.ReplacePlaceholders();
     }
 
     internal override object? Visit(Boolean boolean)
