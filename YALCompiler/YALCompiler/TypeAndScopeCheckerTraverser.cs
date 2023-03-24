@@ -150,7 +150,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 break;
             }
         }
-        
+
+        node.Function = function;
         return function.ReturnType;
     }
 
