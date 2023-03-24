@@ -1,10 +1,11 @@
 #include <string>
-#include <Arduino.h>
-
+#include <stdint.h>
+#include <stdbool.h>
+//#include <Arduino.h>
+         
 struct EMPTY { };
 template <typename I, typename O>
 struct PARAMETERS { 
-  TaskHandle_t taskHandle;
   I *input;
   O *output;
 };

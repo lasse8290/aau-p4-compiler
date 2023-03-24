@@ -1,83 +1,8 @@
-﻿main: {
-    
-    // This is a line comment
-    /* This is a block comment
-       which can span across multiple lines */
-    
-    string h;
-    if((h = "123") == "123") {
-        
-    }
-       if(((9+5)*5)<12){}
-    //(int32[] arri, string s) = arrFunc();   
-       
-    //int32[5] arr = {1, 5, 2, 4, 2};
-    bool bbb = true;
-    bool bbbb = !bbb;
-    
-    
-    float32 f;
-    f = 1;
-    int32 ff;
-    
-    int32[6] a;
-    a[6]=functionWithOneOutputParam();
-    functionWithNoParams();
-    
-    //functionWithInputParams(1, "hello");
-    
-    int32 i = functionWithOneOutputParam();
-    
-    //(int32 ii, string ss) = functionWithInputAndOutputParams(i);
-    int32 x = 0;
-    /*if (x == (i < 0)) {
-        i = 0;
-    } else if (x > 2) {
-        i = 1;
-    } else {
-        i = 2;
-    }*/
-    
-    while (i < 10) {
-        i = i + 1;
-        int32 j = 0;
-    }
-    
-    for (int32 h = 0; h < 10; h++) {
-        //functionWithInputAndOutputParams(h);
-        string k = "hello";
-    }
-    
-    //l = function2(p);
-    
+﻿sumAndDiffFromTwoNumbers: in(int32 a, int32 b) out(int32 sum, int32 diff) {
+    sum = a + b;
+    diff = a - b;
 }
-
-
-functionWithNoParams: {
-    return;
+main: {
+    (int32 x, int32 y) = sumAndDiffFromTwoNumbers(1, 2);
+    x = x + 5;
 }
-
-/*
-arrFunc: out (int32[] k, string s) {
-    return;
-}
-
-
-functionWithInputParams: in (int32 i, string args) {
-    return;
-}
-
-functionWithOneOutputParam: out (int32 o) {
-    return;
-}
-
-functionWithInputAndOutputParams: in (int32 i) out (int32 k, string s) {
-    s = "hello";
-    return;
-}
-
-function2: in (int32 i) out (int32 ix) {
-    i = i + 1;
-    return;
-}
-*/

@@ -1,6 +1,7 @@
 void %%name%% (void *pvParameters) {
-    COMPILER_PARAMS_%%name%% *COMPILER_parameters = (COMPILER_PARAMS_%%name%%*) pvParameters;
-    %%parameters%%
-    
+    COMPILER_PARAMS_%%name%% *_COMPILER_PARAMS_%%name%% = (COMPILER_PARAMS_%%name%%*) pvParameters;
+    %%input_parameters%%
+    %%output_initialization%%
     %%body%%
+    %%output_parameters%%
 }
