@@ -85,7 +85,7 @@ public class UnitTest1
     [Fact]
     public void Should_Create_Correct_Statement()
     {
-        ASTNode node = Setup("my_function: {  }");
+        ASTNode node = Setup("my_function: { int32 hej = 5+2; }");
         
         Function func = (Function)node.Children[0];
         BinaryAssignment assignment = (BinaryAssignment)func.Children[0];
