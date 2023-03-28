@@ -29,6 +29,8 @@ public static class Program {
             YALGrammerParser                 speakParser       = new YALGrammerParser(commonTokenStream);
             YALGrammerVisitor                visitor           = new YALGrammerVisitor(errorHandler, warningsHandler);
             sw.Stop();
+            
+            
             Console.WriteLine("Parsed source code in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
             YALGrammerParser.ProgramContext? n                 = speakParser.program();
