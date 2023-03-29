@@ -3,6 +3,5 @@
     diff = a - b;
 }
 main: {
-    (int32 x, int32 y) = sumAndDiffFromTwoNumbers(1, 2);
-    x = x + 5;
+    (int32 a, int32 b) = sumAndDiffFromTwoNumbers(1, 2)
 }

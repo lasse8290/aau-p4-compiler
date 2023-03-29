@@ -44,14 +44,14 @@ public static class Program {
             TypeAndScopeCheckerTraverser traverser = new(node, errorHandler, warningsHandler);
             traverser.BeginTraverse();
             sw.Stop();
+            Console.WriteLine(warningsHandler.GetAsString());
+            Console.WriteLine(errorHandler.GetAsString());
             Console.WriteLine("Type and scope checked AST in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
             CodeGenTraverser cgt = new(node);
             cgt.BeginTraverse();
             sw.Stop();
             Console.WriteLine("Generated code in " + sw.ElapsedMilliseconds + "ms");
-            Console.WriteLine(warningsHandler.GetAsString());
-            Console.WriteLine(errorHandler.GetAsString());
             string generatedCode = cgt.GetGeneratedCode();
             
             Console.WriteLine(generatedCode);
