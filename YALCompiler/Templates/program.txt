@@ -1,0 +1,23 @@
+#include <string>
+#include <stdint.h>
+#include <stdbool.h>
+//#include <Arduino.h>
+         
+struct EMPTY { };
+template <typename I, typename O>
+struct PARAMETERS { 
+  I *input;
+  O *output;
+};
+
+void* COMPILER_AWAIT(void* params, void* (*func)(void*)) {
+  xTaskCreate(wait_x, "WAIT", 4096, &wait_params, 10, &Handle_WAIT); // function call
+
+  return func(params);
+}
+
+
+
+%%declarations%%
+
+%%program%%
