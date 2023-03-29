@@ -75,7 +75,7 @@ public class UnitTest1
     [Fact]
     public void Assert_Correct_Input_Parameters()
     {
-        ASTNode node = Setup("my_function: in (int32 a, string b) {}");
+        ASTNode node = Setup("my_function: in: (int32 a, string b) {}");
         
         Function func = (Function)node.Children[0];
         Symbol param1 = (Symbol)func.InputParameters[0];
@@ -93,7 +93,7 @@ public class UnitTest1
     [Fact]
     public void Should_Create_Correct_Output_Parameters()
     {
-        ASTNode node = Setup("my_function: out (int32 a, string b) {}");
+        ASTNode node = Setup("my_function: out: (int32 a, string b) {}");
         
         Function func = (Function)node.Children[0];
         Symbol param1 = (Symbol)func.OutputParameters[0];
@@ -125,9 +125,9 @@ public class UnitTest1
     }
 
     [Theory]
-    [InlineData("my_function: { hej++; }", typeof(UnaryAssignment))]
+    [InlineData("my_function: { hej++ }", typeof(UnaryAssignment))]
     [InlineData("my_function: { int32 hej = 5+2; }", typeof(BinaryAssignment))]
-    [InlineData("my_function: { for (int32 i = 5; i < 5; i++) { } }", typeof(ForStatement))]
+    [InlineData("my_function: { for (int32 i = 5; i++; i < 5) { } }", typeof(ForStatement))]
     public void Assert_Correct_Statement_Type(string code, Type expectedStatementType)
     {
         ASTNode node = Setup(code);
