@@ -8,45 +8,41 @@ namespace Testing;
 
 public class ASTUnitTests
 {
-    private static ASTNode Setup(string _string)
-    {
-        AntlrInputStream inputStream = new AntlrInputStream(_string);
-        YALGrammerLexer speakLexer = new YALGrammerLexer(inputStream);
-        CommonTokenStream commonTokenStream = new CommonTokenStream(speakLexer);
-        YALGrammerParser speakParser = new YALGrammerParser(commonTokenStream);
-        IParseTree tree = speakParser.program();
-        YALGrammerVisitor visitor = new YALGrammerVisitor();
-        ASTNode node = (ASTNode)visitor.Visit(tree);
+    YALGrammerVisitor visitor = new YALGrammerVisitor();
 
-        return node;
+    private static YALGrammerParser Setup(string input)
+    {
+        AntlrInputStream inputStream = new AntlrInputStream(input);
+        YALGrammerLexer lexer = new YALGrammerLexer(inputStream);
+        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+        YALGrammerParser parser = new YALGrammerParser(commonTokenStream);
+
+        return parser;
     }
 
     [Theory]
-    [InlineData(@"external <""my_library""> print1: in (string _string);external <""my_library""> print2: in (string _string);", new string[] { "print1", "print2" })]
-    [InlineData(@"external <""my_library2""> printhello1: in (string _string);external <""my_library3""> printhello2: in (string _string);", new string[] { "printhello1", "printhello2" })]
-    public void Assert_External_Function_Declaration_Exists_In_Symbol_Table(string code, string[] expectedNames) {
-        ASTNode node = Setup(code);
+    [InlineData(@"external <""my_library""> print1: in (string _string);", "print1")]
+    [InlineData(@"external <""hej""> print2: in (string _string);", "print2")]
+    public void Assert_External_Function_Exists_In_Symbol_Table(string input, string expectedName) {
+        YALGrammerParser parser = Setup(input);
+        IParseTree tree = parser.externalFunctionDeclaration();
+        ExternalFunction externalVarDcl = (ExternalFunction)visitor.Visit(tree);
 
-        foreach (string expectedName in expectedNames) {
-            bool exists = node.FunctionTable.ContainsKey(expectedName);
-
-            Assert.True(exists);
-        }
-
+        Assert.Equal(expectedName, externalVarDcl.Id);
     }
     
     [Theory]
     [InlineData("my_function: {}", "my_function")]
-    public void Assert_Correct_Function_Name(string code, string functionName)
+    public void Correct_Function_Name(string input, string functionName)
     {
-        ASTNode node = Setup(code);
-        
-        Function func = (Function)node.Children[0];
+        YALGrammerParser parser = Setup(input);
+        IParseTree tree = parser.functionDeclaration();
+        Function func = (Function)visitor.Visit(tree);
 
-        Assert.IsType<Function>(node.Children[0]);
+        Assert.IsType<Function>(func);
         Assert.Equal(functionName, func.Id);
     }
-
+    
     public static TheoryData<string, int> functionsData =>
         new () {
             { "", 0 },
@@ -56,11 +52,13 @@ public class ASTUnitTests
 
     [Theory]
     [MemberData(nameof(functionsData))]
-    public void Should_Create_x_Functions(string code, int expectedFunctionsCount)
+    public void Should_Create_x_Functions(string input, int expectedFunctionsCount)
     {
-        ASTNode node = Setup(code);
+        YALGrammerParser parser = Setup(input);
+        IParseTree tree = parser.program();
+        ASTNode program = (ASTNode)visitor.Visit(tree);
 
-        Assert.Equal(expectedFunctionsCount, node.Children.Count);
+        Assert.Equal(expectedFunctionsCount, program.Children.Count);
     }
 
     [Theory]
@@ -72,46 +70,54 @@ public class ASTUnitTests
     [InlineData("in (string a) out: ()", 1, 0)]
     [InlineData("in (int32 a, int32 b)", 2, 0)]
     [InlineData("in (int32 a, int32 b) out: (int32 c, int32 d)", 2, 2)]
-    public void Assert_Correct_Function_Parameters_Count(string code, int expectedInputParametersCount, int expectedOutputParametersCount)
+    public void Assert_Correct_Function_Parameters_Count(string input, int expectedInputParametersCount, int expectedOutputParametersCount)
     {
-        ASTNode node = Setup($"my_function: {code} {{}}");
-        
-        Function func = (Function)node.Children[0];
+        YALGrammerParser parser = Setup($"my_function: {input} {{}}");
+        IParseTree tree = parser.functionDeclaration();
+        Function func = (Function)visitor.Visit(tree);
         
         Assert.Equal(expectedInputParametersCount, func.InputParameters.Count);
         Assert.Equal(expectedOutputParametersCount, func.OutputParameters.Count);
     }
 
-    public static TheoryData<string, string, List<Types.ValueType>> ParametersData =>
+    public static TheoryData<string, List<Types.ValueType>> InputParametersData =>
         new () {
-            { "in", "int32 a, bool b", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
-            { "out", "int32 a, bool b", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
-            { "in", "float32 c, float64 d", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
-            { "out", "float32 c, float64 d", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
+            { "(int32 a, bool b)", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
+            { "(float32 c, float64 d)", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
         };
 
     [Theory]
-    [MemberData(nameof(ParametersData))]
-    public void Assert_Correct_Parameter_Types(string type, string parameters, List<Types.ValueType> expectedParameterTypes)
+    [MemberData(nameof(InputParametersData))]
+    public void Assert_Input_Parameters(string parameters, List<Types.ValueType> expectedParameterTypes)
     {
-        ASTNode node = Setup($"my_function: {type} ({parameters}) {{ }}");
-
-        Function func = (Function)node.Children[0];
+        IParseTree tree = Setup(parameters).formalInputParams();
+        List<Symbol> list = (List<Symbol>)visitor.Visit(tree);
         
         for (int i = 0; i < expectedParameterTypes.Count; i++) {
             Types.ValueType expectedType = expectedParameterTypes[i];
-            Symbol param;
+            Symbol param = (Symbol)list[i];
 
-            switch (type) {
-                case "in": 
-                    param = (Symbol)func.InputParameters[i]; break;
-                case "out":
-                    param = (Symbol)func.OutputParameters[i]; break;
-                default:
-                    throw new Exception("Type must be either in or out");
-            }
+            Assert.Equal(expectedType, ((SingleType)param.Type!).Type);
+        }
+    }
 
-            Assert.Equal(expectedType ,((SingleType)param.Type!).Type);
+    public static TheoryData<string, List<Types.ValueType>> OutputParametersData =>
+        new () {
+            { "out (int32 a, bool b)", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
+            { "out (float32 c, float64 d)", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
+        };
+    [Theory]
+    [MemberData(nameof(OutputParametersData))]
+    public void Assert_Output_Parameters(string parameters, List<Types.ValueType> expectedParameterTypes)
+    {
+        IParseTree tree = Setup(parameters).formalOutputParams();
+        List<Symbol> list = (List<Symbol>)visitor.Visit(tree);
+        
+        for (int i = 0; i < expectedParameterTypes.Count; i++) {
+            Types.ValueType expectedType = expectedParameterTypes[i];
+            Symbol param = (Symbol)list[i];
+
+            Assert.Equal(expectedType, ((SingleType)param.Type!).Type);
         }
     }
     
@@ -120,28 +126,38 @@ public class ASTUnitTests
     [InlineData("my_function: { int32 hej = 1+2; }", 1)]
     [InlineData("my_function: { int32 hej = 3+4; int32 hej2 = 4+5; }", 2)]
     [InlineData("my_function: { int32 hej = 5+6; int32 hej3 = 6+7; int32 hej4 = 7+8 }", 3)]
-    public void Assert_Correct_Amount_Of_BlockStatement(string code, int expectedStatementsCount)
+    public void Assert_Correct_Amount_Of_BlockStatement(string input, int expectedStatementsCount)
     {
-        ASTNode node = Setup(code);
+        YALGrammerParser parser = Setup(input);
+        IParseTree tree = parser.functionDeclaration();
+        Function func = (Function)visitor.Visit(tree);
         
-        Function func = (Function)node.Children[0];
         Assert.Equal(expectedStatementsCount, func.Children.Count);
     }
 
     [Theory]
-    [InlineData("my_function: { hej++ }", typeof(UnaryAssignment))]
-    [InlineData("my_function: { int32 hej = 5+2; }", typeof(BinaryAssignment))]
-    [InlineData("my_function: { for (int32 i = 5; i < 5; i++) { } }", typeof(ForStatement))]
-    [InlineData("my_function: { while (i < 5) { } }", typeof(WhileStatement))]
-    [InlineData("my_function: { functionCall(); }", typeof(FunctionCall))]
-    [InlineData("my_function: { int32 i; }", typeof(VariableDeclaration))]
-    [InlineData("my_function: { i++; }", typeof(UnaryAssignment))]
-    public void Assert_Correct_Statement_Type(string code, Type expectedStatementType)
+    [InlineData("int32 hej = 5+2;", typeof(BinaryAssignment))]
+    [InlineData("functionCall();", typeof(FunctionCall))]
+    [InlineData("int32 i;", typeof(VariableDeclaration))]
+    [InlineData("i++;", typeof(UnaryAssignment))]
+    public void Assert_Correct_SingleStatement(string input, Type expectedStatementType)
     {
-        ASTNode node = Setup(code);
-        
-        Function func = (Function)node.Children[0];
-        ASTNode stmt = func.Children[0];
+        YALGrammerParser parser = Setup(input);
+        IParseTree tree = parser.singleStatement();
+        var stmt = visitor.Visit(tree);
+
+        Assert.Equal(expectedStatementType, stmt.GetType());
+    }
+
+    [Theory]
+    [InlineData("for (int32 i = 5; i < 5; i++) { }", typeof(ForStatement))]
+    [InlineData("while (i < 5) { }", typeof(WhileStatement))]
+    [InlineData("if (i < 5) { }", typeof(IfStatement))]
+    public void Assert_Correct_BlockStatement(string input, Type expectedStatementType)
+    {
+        YALGrammerParser parser = Setup(input);
+        IParseTree tree = parser.blockStatement();
+        var stmt = visitor.Visit(tree);
 
         Assert.Equal(expectedStatementType, stmt.GetType());
     }

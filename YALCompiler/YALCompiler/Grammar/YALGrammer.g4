@@ -34,7 +34,7 @@ variableDeclarationFormat: TYPE '[' POSITIVE_NUMBER? ']' ID     # ArrayDeclarati
                     
 assignment: simpleAssignment
             | declarationAssignment
-            //| tupleAssignment
+            | tupleAssignment
             ;
 
 
@@ -45,7 +45,7 @@ simpleAssignment: identifier operator=('=' | '+=' | '-=' | '*=' | '\\=' | '%=') 
             
 declarationAssignment:  variableDeclaration '=' predicate;
 
-//tupleAssignment:        tupleDeclaration '=' expression;
+tupleAssignment:        tupleDeclaration '=' expression;
 
 tupleDeclaration:       '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')' ;
 
