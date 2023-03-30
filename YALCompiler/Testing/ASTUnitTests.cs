@@ -1,15 +1,12 @@
-using System.Collections;
 using Antlr4.Runtime.Tree;
-using Iced.Intel;
+using Antlr4.Runtime;
 using YALCompiler;
 using YALCompiler.DataTypes;
-using YALCompiler.ErrorHandlers;
 using YALCompiler.Helpers;
 
 namespace Testing;
-using Antlr4.Runtime;
 
-public class UnitTest1
+public class ASTUnitTests
 {
     private static ASTNode Setup(string _string)
     {
@@ -23,6 +20,20 @@ public class UnitTest1
 
         return node;
     }
+
+    [Theory]
+    [InlineData(@"external <""my_library""> print1: in (string _string);external <""my_library""> print2: in (string _string);", new string[] { "print1", "print2" })]
+    [InlineData(@"external <""my_library2""> printhello1: in (string _string);external <""my_library3""> printhello2: in (string _string);", new string[] { "printhello1", "printhello2" })]
+    public void Assert_External_Function_Declaration_Exists_In_Symbol_Table(string code, string[] expectedNames) {
+        ASTNode node = Setup(code);
+
+        foreach (string expectedName in expectedNames) {
+            bool exists = node.FunctionTable.ContainsKey(expectedName);
+
+            Assert.True(exists);
+        }
+
+    }
     
     [Theory]
     [InlineData("my_function: {}", "my_function")]
@@ -35,17 +46,16 @@ public class UnitTest1
         Assert.IsType<Function>(node.Children[0]);
         Assert.Equal(functionName, func.Id);
     }
-    
-    public static IEnumerable<object[]> Functions =>
-        new List<object[]>
-        {
-            new object[] { "", 0 },
-            new object[] { String.Concat(Enumerable.Range(0, 100).Select(i => $"function{i}: {{}}")), 100 },
-            new object[] { String.Concat(Enumerable.Range(0, 10).Select(i => $"function{i}: {{}}")), 10 },
+
+    public static TheoryData<string, int> functionsData =>
+        new () {
+            { "", 0 },
+            { String.Concat(Enumerable.Range(0, 15).Select(i => $"function{i}: {{}}")), 15 },
+            { String.Concat(Enumerable.Range(0, 2).Select(i => $"function{i}: {{}}")), 2 }
         };
 
     [Theory]
-    [MemberData(nameof(Functions))]
+    [MemberData(nameof(functionsData))]
     public void Should_Create_x_Functions(string code, int expectedFunctionsCount)
     {
         ASTNode node = Setup(code);
@@ -54,17 +64,17 @@ public class UnitTest1
     }
 
     [Theory]
-    [InlineData("my_function: {}", 0, 0)]
-    [InlineData("my_function: in: () {}", 0, 0)]
-    [InlineData("my_function: out: () {}", 0, 0)]
-    [InlineData("my_function: in: () out: () {}", 0, 0)]
-    [InlineData("my_function: in: () out: (string a) {}", 0, 1)]
-    [InlineData("my_function: in: (string a) out: () {}", 1, 0)]
-    [InlineData("my_function: in: (int32 a, int32 b) {}", 2, 0)]
-    [InlineData("my_function: in: (int32 a, int32 b) out: (int32 c, int32 d) {}", 2, 2)]
+    [InlineData("", 0, 0)]
+    [InlineData("in ()", 0, 0)]
+    [InlineData("out: ()", 0, 0)]
+    [InlineData("in () out: ()", 0, 0)]
+    [InlineData("in () out: (string a)", 0, 1)]
+    [InlineData("in (string a) out: ()", 1, 0)]
+    [InlineData("in (int32 a, int32 b)", 2, 0)]
+    [InlineData("in (int32 a, int32 b) out: (int32 c, int32 d)", 2, 2)]
     public void Assert_Correct_Function_Parameters_Count(string code, int expectedInputParametersCount, int expectedOutputParametersCount)
     {
-        ASTNode node = Setup(code);
+        ASTNode node = Setup($"my_function: {code} {{}}");
         
         Function func = (Function)node.Children[0];
         
@@ -72,43 +82,37 @@ public class UnitTest1
         Assert.Equal(expectedOutputParametersCount, func.OutputParameters.Count);
     }
 
-    [Fact]
-    public void Assert_Correct_Input_Parameters()
-    {
-        ASTNode node = Setup("my_function: in: (int32 a, string b) {}");
-        
-        Function func = (Function)node.Children[0];
-        Symbol param1 = (Symbol)func.InputParameters[0];
-        Symbol param2 = (Symbol)func.InputParameters[1];
+    public static TheoryData<string, string, List<Types.ValueType>> ParametersData =>
+        new () {
+            { "in", "int32 a, bool b", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
+            { "out", "int32 a, bool b", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
+            { "in", "float32 c, float64 d", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
+            { "out", "float32 c, float64 d", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
+        };
 
-        Assert.Equal("a", param1.Id);
-        Assert.IsType<SingleType>(param1.Type);
-        Assert.Equal(Types.ValueType.int32 ,((SingleType)param1.Type).Type);
-        
-        Assert.Equal("b", param2.Id);
-        Assert.IsType<SingleType>(param2.Type);
-        Assert.Equal(Types.ValueType.@string ,((SingleType)param2.Type).Type);
-    }
-    
-    [Fact]
-    public void Should_Create_Correct_Output_Parameters()
+    [Theory]
+    [MemberData(nameof(ParametersData))]
+    public void Assert_Correct_Parameter_Types(string type, string parameters, List<Types.ValueType> expectedParameterTypes)
     {
-        ASTNode node = Setup("my_function: out: (int32 a, string b) {}");
-        
+        ASTNode node = Setup($"my_function: {type} ({parameters}) {{ }}");
+
         Function func = (Function)node.Children[0];
-        Symbol param1 = (Symbol)func.OutputParameters[0];
-        Symbol param2 = (Symbol)func.OutputParameters[1];
         
-        Assert.IsType<Function>(node.Children[0]);
-        Assert.Equal(2, func.OutputParameters.Count);
-        Assert.Equal("a", param1.Id);
-        
-        Assert.IsType<SingleType>(param1.Type);
-        Assert.Equal(Types.ValueType.int32 ,((SingleType)param1.Type).Type);
-        Assert.Equal("b", param2.Id);
-        
-        Assert.IsType<SingleType>(param2.Type);
-        Assert.Equal(Types.ValueType.@string ,((SingleType)param2.Type).Type);
+        for (int i = 0; i < expectedParameterTypes.Count; i++) {
+            Types.ValueType expectedType = expectedParameterTypes[i];
+            Symbol param;
+
+            switch (type) {
+                case "in": 
+                    param = (Symbol)func.InputParameters[i]; break;
+                case "out":
+                    param = (Symbol)func.OutputParameters[i]; break;
+                default:
+                    throw new Exception("Type must be either in or out");
+            }
+
+            Assert.Equal(expectedType ,((SingleType)param.Type!).Type);
+        }
     }
     
     [Theory]
@@ -127,14 +131,18 @@ public class UnitTest1
     [Theory]
     [InlineData("my_function: { hej++ }", typeof(UnaryAssignment))]
     [InlineData("my_function: { int32 hej = 5+2; }", typeof(BinaryAssignment))]
-    [InlineData("my_function: { for (int32 i = 5; i++; i < 5) { } }", typeof(ForStatement))]
+    [InlineData("my_function: { for (int32 i = 5; i < 5; i++) { } }", typeof(ForStatement))]
+    [InlineData("my_function: { while (i < 5) { } }", typeof(WhileStatement))]
+    [InlineData("my_function: { functionCall(); }", typeof(FunctionCall))]
+    [InlineData("my_function: { int32 i; }", typeof(VariableDeclaration))]
+    [InlineData("my_function: { i++; }", typeof(UnaryAssignment))]
     public void Assert_Correct_Statement_Type(string code, Type expectedStatementType)
     {
         ASTNode node = Setup(code);
         
         Function func = (Function)node.Children[0];
         ASTNode stmt = func.Children[0];
-        var k = stmt.GetType();
+
         Assert.Equal(expectedStatementType, stmt.GetType());
     }
 }
