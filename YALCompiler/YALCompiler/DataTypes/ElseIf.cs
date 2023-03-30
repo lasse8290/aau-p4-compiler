@@ -2,5 +2,5 @@
 
 public class ElseIf: ASTNode
 {
-    public Predicate Predicate { get; set; }
+    public Expression Predicate { get; set; }
 }
