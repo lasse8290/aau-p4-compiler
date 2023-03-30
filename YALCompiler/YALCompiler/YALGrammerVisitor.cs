@@ -19,6 +19,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         _errorHandler = errorHandler;
         _warningsHandler = warningsHandler;
     }
+    
+    public YALGrammerVisitor() {}
 
     public override object VisitProgram(YALGrammerParser.ProgramContext context)
     {

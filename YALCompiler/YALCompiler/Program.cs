@@ -16,8 +16,8 @@ public static class Program {
             
             Stopwatch sw = new();
             sw.Start();
-            Template.LoadTemplates("Templates", "txt");
-            var                 text            = File.ReadAllText("Grammar/examples.yal");
+            Template.LoadTemplates("StringTemplating/Templates", "txt");
+            var                 text            = File.ReadAllText("YALCompiler/Grammar/examples.yal");
             var                 errorHandler    = new ErrorHandler();
             var                 warningsHandler = new WarningsHandler();
             sw.Stop();
@@ -29,6 +29,8 @@ public static class Program {
             YALGrammerParser                 speakParser       = new YALGrammerParser(commonTokenStream);
             YALGrammerVisitor                visitor           = new YALGrammerVisitor(errorHandler, warningsHandler);
             sw.Stop();
+            
+            
             Console.WriteLine("Parsed source code in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
             YALGrammerParser.ProgramContext? n                 = speakParser.program();
