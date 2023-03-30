@@ -129,11 +129,13 @@ public class CodeGenTraverser : ASTTraverser
         });
         _declarationsBuilder.AppendLine(declarationTemplate.ReplacePlaceholders());
             
-        var parametersBuilder = new StringBuilder();
+        var inputParametersBuilder = new StringBuilder();
         foreach (var symbol in function.InputParameters)
-            parametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = COMPILER_parameters->input->{symbol.Id};");
+            inputParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMS_{function.Id}->input->{symbol.Id};");
+
+        var outputParametersBuilder = new StringBuilder();
         foreach (var symbol in function.OutputParameters)
-            parametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = COMPILER_parameters->output->{symbol.Id};");
+            outputParametersBuilder.AppendLine($"_COMPILER_PARAMS_{function.Id}->output->{symbol.Id} = {symbol.Id};");
         
         var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
@@ -146,8 +148,10 @@ public class CodeGenTraverser : ASTTraverser
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Id),
-            new("parameters", parametersBuilder.ToString()),
-            new("body", bodyBuilder.ToString())
+            new("input_parameters", inputParametersBuilder.ToString()),
+            new("output_initialization", declarationOutputParametersBuilder.ToString()),
+            new("body", bodyBuilder.ToString()),
+            new("output_parameters", outputParametersBuilder.ToString())
         });
 
         return template.ReplacePlaceholders();
@@ -239,6 +243,9 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
+        if (binaryAssignment.Target is TupleDeclaration tupleDeclaration)
+            return (string)InvokeVisitor(tupleDeclaration);
+        
         var op = binaryAssignment.Operator switch
         {
             Operators.AssignmentOperator.Equals                   => "=",
@@ -403,6 +410,37 @@ public class CodeGenTraverser : ASTTraverser
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("return_statement", "return")
+        });
+
+        return template.ReplacePlaceholders();
+    }
+
+    internal override object? Visit(TupleDeclaration tupleDeclaration)
+    {
+        var binaryAssignment = tupleDeclaration.Parent as BinaryAssignment;
+        var functionCall = binaryAssignment.Value as FunctionCall;
+
+        var argumentsBuilder = new StringBuilder();
+        for (int i = 0; i < functionCall.Function.InputParameters.Count; i++) {
+            var symbol = functionCall.Function.InputParameters[i];
+            argumentsBuilder.AppendLine($"_COMPILER_INPUT_ARGS_{functionCall.Identifier}.{symbol.Id} = {InvokeVisitor(functionCall.InputParameters[i])};");
+        }
+        
+        var assignmentBuilder = new StringBuilder();
+        for (var i = 0; i < tupleDeclaration.Variables.Count; i++)
+        {
+            var symbol = tupleDeclaration.Variables[i];
+            var outputSymbol = functionCall.Function.OutputParameters[i];
+            assignmentBuilder.AppendLine(
+                $"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMS_{functionCall.Identifier}.output->{outputSymbol.Id};");
+        }
+
+        var template = new Template("tuple_declaration");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("arguments", argumentsBuilder.ToString()),
+            new("function", functionCall.Identifier),
+            new("declarations", assignmentBuilder.ToString())
         });
 
         return template.ReplacePlaceholders();

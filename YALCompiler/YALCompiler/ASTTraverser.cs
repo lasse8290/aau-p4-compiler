@@ -77,9 +77,8 @@ public abstract class ASTTraverser
 
     protected virtual object? InvokeVisitor(ASTNode node)
     {
-        Type nodeType = node.GetType();
-        MethodInfo? visitMethod = GetType().GetMethod(nameof(Visit), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { nodeType }, null);
-
+        Type        nodeType    = node.GetType();
+        MethodInfo? visitMethod = GetVisitMethodForNodeType(nodeType);
         if (visitMethod != null)
             return visitMethod.Invoke(this, new object[] { node });
 
