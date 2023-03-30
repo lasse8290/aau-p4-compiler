@@ -16,8 +16,8 @@ public static class Program {
             
             Stopwatch sw = new();
             sw.Start();
-            Template.LoadTemplates("Templates", "txt");
-            var                 text            = File.ReadAllText("Grammar/examples.yal");
+            Template.LoadTemplates("StringTemplating/Templates", "txt");
+            var                 text            = File.ReadAllText("YALCompiler/Grammar/examples.yal");
             var                 errorHandler    = new ErrorHandler();
             var                 warningsHandler = new WarningsHandler();
             sw.Stop();
