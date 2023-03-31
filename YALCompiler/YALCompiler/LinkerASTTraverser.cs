@@ -3,6 +3,9 @@ using YALCompiler.DataTypes;
 
 namespace YALCompiler;
 
+/// <summary>
+/// Linking all nodes to their parents
+/// </summary>
 public class LinkerASTTraverser : ASTTraverser
 {
     public LinkerASTTraverser(ASTNode node) : base(node) { }
