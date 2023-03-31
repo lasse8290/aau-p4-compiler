@@ -1,7 +1,10 @@
-sumAndDiffFromTwoNumbers: in(int32 a, int32 b) out(int32 sum, int32 diff) {
-    sum = a + b;
-    diff = a - b;
-}
 main: {
-    (int32 a, int32 b) = sumAndDiffFromTwoNumbers(1, 2)
+    int32 i = 0;
+    bool b = i > 0;
+    if (await func1(b)) {}
+}
+
+func1: in (bool sIn) out (bool s) {
+    s = true;
+    return;
 }

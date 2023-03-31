@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -225,6 +225,16 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitDeclarationAssignment([NotNull] YALGrammerParser.DeclarationAssignmentContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.tupleDeclaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -258,6 +268,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitVariable([NotNull] YALGrammerParser.VariableContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Or</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterOr([NotNull] YALGrammerParser.OrContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Or</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitOr([NotNull] YALGrammerParser.OrContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PrefixUnary</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -295,6 +317,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitFloatLiteral([NotNull] YALGrammerParser.FloatLiteralContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>BooleanLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBooleanLiteral([NotNull] YALGrammerParser.BooleanLiteralContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>BooleanLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBooleanLiteral([NotNull] YALGrammerParser.BooleanLiteralContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>VariableAssignment</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -330,6 +364,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitFunctionCallExpression([NotNull] YALGrammerParser.FunctionCallExpressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Not</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterNot([NotNull] YALGrammerParser.NotContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Not</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitNot([NotNull] YALGrammerParser.NotContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>LeftRightShift</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -378,6 +424,30 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitBitwiseOr([NotNull] YALGrammerParser.BitwiseOrContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Comparison</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterComparison([NotNull] YALGrammerParser.ComparisonContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Comparison</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitComparison([NotNull] YALGrammerParser.ComparisonContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>And</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterAnd([NotNull] YALGrammerParser.AndContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>And</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitAnd([NotNull] YALGrammerParser.AndContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>BitwiseAnd</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -458,90 +528,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitActualInputParams([NotNull] YALGrammerParser.ActualInputParamsContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>Not</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterNot([NotNull] YALGrammerParser.NotContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>Not</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitNot([NotNull] YALGrammerParser.NotContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>Or</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterOr([NotNull] YALGrammerParser.OrContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>Or</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitOr([NotNull] YALGrammerParser.OrContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>ParenthesizedPredicate</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterParenthesizedPredicate([NotNull] YALGrammerParser.ParenthesizedPredicateContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>ParenthesizedPredicate</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitParenthesizedPredicate([NotNull] YALGrammerParser.ParenthesizedPredicateContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>Comparison</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterComparison([NotNull] YALGrammerParser.ComparisonContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>Comparison</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitComparison([NotNull] YALGrammerParser.ComparisonContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>BooleanLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterBooleanLiteral([NotNull] YALGrammerParser.BooleanLiteralContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>BooleanLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitBooleanLiteral([NotNull] YALGrammerParser.BooleanLiteralContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>And</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterAnd([NotNull] YALGrammerParser.AndContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>And</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitAnd([NotNull] YALGrammerParser.AndContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>ExpressionPredicate</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterExpressionPredicate([NotNull] YALGrammerParser.ExpressionPredicateContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>ExpressionPredicate</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitExpressionPredicate([NotNull] YALGrammerParser.ExpressionPredicateContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.ifStatement"/>.
 	/// </summary>

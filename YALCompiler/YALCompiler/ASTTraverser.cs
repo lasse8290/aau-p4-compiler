@@ -58,17 +58,21 @@ public abstract class ASTTraverser
             var node = stack.Pop();
             InvokeVisitor(node);
 
-            var properties = GetNodeChildProperties(node.GetType());
-
-            foreach (var property in properties)
-            {
-                var childNode = property.GetValue(node) as ASTNode;
-                if (childNode != null)
-                {
-                    childNode.Parent = node;
-                    stack.Push(childNode);
-                }
-            }
+            // commented this out because every nodes which aren't in the children list but are part of another wrapper node
+            // are being checked twice, adding the same error to the error list twice
+            // but don't delete it just yet till i've tested it more thoroughly
+            
+            // var properties = GetNodeChildProperties(node.GetType());
+            //
+            // foreach (var property in properties)
+            // {
+            //     var childNode = property.GetValue(node) as ASTNode;
+            //     if (childNode != null)
+            //     {
+            //         childNode.Parent = node;
+            //         stack.Push(childNode);
+            //     }
+            // }
 
             for (int i = node.Children.Count - 1; i >= 0; i--)
                 stack.Push(node.Children[i]);

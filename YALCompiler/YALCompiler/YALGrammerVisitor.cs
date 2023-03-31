@@ -102,9 +102,9 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         symbol.Type = type;
         
-        if (context.predicate() != null && Visit(context.predicate()) is Predicate predicate)
+        if (context.expression() != null && Visit(context.expression()) is Expression expression)
         {
-            symbol.Value = predicate;
+            symbol.Value = expression;
             symbol.Initialized = true;
         }
         
@@ -375,12 +375,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var ifStatement = new IfStatement() { LineNumber = context.Start.Line};
         var ifPath = new If();
 
-        if (Visit(context.predicate()) is Predicate predicate) {
-            ifPath.Predicate = predicate;
+         if (Visit(context.expression()) is Expression expression) {
+            ifPath.Predicate = expression;
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
         }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -409,12 +409,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 var elseIfPath = new ElseIf();
 
-                if (Visit(elseIf.predicate()) is Predicate elseIfPredicate){
-                    elseIfPath.Predicate = elseIfPredicate;
+                if (Visit(elseIf.expression()) is Expression elseIfExpression){
+                    elseIfPath.Predicate = elseIfExpression;
                 }
                 else
                 {
-                    _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), elseIf);
+                    _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), elseIf);
                 }
                 
                 StatementBlock elseIfStatementBlock = Visit(elseIf.statementBlock()) as StatementBlock;
@@ -472,13 +472,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         WhileStatement whileStatement = new WhileStatement();
 
-        if (Visit(context.predicate()) is Predicate predicate)
+        if (Visit(context.expression()) is Expression expression)
         {
-            whileStatement.Predicate = predicate;
+            whileStatement.Predicate = expression;
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
         }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -514,13 +514,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             forStatement.SymbolTable.Add(varDecl.Variable);
         }
 
-        if (Visit(context.predicate()) is Predicate predicate)
+        if (Visit(context.expression()) is Expression expression)
         {
-            forStatement.RunCondition = predicate;
+            forStatement.RunCondition = expression;
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.predicate().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
         }
 
         forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
@@ -553,10 +553,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitNot(YALGrammerParser.NotContext context)
     {
-        if (Visit(context.predicate()) is not Predicate predicate) return null;
-        predicate.Negated = true;
-        predicate.LineNumber = context.Start.Line;
-        return predicate;
+        if (Visit(context.expression()) is not Expression expression) return null;
+        expression.Negated = true;
+        expression.LineNumber = context.Start.Line;
+        return expression;
     }
 
     public override object VisitAnd(YALGrammerParser.AndContext context)
@@ -564,8 +564,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var compoundPredicate = new CompoundPredicate
         {
             Operator = Operators.PredicateOperator.And,
-            Left = Visit(context.predicate(0)) as Expression,
-            Right = Visit(context.predicate(1)) as Expression
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
         };
         compoundPredicate.LineNumber = context.Start.Line;
         return compoundPredicate;
@@ -576,8 +576,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var compoundPredicate = new CompoundPredicate
         {
             Operator = Operators.PredicateOperator.Or,
-            Left = Visit(context.predicate(0)) as Expression,
-            Right = Visit(context.predicate(1)) as Expression
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
         };
         compoundPredicate.LineNumber = context.Start.Line;
         return compoundPredicate;
@@ -587,8 +587,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var compoundPredicate = new CompoundPredicate
         {
-            Left = Visit(context.predicate(0)) as Expression,
-            Right = Visit(context.predicate(1)) as Expression
+            Left = Visit(context.expression(0)) as Expression,
+            Right = Visit(context.expression(1)) as Expression
         };
         switch (context.@operator.Type)
         {
@@ -613,11 +613,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
         compoundPredicate.LineNumber = context.Start.Line;
         return compoundPredicate;
-    }
-
-    public override object VisitParenthesizedPredicate(YALGrammerParser.ParenthesizedPredicateContext context)
-    {
-        return Visit(context.predicate());
     }
 
     public override object VisitBooleanLiteral(YALGrammerParser.BooleanLiteralContext context)
@@ -854,7 +849,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var assignment = new BinaryAssignment()
         {
             Target = Visit(context.identifier()) as Identifier,
-            Value = Visit(context.predicate()) as Expression
+            Value = Visit(context.expression()) as Expression
         };
         
         if (assignment.Target is not null)
@@ -931,29 +926,29 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             Target = Visit(context.variableDeclaration()) as ASTNode,
             Operator = Operators.AssignmentOperator.Equals,
-            Value = Visit(context.predicate()) as Expression
+            Value = Visit(context.expression()) as Expression
         };
 
         return assignment;
     }
     
-    // public override object VisitTupleAssignment(YALGrammerParser.TupleAssignmentContext context)
-    // {
-    //     var assignment = new BinaryAssignment()
-    //     {
-    //         Target = Visit(context.tupleDeclaration()),
-    //         Operator = Operators.AssignmentOperator.Equals,
-    //         Value = Visit(context.expression()) as Expression
-    //     };
-    //     
-    //     if (assignment.Target is not null)
-    //         ((Identifier)assignment.Target).Parent = assignment;
-    //     
-    //     if (assignment.Value is not null)
-    //         assignment.Value.Parent = assignment;
-    //     
-    //     return assignment;
-    // }
+    public override object VisitTupleAssignment(YALGrammerParser.TupleAssignmentContext context)
+    {
+        var assignment = new BinaryAssignment()
+        {
+            Target = Visit(context.tupleDeclaration()) as ASTNode,
+            Operator = Operators.AssignmentOperator.Equals,
+            Value = Visit(context.expression()) as Expression
+        };
+        
+        if (assignment.Target is not null)
+            ((Identifier)assignment.Target).Parent = assignment;
+        
+        if (assignment.Value is not null)
+            assignment.Value.Parent = assignment;
+        
+        return assignment;
+    }
     
     public override object VisitTupleDeclaration(YALGrammerParser.TupleDeclarationContext context)
     {
@@ -993,6 +988,4 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
         return arrayLiteral;
     }
-
-    
 } 

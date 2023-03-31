@@ -8,4 +8,9 @@ public class InvalidPredicate: Exception
     {
         
     }
+    
+    public InvalidPredicate(string predicate, string type): base($"Invalid predicate: {predicate} of type {type}")
+    {
+        
+    }
 }
