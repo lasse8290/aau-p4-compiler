@@ -1,10 +1,7 @@
-main: {
-    int32 i = 0;
-    bool b = i > 0;
-    if (await func1(b)) {}
+async expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
+	area = width * length;
 }
 
-func1: in (bool sIn) out (bool s) {
-    s = true;
-    return;
+async test: {
+	int32 test = expensiveSquareArea(10, 10);
 }

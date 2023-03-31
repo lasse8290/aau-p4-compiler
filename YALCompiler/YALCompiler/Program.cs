@@ -58,7 +58,10 @@ public static class Program {
             
             Console.WriteLine(generatedCode);
 
-            
+            string filePath = Path.Combine("C:\\Users\\Rasmus\\Documents", "GenCode.txt");
+
+            File.WriteAllText(filePath, generatedCode);
+
 
             Console.WriteLine("Done");
 

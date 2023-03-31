@@ -1,0 +1,1 @@
+﻿(*((COMPILER_OUTPUT_STRUCT_%%function%%*) COMPILER_AWAIT(COMPILER_INPUT_STRUCT_%%function%% { %%arguments%% }, %%function%%)))%%suffix%%

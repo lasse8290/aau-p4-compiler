@@ -1,19 +1,33 @@
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
-//#include <Arduino.h>
-         
-struct EMPTY { };
+#include <Arduino.h>
+
+
+typedef void (*Func)(void*);
+
 template <typename I, typename O>
-struct PARAMETERS { 
+struct COMPILER_PARAMETERS {
+  TaskHandle_t taskhandle; 
   I *input;
   O *output;
 };
 
-void* COMPILER_AWAIT(void* params, void* (*func)(void*)) {
-  xTaskCreate(wait_x, "WAIT", 4096, &wait_params, 10, &Handle_WAIT); // function call
+template <typename I>
+void* COMPILER_AWAIT(I inputParameters, Func func) {
+    TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
 
-  return func(params);
+    COMPILER_PARAMETERS<void, void> parameters;
+    parameters.taskhandle = taskhandle;
+    parameters.input = &inputParameters;
+
+    void* outputParameters;
+    parameters.output = &outputParameters;
+
+    xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
+    xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+
+    return parameters.output;
 }
 
 
