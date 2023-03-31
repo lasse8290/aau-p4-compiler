@@ -1,4 +1,4 @@
-using System.Diagnostics;
+    using System.Diagnostics;
 using StringTemplating;
 using Antlr4.Runtime;
 using BenchmarkDotNet.Running;
@@ -16,8 +16,8 @@ public static class Program {
             
             Stopwatch sw = new();
             sw.Start();
-            Template.LoadTemplates("StringTemplating/Templates", "txt");
-            var                 text            = File.ReadAllText("YALCompiler/Grammar/examples.yal");
+            Template.LoadTemplates("Templates", "txt");
+            var                 text            = File.ReadAllText("Grammar/examples.yal");
             var                 errorHandler    = new ErrorHandler();
             var                 warningsHandler = new WarningsHandler();
             sw.Stop();
@@ -46,14 +46,14 @@ public static class Program {
             TypeAndScopeCheckerTraverser traverser = new(node, errorHandler, warningsHandler);
             traverser.BeginTraverse();
             sw.Stop();
+            Console.WriteLine(warningsHandler.GetAsString());
+            Console.WriteLine(errorHandler.GetAsString());
             Console.WriteLine("Type and scope checked AST in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
             CodeGenTraverser cgt = new(node);
             cgt.BeginTraverse();
             sw.Stop();
             Console.WriteLine("Generated code in " + sw.ElapsedMilliseconds + "ms");
-            Console.WriteLine(warningsHandler.GetAsString());
-            Console.WriteLine(errorHandler.GetAsString());
             string generatedCode = cgt.GetGeneratedCode();
             
             Console.WriteLine(generatedCode);

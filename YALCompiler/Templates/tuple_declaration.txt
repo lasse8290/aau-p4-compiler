@@ -1,0 +1,9 @@
+﻿COMPILER_INPUT_PARAMS_%%function%% _COMPILER_INPUT_ARGS_%%function%%;
+COMPILER_OUTPUT_PARAMS_%%function%% _COMPILER_OUTPUT_ARGS_%%function%%;
+COMPILER_PARAMS_%%function%% _COMPILER_PARAMS_%%function%% = { &_COMPILER_INPUT_ARGS_%%function%%, &_COMPILER_OUTPUT_ARGS_%%function%% };
+
+%%arguments%%
+
+%%function%%(&_COMPILER_PARAMS_%%function%%);
+
+%%declarations%%

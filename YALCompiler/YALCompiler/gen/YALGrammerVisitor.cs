@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -147,6 +147,12 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDeclarationAssignment([NotNull] YALGrammerParser.DeclarationAssignmentContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="YALGrammerParser.tupleAssignment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTupleAssignment([NotNull] YALGrammerParser.TupleAssignmentContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.tupleDeclaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -166,6 +172,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitVariable([NotNull] YALGrammerParser.VariableContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Or</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOr([NotNull] YALGrammerParser.OrContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>PrefixUnary</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -188,6 +201,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitFloatLiteral([NotNull] YALGrammerParser.FloatLiteralContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>BooleanLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBooleanLiteral([NotNull] YALGrammerParser.BooleanLiteralContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>VariableAssignment</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -208,6 +228,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitFunctionCallExpression([NotNull] YALGrammerParser.FunctionCallExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Not</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNot([NotNull] YALGrammerParser.NotContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>LeftRightShift</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -236,6 +263,20 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitBitwiseOr([NotNull] YALGrammerParser.BitwiseOrContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Comparison</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitComparison([NotNull] YALGrammerParser.ComparisonContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>And</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAnd([NotNull] YALGrammerParser.AndContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>BitwiseAnd</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -283,55 +324,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitActualInputParams([NotNull] YALGrammerParser.ActualInputParamsContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Not</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitNot([NotNull] YALGrammerParser.NotContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Or</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitOr([NotNull] YALGrammerParser.OrContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>ParenthesizedPredicate</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitParenthesizedPredicate([NotNull] YALGrammerParser.ParenthesizedPredicateContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Comparison</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitComparison([NotNull] YALGrammerParser.ComparisonContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>BooleanLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitBooleanLiteral([NotNull] YALGrammerParser.BooleanLiteralContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>And</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitAnd([NotNull] YALGrammerParser.AndContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>ExpressionPredicate</c>
-	/// labeled alternative in <see cref="YALGrammerParser.predicate"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitExpressionPredicate([NotNull] YALGrammerParser.ExpressionPredicateContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.ifStatement"/>.
 	/// </summary>

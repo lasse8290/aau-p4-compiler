@@ -150,6 +150,24 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 break;
             }
         }
+        
+        //check if await is used that it is within an async function
+        if (node.Await)
+        {
+            Function? parentFunction = null;
+            ASTNode? tempNode = node;
+            while (parentFunction is null && tempNode is not null)
+            {
+                tempNode = tempNode.Parent;
+                if (tempNode is Function functionNode)
+                    parentFunction = functionNode;
+            }
+
+            if (parentFunction is not null && !parentFunction.IsAsync)
+            {
+                _errorHandler.AddError(new InvalidAwaitException(), node.LineNumber);
+            }
+        }
 
         node.Function = function;
         return function.ReturnType;
@@ -250,8 +268,11 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         {
             _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightSingleType.Type), node.LineNumber);
         }
+        else
+        {
+            node.Type = Types.GetLeastAssignableType(leftSingleType, rightSingleType);
+        }
         
-        node.Type = Types.GetLeastAssignableType(leftSingleType, rightSingleType);
         return node.Type;
     }
 
@@ -312,4 +333,47 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return leastAssignableType;
     }
 
+    internal override object? Visit(If node)
+    {
+        YALType? type = Visit(node.Predicate) as YALType;
+        if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
+        {
+            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type.ToString()), node.LineNumber);
+        }
+
+        return null;
+    }
+    
+    internal override object? Visit(ElseIf node)
+    {
+        YALType? type = Visit(node.Predicate) as YALType;
+        if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
+        {
+            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type.ToString()), node.LineNumber);
+        }
+
+        return null;
+    }
+    
+    internal override object? Visit(WhileStatement node)
+    {
+        YALType? type = Visit(node.Predicate) as YALType;
+        if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
+        {
+            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type.ToString()), node.LineNumber);
+        }
+
+        return null;
+    }
+    
+    internal override object? Visit(ForStatement node)
+    {
+        YALType? type = Visit(node.RunCondition) as YALType;
+        if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
+        {
+            _errorHandler.AddError(new InvalidPredicate(node.RunCondition.ToString(), type.ToString()), node.LineNumber);
+        }
+
+        return null;
+    }
 }
