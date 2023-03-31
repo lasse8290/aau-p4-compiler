@@ -40,6 +40,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                                 index.Value, symbol.ArraySize.Value), node.LineNumber);
                         }
                     }
+
+                    symbol.Initialized = true;
                 }
                 else
                 {
@@ -164,11 +166,12 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             }
 
             if (parentFunction is not null && !parentFunction.IsAsync)
-            {
                 _errorHandler.AddError(new InvalidAwaitException(), node.LineNumber);
-            }
-        }
 
+            if (!function.IsAsync)
+                _errorHandler.AddError(new CannotAwaitNonAsyncFunctionException(), node.LineNumber);
+        }
+        
         node.Function = function;
         return function.ReturnType;
     }
@@ -291,6 +294,17 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             _errorHandler.AddError(new TypeMismatchException(leftType?.ToString() ?? "null", rightType?.ToString() ?? "null"), node.LineNumber);
             return null;
         }
+        
+        //This part invalidates comparison of tuples
+        if (leftType is TupleType leftTupleType)
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftTupleType), node.LineNumber);
+            return null;
+        } else if (rightType is TupleType rightTupleType)
+        {
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightTupleType), node.LineNumber);
+            return null;
+        }
 
         // if (!Types.CheckCompoundExpressionTypesAreValid(leftType, rightType))
         // {
@@ -338,7 +352,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType? type = Visit(node.Predicate) as YALType;
         if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
         {
-            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type.ToString()), node.LineNumber);
+            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type?.ToString() ?? "null"), node.LineNumber);
         }
 
         return null;
@@ -375,5 +389,33 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
 
         return null;
+    }
+
+    internal override object? Visit(ReturnStatement node)
+    {
+        Function? parentFunction = null;
+        ASTNode? tempNode = node;
+        while (parentFunction is null && tempNode is not null)
+        {
+            tempNode = tempNode.Parent;
+            if (tempNode is Function functionNode)
+                parentFunction = functionNode;
+        }
+
+        if (parentFunction is not null)
+        {
+            foreach (Symbol outParam in parentFunction.OutputParameters)
+            {
+                if (!outParam.Initialized)
+                    _errorHandler.AddError(new UninitializedVariableException(outParam.Id), node.LineNumber);
+            }
+        }
+
+        return null;
+    }
+
+    internal override object? Visit(Function node)
+    {
+        return node.ReturnType;
     }
 }

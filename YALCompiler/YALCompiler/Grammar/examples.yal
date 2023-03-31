@@ -1,10 +1,30 @@
-main: {
+async main: {
     int32 i = 0;
     bool b = i > 0;
-    if (await func1(b)) {}
+    string s = b + "4";
 }
 
-func1: in (bool sIn) out (bool s) {
+async func1: in (bool sIn) out (bool s) {
     s = true;
+}
+
+async func2: in (bool sIn) out (bool b, int32 f, bool g, string s) {
+    s = "true";
+    f = 5;
+    g = false;
+    b = true;
+    (string sss, int32 fff) = await func3();
+    return;
+}
+
+async func3: out (string s, int32 f) {
+    s = "true";
+    f = 5;
+    return;
+}
+
+async func4: out (string s, int32 f) {
+    s = "true";
+    f = 5;
     return;
 }

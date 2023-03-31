@@ -234,6 +234,9 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 _errorHandler.AddError(e, context);                    
             }
         }
+        
+        if (func.Children.LastOrDefault() is not ReturnStatement)
+            func.Children.Add(new ReturnStatement());
 
         func.LineNumber = context.Start.Line;
         return func;
