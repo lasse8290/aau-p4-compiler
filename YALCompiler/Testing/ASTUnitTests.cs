@@ -8,7 +8,6 @@ namespace Testing;
 
 public class ASTUnitTests
 {
-
     YALGrammerVisitor visitor = new YALGrammerVisitor();
 
     public IParseTree Parse(YALGrammerParser parser, string methodName) => (IParseTree)parser.GetType().GetMethod(methodName).Invoke(parser, null);
@@ -23,21 +22,28 @@ public class ASTUnitTests
         return parser;
     }
 
-    private ASTNode Setup(string input, string methodName) {
+    private ASTNode Setup(string input, string methodName)
+    {
         YALGrammerParser parser = Setup(input);
         IParseTree tree = Parse(parser, methodName);
-        return (ASTNode)visitor.Visit(tree);
+
+        ASTNode node = (ASTNode)visitor.Visit(tree);
+        LinkerASTTraverser linker = new(node);
+        linker.BeginTraverse();
+
+        return node;
     }
 
     [Theory]
     [InlineData(@"external <""my_library""> print1: in (string _string);", "print1")]
     [InlineData(@"external <""hej""> print2: in (string _string);", "print2")]
-    public void Assert_External_Function_Exists_In_Symbol_Table(string input, string expectedName) {
+    public void Assert_External_Function_Exists_In_Symbol_Table(string input, string expectedName)
+    {
         ExternalFunction externalVarDcl = (ExternalFunction)Setup(input, nameof(YALGrammerParser.externalFunctionDeclaration));
 
         Assert.Equal(expectedName, externalVarDcl.Id);
     }
-    
+
     [Theory]
     [InlineData("my_function: {}", "my_function")]
     [InlineData("function_name_100: {}", "function_name_100")]
@@ -48,9 +54,9 @@ public class ASTUnitTests
         Assert.IsType<Function>(func);
         Assert.Equal(functionName, func.Id);
     }
-    
+
     public static TheoryData<string, int> functionsData =>
-        new () {
+        new() {
             { "", 0 },
             { String.Concat(Enumerable.Range(0, 40).Select(i => $"function{i}: {{}}")), 40 },
             { String.Concat(Enumerable.Range(0, 15).Select(i => $"function{i}: {{}}")), 15 },
@@ -78,13 +84,13 @@ public class ASTUnitTests
     public void Assert_Correct_Function_Parameters_Count(string input, int expectedInputParametersCount, int expectedOutputParametersCount)
     {
         Function func = (Function)Setup($"my_function: {input} {{}}", nameof(YALGrammerParser.functionDeclaration));
-        
+
         Assert.Equal(expectedInputParametersCount, func.InputParameters.Count);
         Assert.Equal(expectedOutputParametersCount, func.OutputParameters.Count);
     }
 
     public static TheoryData<string, List<Types.ValueType>> InputParametersData =>
-        new () {
+        new() {
             { "in (int32 a, bool b)", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
             { "in (float32 c, float64 d)", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
             { "out (int32 a, bool b)", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
@@ -96,7 +102,8 @@ public class ASTUnitTests
     public void Assert_Formal_Parameters(string parameters, List<Types.ValueType> expectedParameterTypes)
     {
         IParseTree tree;
-        switch (parameters.Split(" ")[0]) {
+        switch (parameters.Split(" ")[0])
+        {
             case "in":
                 tree = Setup(parameters).formalInputParams();
                 break;
@@ -104,18 +111,19 @@ public class ASTUnitTests
                 tree = Setup(parameters).formalOutputParams();
                 break;
             default:
-                throw new Exception("First lexer be 'in' or 'out'");
+                throw new Exception("First lexer must be 'in' or 'out'");
         }
         List<Symbol> list = (List<Symbol>)visitor.Visit(tree);
-        
-        for (int i = 0; i < expectedParameterTypes.Count; i++) {
+
+        for (int i = 0; i < expectedParameterTypes.Count; i++)
+        {
             Types.ValueType expectedType = expectedParameterTypes[i];
             Symbol param = (Symbol)list[i];
 
             Assert.Equal(expectedType, ((SingleType)param.Type!).Type);
         }
     }
-    
+
     [Theory]
     [InlineData("my_function: { }", 0)]
     [InlineData("my_function: { int32 hej = 1+2; }", 1)]
@@ -124,7 +132,7 @@ public class ASTUnitTests
     public void Assert_Correct_Amount_Of_BlockStatements(string input, int expectedStatementsCount)
     {
         Function func = (Function)Setup(input, nameof(YALGrammerParser.functionDeclaration));
-        
+
         Assert.Equal(expectedStatementsCount, func.Children.Count);
     }
 
@@ -144,7 +152,7 @@ public class ASTUnitTests
     [InlineData("for (int32 i = 5; i < 5; i++) { }", typeof(ForStatement))]
     [InlineData("while (i < 5) { }", typeof(WhileStatement))]
     [InlineData("if (i < 5) { }", typeof(IfStatement))]
-    public void Assert_Correct_BlockStatement_Type(string input, Type expectedStatementType)
+    public void Assert_BlockStatement_Type(string input, Type expectedStatementType)
     {
         var stmt = Setup(input, nameof(YALGrammerParser.blockStatement));
 
@@ -153,12 +161,30 @@ public class ASTUnitTests
 
     [Theory]
     [InlineData("for (int32 i = 5; i < 10; i++) {}")]
-    public void Assert_Correct_For_Loop(string input) {
-        ForStatement for_stmt = (ForStatement)Setup(input, nameof(YALGrammerParser.forStatement));
+    public void Assert_For_Loop(string input)
+    {
+        var for_stmt = Setup(input, nameof(YALGrammerParser.forStatement));
 
-        Symbol? symbol = CompilerUtilities.FindSymbol("i", for_stmt);
+        Assert.Equal(typeof(ForStatement), for_stmt.GetType());
+    }
 
-    
-        Console.WriteLine("test");
+    [Theory]
+    [InlineData("5++", typeof(UnaryCompoundExpression))]
+    [InlineData("++5", typeof(UnaryCompoundExpression))]
+    [InlineData("5 * 10", typeof(CompoundExpression))]
+    [InlineData("5 + 10", typeof(CompoundExpression))]
+    [InlineData("5 << 10", typeof(CompoundExpression))]
+    [InlineData("5 >> 10", typeof(CompoundExpression))]
+    [InlineData("5 & 10", typeof(CompoundExpression))]
+    [InlineData("5 ^ 10", typeof(CompoundExpression))]
+    [InlineData("5 | 10", typeof(CompoundExpression))]
+    [InlineData("5 ~ 10", typeof(CompoundExpression))]
+    [InlineData(@"hi = ""whaaat""", typeof(BinaryAssignment))]
+    [InlineData(@"myCall(param1, param2)", typeof(FunctionCall))]
+    public void Assert_Expression_Type(string input, Type expectedExpressionType)
+    {
+        var expr = Setup(input, nameof(YALGrammerParser.expression));
+
+        Assert.Equal(expectedExpressionType, expr.GetType());
     }
 }
