@@ -151,12 +151,15 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
         
         List<SingleType?> actualParams = new();
+        List<string> actualParamTypes = new();
         bool hasError = false;
         for (int i = 0; i < function.InputParameters.Count; i++)
         {
             var actualParam = Visit(node.InputParameters[i]) as SingleType;
             actualParams.Add(actualParam);
-            if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, actualParam))
+            actualParamTypes.Add((node.InputParameters[i].IsRef ? "ref " : "") + (actualParam?.ToString() ?? "null"));
+            if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, actualParam) ||
+                function.InputParameters[i].IsRef != node.InputParameters[i].IsRef)
             {
                 hasError = true;
             }
@@ -166,8 +169,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         {
             _errorHandler.AddError(
                 new InvalidFunctionCallInputParameters(
-                    function.InputParameters.Select(s => s.Type as SingleType).ToList(),
-                    actualParams),
+                    function.InputParameters,
+                    actualParamTypes),
                 node.LineNumber);    
         }
         

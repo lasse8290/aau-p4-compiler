@@ -244,7 +244,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitFormalInputParams(YALGrammerParser.FormalInputParamsContext context)
     {
         var paramVars = new List<Symbol>();
-        foreach (var varDecl in context.variableDeclarationFormat())
+        
+        foreach (var varDecl in context.referenceableVariableDeclarationFormat())
         {
             if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
             {
@@ -265,6 +266,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
         }
         return paramVars;
+    }
+
+    public override object VisitReferenceableVariableDeclarationFormat(YALGrammerParser.ReferenceableVariableDeclarationFormatContext context)
+    {
+        var variable = Visit(context.variableDeclarationFormat()) as VariableDeclaration;
+        if (variable is not null) variable.Variable.IsRef = context.REF() != null;
+        return variable;
     }
 
     public override object VisitArrayDeclaration(YALGrammerParser.ArrayDeclarationContext context)
@@ -635,6 +643,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
     #region ExpressionVisitors
 
+    public override object VisitReferenceableExpression(YALGrammerParser.ReferenceableExpressionContext context)
+    {
+        var referenceable = Visit(context.expression()) as Expression;
+        if (referenceable is not null) referenceable.IsRef = context.REF() != null;
+        return referenceable;
+    }
+    
     public override object VisitVariable(YALGrammerParser.VariableContext context)
     {
         return Visit(context.identifier());
@@ -835,7 +850,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitActualInputParams(YALGrammerParser.ActualInputParamsContext context)
     {
         List<Expression> actualInputParams = new();
-        foreach (var expression in context.expression())
+        foreach (var expression in context.referenceableExpression())
         {
             if (Visit(expression) is Expression expr)
             {

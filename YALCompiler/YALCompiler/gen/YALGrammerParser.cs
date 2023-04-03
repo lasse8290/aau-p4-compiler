@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -39,44 +39,46 @@ public partial class YALGrammerParser : Parser {
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
 		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
 		T__17=18, EXTERNAL=19, ASYNC=20, AWAIT=21, RETURN=22, TYPE=23, IN=24, 
-		OUT=25, STRING=26, BOOLEAN=27, ID=28, POSITIVE_NUMBER=29, FLOAT=30, TIMES=31, 
-		DIV=32, MOD=33, PLUS=34, MINUS=35, LSHIFT=36, RSHIFT=37, INCREMENT=38, 
-		DECREMENT=39, LESS_THAN=40, LESS_THAN_OR_EQUAL=41, GREATER_THAN=42, GREATER_THAN_OR_EQUAL=43, 
-		EQUALS=44, NOT_EQUAL=45, EQUAL=46, PLUS_EQUAL=47, MINUS_EQUAL=48, MULTIPLY_EQUAL=49, 
-		DIVIDE_EQUAL=50, MODULO_EQUAL=51, BITWISE_NOT=52, LBRACKET=53, RBRACKET=54, 
-		WHITESPACE=55, NEWLINE=56, COMMENT=57, LINE_COMMENT=58;
+		OUT=25, REF=26, STRING=27, BOOLEAN=28, ID=29, POSITIVE_NUMBER=30, FLOAT=31, 
+		TIMES=32, DIV=33, MOD=34, PLUS=35, MINUS=36, LSHIFT=37, RSHIFT=38, INCREMENT=39, 
+		DECREMENT=40, LESS_THAN=41, LESS_THAN_OR_EQUAL=42, GREATER_THAN=43, GREATER_THAN_OR_EQUAL=44, 
+		EQUALS=45, NOT_EQUAL=46, EQUAL=47, PLUS_EQUAL=48, MINUS_EQUAL=49, MULTIPLY_EQUAL=50, 
+		DIVIDE_EQUAL=51, MODULO_EQUAL=52, BITWISE_NOT=53, LBRACKET=54, RBRACKET=55, 
+		WHITESPACE=56, NEWLINE=57, COMMENT=58, LINE_COMMENT=59;
 	public const int
 		RULE_program = 0, RULE_globalVariableDeclaration = 1, RULE_externalFunctionDeclaration = 2, 
 		RULE_functionDeclaration = 3, RULE_formalInputParams = 4, RULE_formalOutputParams = 5, 
 		RULE_statementBlock = 6, RULE_blockStatement = 7, RULE_singleStatement = 8, 
-		RULE_variableDeclaration = 9, RULE_variableDeclarationFormat = 10, RULE_assignment = 11, 
-		RULE_simpleAssignment = 12, RULE_declarationAssignment = 13, RULE_tupleAssignment = 14, 
-		RULE_tupleDeclaration = 15, RULE_expression = 16, RULE_functionCall = 17, 
-		RULE_actualInputParams = 18, RULE_ifStatement = 19, RULE_elseIfStatement = 20, 
-		RULE_elseStatement = 21, RULE_whileStatement = 22, RULE_forStatement = 23, 
-		RULE_identifier = 24;
+		RULE_variableDeclaration = 9, RULE_referenceableVariableDeclarationFormat = 10, 
+		RULE_referenceableExpression = 11, RULE_variableDeclarationFormat = 12, 
+		RULE_assignment = 13, RULE_simpleAssignment = 14, RULE_declarationAssignment = 15, 
+		RULE_tupleAssignment = 16, RULE_tupleDeclaration = 17, RULE_expression = 18, 
+		RULE_functionCall = 19, RULE_actualInputParams = 20, RULE_ifStatement = 21, 
+		RULE_elseIfStatement = 22, RULE_elseStatement = 23, RULE_whileStatement = 24, 
+		RULE_forStatement = 25, RULE_identifier = 26;
 	public static readonly string[] ruleNames = {
 		"program", "globalVariableDeclaration", "externalFunctionDeclaration", 
 		"functionDeclaration", "formalInputParams", "formalOutputParams", "statementBlock", 
-		"blockStatement", "singleStatement", "variableDeclaration", "variableDeclarationFormat", 
-		"assignment", "simpleAssignment", "declarationAssignment", "tupleAssignment", 
-		"tupleDeclaration", "expression", "functionCall", "actualInputParams", 
-		"ifStatement", "elseIfStatement", "elseStatement", "whileStatement", "forStatement", 
-		"identifier"
+		"blockStatement", "singleStatement", "variableDeclaration", "referenceableVariableDeclarationFormat", 
+		"referenceableExpression", "variableDeclarationFormat", "assignment", 
+		"simpleAssignment", "declarationAssignment", "tupleAssignment", "tupleDeclaration", 
+		"expression", "functionCall", "actualInputParams", "ifStatement", "elseIfStatement", 
+		"elseStatement", "whileStatement", "forStatement", "identifier"
 	};
 
 	private static readonly string[] _LiteralNames = {
 		null, "';'", "':'", "'('", "','", "')'", "'{'", "'}'", "'!'", "'&'", "'^'", 
 		"'|'", "'&&'", "'||'", "'if'", "'else if'", "'else'", "'while'", "'for'", 
 		"'external'", "'async'", "'await'", "'return'", null, "'in'", "'out'", 
-		null, null, null, null, null, "'*'", "'/'", "'%'", "'+'", "'-'", "'<<'", 
-		"'>>'", "'++'", "'--'", "'<'", "'<='", "'>'", "'>='", "'=='", "'!='", 
-		"'='", "'+='", "'-='", "'*='", "'\\='", "'%='", "'~'", "'['", "']'"
+		"'ref'", null, null, null, null, null, "'*'", "'/'", "'%'", "'+'", "'-'", 
+		"'<<'", "'>>'", "'++'", "'--'", "'<'", "'<='", "'>'", "'>='", "'=='", 
+		"'!='", "'='", "'+='", "'-='", "'*='", "'\\='", "'%='", "'~'", "'['", 
+		"']'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, "EXTERNAL", "ASYNC", "AWAIT", 
-		"RETURN", "TYPE", "IN", "OUT", "STRING", "BOOLEAN", "ID", "POSITIVE_NUMBER", 
+		"RETURN", "TYPE", "IN", "OUT", "REF", "STRING", "BOOLEAN", "ID", "POSITIVE_NUMBER", 
 		"FLOAT", "TIMES", "DIV", "MOD", "PLUS", "MINUS", "LSHIFT", "RSHIFT", "INCREMENT", 
 		"DECREMENT", "LESS_THAN", "LESS_THAN_OR_EQUAL", "GREATER_THAN", "GREATER_THAN_OR_EQUAL", 
 		"EQUALS", "NOT_EQUAL", "EQUAL", "PLUS_EQUAL", "MINUS_EQUAL", "MULTIPLY_EQUAL", 
@@ -166,30 +168,30 @@ public partial class YALGrammerParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 55;
+			State = 59;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (((_la) & ~0x3f) == 0 && ((1L << _la) & 278396928L) != 0) {
+			while (((_la) & ~0x3f) == 0 && ((1L << _la) & 546832384L) != 0) {
 				{
-				State = 53;
+				State = 57;
 				ErrorHandler.Sync(this);
 				switch (TokenStream.LA(1)) {
 				case EXTERNAL:
 					{
-					State = 50;
+					State = 54;
 					externalFunctionDeclaration();
 					}
 					break;
 				case TYPE:
 					{
-					State = 51;
+					State = 55;
 					globalVariableDeclaration();
 					}
 					break;
 				case ASYNC:
 				case ID:
 					{
-					State = 52;
+					State = 56;
 					functionDeclaration();
 					}
 					break;
@@ -197,11 +199,11 @@ public partial class YALGrammerParser : Parser {
 					throw new NoViableAltException(this);
 				}
 				}
-				State = 57;
+				State = 61;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 58;
+			State = 62;
 			Match(Eof);
 			}
 		}
@@ -257,45 +259,45 @@ public partial class YALGrammerParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 60;
+			State = 64;
 			Match(TYPE);
-			State = 66;
+			State = 70;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==LBRACKET) {
 				{
-				State = 61;
+				State = 65;
 				Match(LBRACKET);
-				State = 63;
+				State = 67;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==POSITIVE_NUMBER) {
 					{
-					State = 62;
+					State = 66;
 					Match(POSITIVE_NUMBER);
 					}
 				}
 
-				State = 65;
+				State = 69;
 				Match(RBRACKET);
 				}
 			}
 
-			State = 68;
+			State = 72;
 			Match(ID);
-			State = 71;
+			State = 75;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==EQUAL) {
 				{
-				State = 69;
+				State = 73;
 				Match(EQUAL);
-				State = 70;
+				State = 74;
 				expression(0);
 				}
 			}
 
-			State = 73;
+			State = 77;
 			Match(T__0);
 			}
 		}
@@ -353,39 +355,39 @@ public partial class YALGrammerParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 75;
-			Match(EXTERNAL);
-			State = 76;
-			Match(LESS_THAN);
-			State = 77;
-			Match(STRING);
-			State = 78;
-			Match(GREATER_THAN);
 			State = 79;
-			Match(ID);
+			Match(EXTERNAL);
 			State = 80;
-			Match(T__1);
+			Match(LESS_THAN);
+			State = 81;
+			Match(STRING);
 			State = 82;
+			Match(GREATER_THAN);
+			State = 83;
+			Match(ID);
+			State = 84;
+			Match(T__1);
+			State = 86;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==IN) {
 				{
-				State = 81;
+				State = 85;
 				formalInputParams();
 				}
 			}
 
-			State = 85;
+			State = 89;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==OUT) {
 				{
-				State = 84;
+				State = 88;
 				formalOutputParams();
 				}
 			}
 
-			State = 87;
+			State = 91;
 			Match(T__0);
 			}
 		}
@@ -443,41 +445,41 @@ public partial class YALGrammerParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 90;
+			State = 94;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==ASYNC) {
 				{
-				State = 89;
+				State = 93;
 				Match(ASYNC);
 				}
 			}
 
-			State = 92;
+			State = 96;
 			Match(ID);
-			State = 93;
+			State = 97;
 			Match(T__1);
-			State = 95;
+			State = 99;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==IN) {
 				{
-				State = 94;
+				State = 98;
 				formalInputParams();
 				}
 			}
 
-			State = 98;
+			State = 102;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==OUT) {
 				{
-				State = 97;
+				State = 101;
 				formalOutputParams();
 				}
 			}
 
-			State = 100;
+			State = 104;
 			statementBlock();
 			}
 		}
@@ -494,11 +496,11 @@ public partial class YALGrammerParser : Parser {
 
 	public partial class FormalInputParamsContext : ParserRuleContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode IN() { return GetToken(YALGrammerParser.IN, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public VariableDeclarationFormatContext[] variableDeclarationFormat() {
-			return GetRuleContexts<VariableDeclarationFormatContext>();
+		[System.Diagnostics.DebuggerNonUserCode] public ReferenceableVariableDeclarationFormatContext[] referenceableVariableDeclarationFormat() {
+			return GetRuleContexts<ReferenceableVariableDeclarationFormatContext>();
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public VariableDeclarationFormatContext variableDeclarationFormat(int i) {
-			return GetRuleContext<VariableDeclarationFormatContext>(i);
+		[System.Diagnostics.DebuggerNonUserCode] public ReferenceableVariableDeclarationFormatContext referenceableVariableDeclarationFormat(int i) {
+			return GetRuleContext<ReferenceableVariableDeclarationFormatContext>(i);
 		}
 		public FormalInputParamsContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -531,29 +533,29 @@ public partial class YALGrammerParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 102;
+			State = 106;
 			Match(IN);
-			State = 103;
+			State = 107;
 			Match(T__2);
-			State = 104;
-			variableDeclarationFormat();
-			State = 109;
+			State = 108;
+			referenceableVariableDeclarationFormat();
+			State = 113;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==T__3) {
 				{
 				{
-				State = 105;
+				State = 109;
 				Match(T__3);
-				State = 106;
-				variableDeclarationFormat();
+				State = 110;
+				referenceableVariableDeclarationFormat();
 				}
 				}
-				State = 111;
+				State = 115;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 112;
+			State = 116;
 			Match(T__4);
 			}
 		}
@@ -607,29 +609,29 @@ public partial class YALGrammerParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 114;
+			State = 118;
 			Match(OUT);
-			State = 115;
+			State = 119;
 			Match(T__2);
-			State = 116;
+			State = 120;
 			variableDeclarationFormat();
-			State = 121;
+			State = 125;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==T__3) {
 				{
 				{
-				State = 117;
+				State = 121;
 				Match(T__3);
-				State = 118;
+				State = 122;
 				variableDeclarationFormat();
 				}
 				}
-				State = 123;
+				State = 127;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 124;
+			State = 128;
 			Match(T__4);
 			}
 		}
@@ -688,21 +690,21 @@ public partial class YALGrammerParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 126;
+			State = 130;
 			Match(T__5);
-			State = 136;
+			State = 140;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (((_la) & ~0x3f) == 0 && ((1L << _la) & 824917245960L) != 0) {
+			while (((_la) & ~0x3f) == 0 && ((1L << _la) & 1649819402248L) != 0) {
 				{
-				State = 134;
+				State = 138;
 				ErrorHandler.Sync(this);
 				switch (TokenStream.LA(1)) {
 				case T__13:
 				case T__16:
 				case T__17:
 					{
-					State = 127;
+					State = 131;
 					blockStatement();
 					}
 					break;
@@ -714,19 +716,19 @@ public partial class YALGrammerParser : Parser {
 				case INCREMENT:
 				case DECREMENT:
 					{
-					State = 128;
+					State = 132;
 					singleStatement();
-					State = 130;
+					State = 134;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 					do {
 						{
 						{
-						State = 129;
+						State = 133;
 						Match(T__0);
 						}
 						}
-						State = 132;
+						State = 136;
 						ErrorHandler.Sync(this);
 						_la = TokenStream.LA(1);
 					} while ( _la==T__0 );
@@ -736,11 +738,11 @@ public partial class YALGrammerParser : Parser {
 					throw new NoViableAltException(this);
 				}
 				}
-				State = 138;
+				State = 142;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 139;
+			State = 143;
 			Match(T__6);
 			}
 		}
@@ -793,27 +795,27 @@ public partial class YALGrammerParser : Parser {
 		BlockStatementContext _localctx = new BlockStatementContext(Context, State);
 		EnterRule(_localctx, 14, RULE_blockStatement);
 		try {
-			State = 144;
+			State = 148;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case T__13:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 141;
+				State = 145;
 				ifStatement();
 				}
 				break;
 			case T__16:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 142;
+				State = 146;
 				whileStatement();
 				}
 				break;
 			case T__17:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 143;
+				State = 147;
 				forStatement();
 				}
 				break;
@@ -871,34 +873,34 @@ public partial class YALGrammerParser : Parser {
 		SingleStatementContext _localctx = new SingleStatementContext(Context, State);
 		EnterRule(_localctx, 16, RULE_singleStatement);
 		try {
-			State = 150;
+			State = 154;
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,16,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 146;
+				State = 150;
 				variableDeclaration();
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 147;
+				State = 151;
 				assignment();
 				}
 				break;
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 148;
+				State = 152;
 				functionCall();
 				}
 				break;
 			case 4:
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 149;
+				State = 153;
 				Match(RETURN);
 				}
 				break;
@@ -977,14 +979,14 @@ public partial class YALGrammerParser : Parser {
 		VariableDeclarationContext _localctx = new VariableDeclarationContext(Context, State);
 		EnterRule(_localctx, 18, RULE_variableDeclaration);
 		try {
-			State = 154;
+			State = 158;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case TYPE:
 				_localctx = new SimpleVariableDeclarationFormatContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 152;
+				State = 156;
 				variableDeclarationFormat();
 				}
 				break;
@@ -992,12 +994,134 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new TupleVariableDeclarationContext(_localctx);
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 153;
+				State = 157;
 				tupleDeclaration();
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class ReferenceableVariableDeclarationFormatContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public VariableDeclarationFormatContext variableDeclarationFormat() {
+			return GetRuleContext<VariableDeclarationFormatContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode REF() { return GetToken(YALGrammerParser.REF, 0); }
+		public ReferenceableVariableDeclarationFormatContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_referenceableVariableDeclarationFormat; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IYALGrammerListener typedListener = listener as IYALGrammerListener;
+			if (typedListener != null) typedListener.EnterReferenceableVariableDeclarationFormat(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IYALGrammerListener typedListener = listener as IYALGrammerListener;
+			if (typedListener != null) typedListener.ExitReferenceableVariableDeclarationFormat(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IYALGrammerVisitor<TResult> typedVisitor = visitor as IYALGrammerVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitReferenceableVariableDeclarationFormat(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public ReferenceableVariableDeclarationFormatContext referenceableVariableDeclarationFormat() {
+		ReferenceableVariableDeclarationFormatContext _localctx = new ReferenceableVariableDeclarationFormatContext(Context, State);
+		EnterRule(_localctx, 20, RULE_referenceableVariableDeclarationFormat);
+		int _la;
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 161;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			if (_la==REF) {
+				{
+				State = 160;
+				Match(REF);
+				}
+			}
+
+			State = 163;
+			variableDeclarationFormat();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class ReferenceableExpressionContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode REF() { return GetToken(YALGrammerParser.REF, 0); }
+		public ReferenceableExpressionContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_referenceableExpression; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IYALGrammerListener typedListener = listener as IYALGrammerListener;
+			if (typedListener != null) typedListener.EnterReferenceableExpression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IYALGrammerListener typedListener = listener as IYALGrammerListener;
+			if (typedListener != null) typedListener.ExitReferenceableExpression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IYALGrammerVisitor<TResult> typedVisitor = visitor as IYALGrammerVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitReferenceableExpression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public ReferenceableExpressionContext referenceableExpression() {
+		ReferenceableExpressionContext _localctx = new ReferenceableExpressionContext(Context, State);
+		EnterRule(_localctx, 22, RULE_referenceableExpression);
+		int _la;
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 166;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			if (_la==REF) {
+				{
+				State = 165;
+				Match(REF);
+				}
+			}
+
+			State = 168;
+			expression(0);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1072,33 +1196,33 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public VariableDeclarationFormatContext variableDeclarationFormat() {
 		VariableDeclarationFormatContext _localctx = new VariableDeclarationFormatContext(Context, State);
-		EnterRule(_localctx, 20, RULE_variableDeclarationFormat);
+		EnterRule(_localctx, 24, RULE_variableDeclarationFormat);
 		int _la;
 		try {
-			State = 165;
+			State = 179;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,19,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,21,Context) ) {
 			case 1:
 				_localctx = new ArrayDeclarationContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 156;
+				State = 170;
 				Match(TYPE);
-				State = 157;
+				State = 171;
 				Match(LBRACKET);
-				State = 159;
+				State = 173;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==POSITIVE_NUMBER) {
 					{
-					State = 158;
+					State = 172;
 					Match(POSITIVE_NUMBER);
 					}
 				}
 
-				State = 161;
+				State = 175;
 				Match(RBRACKET);
-				State = 162;
+				State = 176;
 				Match(ID);
 				}
 				break;
@@ -1106,9 +1230,9 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new SimpleVariableDeclarationContext(_localctx);
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 163;
+				State = 177;
 				Match(TYPE);
-				State = 164;
+				State = 178;
 				Match(ID);
 				}
 				break;
@@ -1161,29 +1285,29 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public AssignmentContext assignment() {
 		AssignmentContext _localctx = new AssignmentContext(Context, State);
-		EnterRule(_localctx, 22, RULE_assignment);
+		EnterRule(_localctx, 26, RULE_assignment);
 		try {
-			State = 170;
+			State = 184;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,20,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,22,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 167;
+				State = 181;
 				simpleAssignment();
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 168;
+				State = 182;
 				declarationAssignment();
 				}
 				break;
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 169;
+				State = 183;
 				tupleAssignment();
 				}
 				break;
@@ -1298,29 +1422,29 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public SimpleAssignmentContext simpleAssignment() {
 		SimpleAssignmentContext _localctx = new SimpleAssignmentContext(Context, State);
-		EnterRule(_localctx, 24, RULE_simpleAssignment);
+		EnterRule(_localctx, 28, RULE_simpleAssignment);
 		int _la;
 		try {
-			State = 181;
+			State = 195;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,21,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,23,Context) ) {
 			case 1:
 				_localctx = new IdAssignmentContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 172;
+				State = 186;
 				identifier();
-				State = 173;
+				State = 187;
 				((IdAssignmentContext)_localctx).@operator = TokenStream.LT(1);
 				_la = TokenStream.LA(1);
-				if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 4433230883192832L) != 0) ) {
+				if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 8866461766385664L) != 0) ) {
 					((IdAssignmentContext)_localctx).@operator = ErrorHandler.RecoverInline(this);
 				}
 				else {
 					ErrorHandler.ReportMatch(this);
 				    Consume();
 				}
-				State = 174;
+				State = 188;
 				expression(0);
 				}
 				break;
@@ -1328,7 +1452,7 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new IdPreIncrementDecrementAssignmentContext(_localctx);
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 176;
+				State = 190;
 				((IdPreIncrementDecrementAssignmentContext)_localctx).@operator = TokenStream.LT(1);
 				_la = TokenStream.LA(1);
 				if ( !(_la==INCREMENT || _la==DECREMENT) ) {
@@ -1338,7 +1462,7 @@ public partial class YALGrammerParser : Parser {
 					ErrorHandler.ReportMatch(this);
 				    Consume();
 				}
-				State = 177;
+				State = 191;
 				identifier();
 				}
 				break;
@@ -1346,9 +1470,9 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new IdPostIncrementDecrementAssignmentContext(_localctx);
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 178;
+				State = 192;
 				identifier();
-				State = 179;
+				State = 193;
 				((IdPostIncrementDecrementAssignmentContext)_localctx).@operator = TokenStream.LT(1);
 				_la = TokenStream.LA(1);
 				if ( !(_la==INCREMENT || _la==DECREMENT) ) {
@@ -1407,15 +1531,15 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public DeclarationAssignmentContext declarationAssignment() {
 		DeclarationAssignmentContext _localctx = new DeclarationAssignmentContext(Context, State);
-		EnterRule(_localctx, 26, RULE_declarationAssignment);
+		EnterRule(_localctx, 30, RULE_declarationAssignment);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 183;
+			State = 197;
 			variableDeclaration();
-			State = 184;
+			State = 198;
 			Match(EQUAL);
-			State = 185;
+			State = 199;
 			expression(0);
 			}
 		}
@@ -1464,15 +1588,15 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public TupleAssignmentContext tupleAssignment() {
 		TupleAssignmentContext _localctx = new TupleAssignmentContext(Context, State);
-		EnterRule(_localctx, 28, RULE_tupleAssignment);
+		EnterRule(_localctx, 32, RULE_tupleAssignment);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 187;
+			State = 201;
 			tupleDeclaration();
-			State = 188;
+			State = 202;
 			Match(EQUAL);
-			State = 189;
+			State = 203;
 			expression(0);
 			}
 		}
@@ -1520,32 +1644,32 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public TupleDeclarationContext tupleDeclaration() {
 		TupleDeclarationContext _localctx = new TupleDeclarationContext(Context, State);
-		EnterRule(_localctx, 30, RULE_tupleDeclaration);
+		EnterRule(_localctx, 34, RULE_tupleDeclaration);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 191;
+			State = 205;
 			Match(T__2);
-			State = 192;
+			State = 206;
 			variableDeclarationFormat();
-			State = 197;
+			State = 211;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==T__3) {
 				{
 				{
-				State = 193;
+				State = 207;
 				Match(T__3);
-				State = 194;
+				State = 208;
 				variableDeclarationFormat();
 				}
 				}
-				State = 199;
+				State = 213;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 200;
+			State = 214;
 			Match(T__4);
 			}
 		}
@@ -2119,25 +2243,25 @@ public partial class YALGrammerParser : Parser {
 		int _parentState = State;
 		ExpressionContext _localctx = new ExpressionContext(Context, _parentState);
 		ExpressionContext _prevctx = _localctx;
-		int _startState = 32;
-		EnterRecursionRule(_localctx, 32, RULE_expression, _p);
+		int _startState = 36;
+		EnterRecursionRule(_localctx, 36, RULE_expression, _p);
 		int _la;
 		try {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 236;
+			State = 250;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,27,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,29,Context) ) {
 			case 1:
 				{
 				_localctx = new NotContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 
-				State = 203;
+				State = 217;
 				Match(T__7);
-				State = 204;
+				State = 218;
 				expression(22);
 				}
 				break;
@@ -2146,17 +2270,17 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new PrefixUnaryContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 205;
+				State = 219;
 				((PrefixUnaryContext)_localctx).@operator = TokenStream.LT(1);
 				_la = TokenStream.LA(1);
-				if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 4504424261091328L) != 0) ) {
+				if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 9008848522182656L) != 0) ) {
 					((PrefixUnaryContext)_localctx).@operator = ErrorHandler.RecoverInline(this);
 				}
 				else {
 					ErrorHandler.ReportMatch(this);
 				    Consume();
 				}
-				State = 206;
+				State = 220;
 				expression(20);
 				}
 				break;
@@ -2165,7 +2289,7 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new VariableAssignmentContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 207;
+				State = 221;
 				simpleAssignment();
 				}
 				break;
@@ -2174,7 +2298,7 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new VariableContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 208;
+				State = 222;
 				identifier();
 				}
 				break;
@@ -2183,7 +2307,7 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new FunctionCallExpressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 209;
+				State = 223;
 				functionCall();
 				}
 				break;
@@ -2192,17 +2316,17 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new FloatLiteralContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 211;
+				State = 225;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==MINUS) {
 					{
-					State = 210;
+					State = 224;
 					Match(MINUS);
 					}
 				}
 
-				State = 213;
+				State = 227;
 				Match(FLOAT);
 				}
 				break;
@@ -2211,17 +2335,17 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new NumberLiteralContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 215;
+				State = 229;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==MINUS) {
 					{
-					State = 214;
+					State = 228;
 					Match(MINUS);
 					}
 				}
 
-				State = 217;
+				State = 231;
 				Match(POSITIVE_NUMBER);
 				}
 				break;
@@ -2230,7 +2354,7 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new StringLiteralContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 218;
+				State = 232;
 				Match(STRING);
 				}
 				break;
@@ -2239,7 +2363,7 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new BooleanLiteralContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 219;
+				State = 233;
 				Match(BOOLEAN);
 				}
 				break;
@@ -2248,11 +2372,11 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new ParenthesizedExpressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 220;
+				State = 234;
 				Match(T__2);
-				State = 221;
+				State = 235;
 				expression(0);
-				State = 222;
+				State = 236;
 				Match(T__4);
 				}
 				break;
@@ -2261,69 +2385,69 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new ArrayLiteralContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 224;
+				State = 238;
 				Match(T__5);
-				State = 233;
+				State = 247;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (((_la) & ~0x3f) == 0 && ((1L << _la) & 4504460703301960L) != 0) {
+				if (((_la) & ~0x3f) == 0 && ((1L << _la) & 9008921404506440L) != 0) {
 					{
-					State = 225;
+					State = 239;
 					expression(0);
-					State = 230;
+					State = 244;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 					while (_la==T__3) {
 						{
 						{
-						State = 226;
+						State = 240;
 						Match(T__3);
-						State = 227;
+						State = 241;
 						expression(0);
 						}
 						}
-						State = 232;
+						State = 246;
 						ErrorHandler.Sync(this);
 						_la = TokenStream.LA(1);
 					}
 					}
 				}
 
-				State = 235;
+				State = 249;
 				Match(T__6);
 				}
 				break;
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 272;
+			State = 286;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,29,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,31,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( ParseListeners!=null )
 						TriggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					State = 270;
+					State = 284;
 					ErrorHandler.Sync(this);
-					switch ( Interpreter.AdaptivePredict(TokenStream,28,Context) ) {
+					switch ( Interpreter.AdaptivePredict(TokenStream,30,Context) ) {
 					case 1:
 						{
 						_localctx = new MultiplicationDivisionModuloContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 238;
+						State = 252;
 						if (!(Precpred(Context, 19))) throw new FailedPredicateException(this, "Precpred(Context, 19)");
-						State = 239;
+						State = 253;
 						((MultiplicationDivisionModuloContext)_localctx).@operator = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
-						if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 15032385536L) != 0) ) {
+						if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 30064771072L) != 0) ) {
 							((MultiplicationDivisionModuloContext)_localctx).@operator = ErrorHandler.RecoverInline(this);
 						}
 						else {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 240;
+						State = 254;
 						expression(20);
 						}
 						break;
@@ -2331,9 +2455,9 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new AdditionSubtractionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 241;
+						State = 255;
 						if (!(Precpred(Context, 18))) throw new FailedPredicateException(this, "Precpred(Context, 18)");
-						State = 242;
+						State = 256;
 						((AdditionSubtractionContext)_localctx).@operator = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==PLUS || _la==MINUS) ) {
@@ -2343,7 +2467,7 @@ public partial class YALGrammerParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 243;
+						State = 257;
 						expression(19);
 						}
 						break;
@@ -2351,9 +2475,9 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new LeftRightShiftContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 244;
+						State = 258;
 						if (!(Precpred(Context, 17))) throw new FailedPredicateException(this, "Precpred(Context, 17)");
-						State = 245;
+						State = 259;
 						((LeftRightShiftContext)_localctx).@operator = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==LSHIFT || _la==RSHIFT) ) {
@@ -2363,7 +2487,7 @@ public partial class YALGrammerParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 246;
+						State = 260;
 						expression(18);
 						}
 						break;
@@ -2371,11 +2495,11 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new BitwiseAndContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 247;
+						State = 261;
 						if (!(Precpred(Context, 16))) throw new FailedPredicateException(this, "Precpred(Context, 16)");
-						State = 248;
+						State = 262;
 						Match(T__8);
-						State = 249;
+						State = 263;
 						expression(17);
 						}
 						break;
@@ -2383,11 +2507,11 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new BitwiseXorContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 250;
+						State = 264;
 						if (!(Precpred(Context, 15))) throw new FailedPredicateException(this, "Precpred(Context, 15)");
-						State = 251;
+						State = 265;
 						Match(T__9);
-						State = 252;
+						State = 266;
 						expression(16);
 						}
 						break;
@@ -2395,11 +2519,11 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new BitwiseOrContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 253;
+						State = 267;
 						if (!(Precpred(Context, 14))) throw new FailedPredicateException(this, "Precpred(Context, 14)");
-						State = 254;
+						State = 268;
 						Match(T__10);
-						State = 255;
+						State = 269;
 						expression(15);
 						}
 						break;
@@ -2407,11 +2531,11 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new BitwiseNotContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 256;
+						State = 270;
 						if (!(Precpred(Context, 13))) throw new FailedPredicateException(this, "Precpred(Context, 13)");
-						State = 257;
+						State = 271;
 						Match(BITWISE_NOT);
-						State = 258;
+						State = 272;
 						expression(14);
 						}
 						break;
@@ -2419,19 +2543,19 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new ComparisonContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 259;
+						State = 273;
 						if (!(Precpred(Context, 12))) throw new FailedPredicateException(this, "Precpred(Context, 12)");
-						State = 260;
+						State = 274;
 						((ComparisonContext)_localctx).@operator = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
-						if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 69269232549888L) != 0) ) {
+						if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 138538465099776L) != 0) ) {
 							((ComparisonContext)_localctx).@operator = ErrorHandler.RecoverInline(this);
 						}
 						else {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 261;
+						State = 275;
 						expression(13);
 						}
 						break;
@@ -2439,11 +2563,11 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new AndContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 262;
+						State = 276;
 						if (!(Precpred(Context, 11))) throw new FailedPredicateException(this, "Precpred(Context, 11)");
-						State = 263;
+						State = 277;
 						Match(T__11);
-						State = 264;
+						State = 278;
 						expression(12);
 						}
 						break;
@@ -2451,11 +2575,11 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new OrContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 265;
+						State = 279;
 						if (!(Precpred(Context, 10))) throw new FailedPredicateException(this, "Precpred(Context, 10)");
-						State = 266;
+						State = 280;
 						Match(T__12);
-						State = 267;
+						State = 281;
 						expression(11);
 						}
 						break;
@@ -2463,9 +2587,9 @@ public partial class YALGrammerParser : Parser {
 						{
 						_localctx = new PostIncrementDecrementContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 268;
+						State = 282;
 						if (!(Precpred(Context, 21))) throw new FailedPredicateException(this, "Precpred(Context, 21)");
-						State = 269;
+						State = 283;
 						((PostIncrementDecrementContext)_localctx).@operator = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==INCREMENT || _la==DECREMENT) ) {
@@ -2480,9 +2604,9 @@ public partial class YALGrammerParser : Parser {
 					}
 					} 
 				}
-				State = 274;
+				State = 288;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,29,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,31,Context);
 			}
 			}
 		}
@@ -2529,28 +2653,28 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public FunctionCallContext functionCall() {
 		FunctionCallContext _localctx = new FunctionCallContext(Context, State);
-		EnterRule(_localctx, 34, RULE_functionCall);
+		EnterRule(_localctx, 38, RULE_functionCall);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 276;
+			State = 290;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==AWAIT) {
 				{
-				State = 275;
+				State = 289;
 				Match(AWAIT);
 				}
 			}
 
-			State = 278;
+			State = 292;
 			Match(ID);
-			State = 279;
+			State = 293;
 			Match(T__2);
-			State = 280;
+			State = 294;
 			actualInputParams();
-			State = 281;
+			State = 295;
 			Match(T__4);
 			}
 		}
@@ -2566,11 +2690,11 @@ public partial class YALGrammerParser : Parser {
 	}
 
 	public partial class ActualInputParamsContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
+		[System.Diagnostics.DebuggerNonUserCode] public ReferenceableExpressionContext[] referenceableExpression() {
+			return GetRuleContexts<ReferenceableExpressionContext>();
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
+		[System.Diagnostics.DebuggerNonUserCode] public ReferenceableExpressionContext referenceableExpression(int i) {
+			return GetRuleContext<ReferenceableExpressionContext>(i);
 		}
 		public ActualInputParamsContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -2598,31 +2722,31 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public ActualInputParamsContext actualInputParams() {
 		ActualInputParamsContext _localctx = new ActualInputParamsContext(Context, State);
-		EnterRule(_localctx, 36, RULE_actualInputParams);
+		EnterRule(_localctx, 40, RULE_actualInputParams);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 291;
+			State = 305;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if (((_la) & ~0x3f) == 0 && ((1L << _la) & 4504460703301960L) != 0) {
+			if (((_la) & ~0x3f) == 0 && ((1L << _la) & 9008921471615304L) != 0) {
 				{
-				State = 283;
-				expression(0);
-				State = 288;
+				State = 297;
+				referenceableExpression();
+				State = 302;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==T__3) {
 					{
 					{
-					State = 284;
+					State = 298;
 					Match(T__3);
-					State = 285;
-					expression(0);
+					State = 299;
+					referenceableExpression();
 					}
 					}
-					State = 290;
+					State = 304;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
@@ -2684,41 +2808,41 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public IfStatementContext ifStatement() {
 		IfStatementContext _localctx = new IfStatementContext(Context, State);
-		EnterRule(_localctx, 38, RULE_ifStatement);
+		EnterRule(_localctx, 42, RULE_ifStatement);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 293;
+			State = 307;
 			Match(T__13);
-			State = 294;
+			State = 308;
 			Match(T__2);
-			State = 295;
+			State = 309;
 			expression(0);
-			State = 296;
+			State = 310;
 			Match(T__4);
-			State = 297;
+			State = 311;
 			statementBlock();
-			State = 301;
+			State = 315;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==T__14) {
 				{
 				{
-				State = 298;
+				State = 312;
 				elseIfStatement();
 				}
 				}
-				State = 303;
+				State = 317;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 305;
+			State = 319;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==T__15) {
 				{
-				State = 304;
+				State = 318;
 				elseStatement();
 				}
 			}
@@ -2769,19 +2893,19 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public ElseIfStatementContext elseIfStatement() {
 		ElseIfStatementContext _localctx = new ElseIfStatementContext(Context, State);
-		EnterRule(_localctx, 40, RULE_elseIfStatement);
+		EnterRule(_localctx, 44, RULE_elseIfStatement);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 307;
+			State = 321;
 			Match(T__14);
-			State = 308;
+			State = 322;
 			Match(T__2);
-			State = 309;
+			State = 323;
 			expression(0);
-			State = 310;
+			State = 324;
 			Match(T__4);
-			State = 311;
+			State = 325;
 			statementBlock();
 			}
 		}
@@ -2826,13 +2950,13 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public ElseStatementContext elseStatement() {
 		ElseStatementContext _localctx = new ElseStatementContext(Context, State);
-		EnterRule(_localctx, 42, RULE_elseStatement);
+		EnterRule(_localctx, 46, RULE_elseStatement);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 313;
+			State = 327;
 			Match(T__15);
-			State = 314;
+			State = 328;
 			statementBlock();
 			}
 		}
@@ -2880,19 +3004,19 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public WhileStatementContext whileStatement() {
 		WhileStatementContext _localctx = new WhileStatementContext(Context, State);
-		EnterRule(_localctx, 44, RULE_whileStatement);
+		EnterRule(_localctx, 48, RULE_whileStatement);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 316;
+			State = 330;
 			Match(T__16);
-			State = 317;
+			State = 331;
 			Match(T__2);
-			State = 318;
+			State = 332;
 			expression(0);
-			State = 319;
+			State = 333;
 			Match(T__4);
-			State = 320;
+			State = 334;
 			statementBlock();
 			}
 		}
@@ -2946,27 +3070,27 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public ForStatementContext forStatement() {
 		ForStatementContext _localctx = new ForStatementContext(Context, State);
-		EnterRule(_localctx, 46, RULE_forStatement);
+		EnterRule(_localctx, 50, RULE_forStatement);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 322;
+			State = 336;
 			Match(T__17);
-			State = 323;
+			State = 337;
 			Match(T__2);
-			State = 324;
+			State = 338;
 			declarationAssignment();
-			State = 325;
+			State = 339;
 			Match(T__0);
-			State = 326;
+			State = 340;
 			expression(0);
-			State = 327;
+			State = 341;
 			Match(T__0);
-			State = 328;
+			State = 342;
 			assignment();
-			State = 329;
+			State = 343;
 			Match(T__4);
-			State = 330;
+			State = 344;
 			statementBlock();
 			}
 		}
@@ -3064,22 +3188,22 @@ public partial class YALGrammerParser : Parser {
 	[RuleVersion(0)]
 	public IdentifierContext identifier() {
 		IdentifierContext _localctx = new IdentifierContext(Context, State);
-		EnterRule(_localctx, 48, RULE_identifier);
+		EnterRule(_localctx, 52, RULE_identifier);
 		try {
-			State = 342;
+			State = 356;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,35,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,37,Context) ) {
 			case 1:
 				_localctx = new ArrayElementIdentifierContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 332;
+				State = 346;
 				Match(ID);
-				State = 333;
+				State = 347;
 				Match(LBRACKET);
-				State = 334;
+				State = 348;
 				expression(0);
-				State = 335;
+				State = 349;
 				Match(RBRACKET);
 				}
 				break;
@@ -3087,7 +3211,7 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new SimpleIdentifierContext(_localctx);
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 337;
+				State = 351;
 				Match(ID);
 				}
 				break;
@@ -3095,11 +3219,11 @@ public partial class YALGrammerParser : Parser {
 				_localctx = new ParenthesizedIdentifierContext(_localctx);
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 338;
+				State = 352;
 				Match(T__2);
-				State = 339;
+				State = 353;
 				identifier();
-				State = 340;
+				State = 354;
 				Match(T__4);
 				}
 				break;
@@ -3118,7 +3242,7 @@ public partial class YALGrammerParser : Parser {
 
 	public override bool Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 16: return expression_sempred((ExpressionContext)_localctx, predIndex);
+		case 18: return expression_sempred((ExpressionContext)_localctx, predIndex);
 		}
 		return true;
 	}
@@ -3140,122 +3264,127 @@ public partial class YALGrammerParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,58,345,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
+		4,1,59,359,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
 		7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
 		2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,21,
-		2,22,7,22,2,23,7,23,2,24,7,24,1,0,1,0,1,0,5,0,54,8,0,10,0,12,0,57,9,0,
-		1,0,1,0,1,1,1,1,1,1,3,1,64,8,1,1,1,3,1,67,8,1,1,1,1,1,1,1,3,1,72,8,1,1,
-		1,1,1,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,83,8,2,1,2,3,2,86,8,2,1,2,1,2,1,
-		3,3,3,91,8,3,1,3,1,3,1,3,3,3,96,8,3,1,3,3,3,99,8,3,1,3,1,3,1,4,1,4,1,4,
-		1,4,1,4,5,4,108,8,4,10,4,12,4,111,9,4,1,4,1,4,1,5,1,5,1,5,1,5,1,5,5,5,
-		120,8,5,10,5,12,5,123,9,5,1,5,1,5,1,6,1,6,1,6,1,6,4,6,131,8,6,11,6,12,
-		6,132,5,6,135,8,6,10,6,12,6,138,9,6,1,6,1,6,1,7,1,7,1,7,3,7,145,8,7,1,
-		8,1,8,1,8,1,8,3,8,151,8,8,1,9,1,9,3,9,155,8,9,1,10,1,10,1,10,3,10,160,
-		8,10,1,10,1,10,1,10,1,10,3,10,166,8,10,1,11,1,11,1,11,3,11,171,8,11,1,
-		12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,3,12,182,8,12,1,13,1,13,1,13,
-		1,13,1,14,1,14,1,14,1,14,1,15,1,15,1,15,1,15,5,15,196,8,15,10,15,12,15,
-		199,9,15,1,15,1,15,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,3,16,212,
-		8,16,1,16,1,16,3,16,216,8,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,
-		16,1,16,1,16,5,16,229,8,16,10,16,12,16,232,9,16,3,16,234,8,16,1,16,3,16,
-		237,8,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,
-		16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,16,1,
-		16,1,16,1,16,1,16,1,16,1,16,5,16,271,8,16,10,16,12,16,274,9,16,1,17,3,
-		17,277,8,17,1,17,1,17,1,17,1,17,1,17,1,18,1,18,1,18,5,18,287,8,18,10,18,
-		12,18,290,9,18,3,18,292,8,18,1,19,1,19,1,19,1,19,1,19,1,19,5,19,300,8,
-		19,10,19,12,19,303,9,19,1,19,3,19,306,8,19,1,20,1,20,1,20,1,20,1,20,1,
-		20,1,21,1,21,1,21,1,22,1,22,1,22,1,22,1,22,1,22,1,23,1,23,1,23,1,23,1,
-		23,1,23,1,23,1,23,1,23,1,23,1,24,1,24,1,24,1,24,1,24,1,24,1,24,1,24,1,
-		24,1,24,3,24,343,8,24,1,24,0,1,32,25,0,2,4,6,8,10,12,14,16,18,20,22,24,
-		26,28,30,32,34,36,38,40,42,44,46,48,0,7,1,0,46,51,1,0,38,39,2,0,38,39,
-		52,52,1,0,31,33,1,0,34,35,1,0,36,37,1,0,40,45,380,0,55,1,0,0,0,2,60,1,
-		0,0,0,4,75,1,0,0,0,6,90,1,0,0,0,8,102,1,0,0,0,10,114,1,0,0,0,12,126,1,
-		0,0,0,14,144,1,0,0,0,16,150,1,0,0,0,18,154,1,0,0,0,20,165,1,0,0,0,22,170,
-		1,0,0,0,24,181,1,0,0,0,26,183,1,0,0,0,28,187,1,0,0,0,30,191,1,0,0,0,32,
-		236,1,0,0,0,34,276,1,0,0,0,36,291,1,0,0,0,38,293,1,0,0,0,40,307,1,0,0,
-		0,42,313,1,0,0,0,44,316,1,0,0,0,46,322,1,0,0,0,48,342,1,0,0,0,50,54,3,
-		4,2,0,51,54,3,2,1,0,52,54,3,6,3,0,53,50,1,0,0,0,53,51,1,0,0,0,53,52,1,
-		0,0,0,54,57,1,0,0,0,55,53,1,0,0,0,55,56,1,0,0,0,56,58,1,0,0,0,57,55,1,
-		0,0,0,58,59,5,0,0,1,59,1,1,0,0,0,60,66,5,23,0,0,61,63,5,53,0,0,62,64,5,
-		29,0,0,63,62,1,0,0,0,63,64,1,0,0,0,64,65,1,0,0,0,65,67,5,54,0,0,66,61,
-		1,0,0,0,66,67,1,0,0,0,67,68,1,0,0,0,68,71,5,28,0,0,69,70,5,46,0,0,70,72,
-		3,32,16,0,71,69,1,0,0,0,71,72,1,0,0,0,72,73,1,0,0,0,73,74,5,1,0,0,74,3,
-		1,0,0,0,75,76,5,19,0,0,76,77,5,40,0,0,77,78,5,26,0,0,78,79,5,42,0,0,79,
-		80,5,28,0,0,80,82,5,2,0,0,81,83,3,8,4,0,82,81,1,0,0,0,82,83,1,0,0,0,83,
-		85,1,0,0,0,84,86,3,10,5,0,85,84,1,0,0,0,85,86,1,0,0,0,86,87,1,0,0,0,87,
-		88,5,1,0,0,88,5,1,0,0,0,89,91,5,20,0,0,90,89,1,0,0,0,90,91,1,0,0,0,91,
-		92,1,0,0,0,92,93,5,28,0,0,93,95,5,2,0,0,94,96,3,8,4,0,95,94,1,0,0,0,95,
-		96,1,0,0,0,96,98,1,0,0,0,97,99,3,10,5,0,98,97,1,0,0,0,98,99,1,0,0,0,99,
-		100,1,0,0,0,100,101,3,12,6,0,101,7,1,0,0,0,102,103,5,24,0,0,103,104,5,
-		3,0,0,104,109,3,20,10,0,105,106,5,4,0,0,106,108,3,20,10,0,107,105,1,0,
-		0,0,108,111,1,0,0,0,109,107,1,0,0,0,109,110,1,0,0,0,110,112,1,0,0,0,111,
-		109,1,0,0,0,112,113,5,5,0,0,113,9,1,0,0,0,114,115,5,25,0,0,115,116,5,3,
-		0,0,116,121,3,20,10,0,117,118,5,4,0,0,118,120,3,20,10,0,119,117,1,0,0,
-		0,120,123,1,0,0,0,121,119,1,0,0,0,121,122,1,0,0,0,122,124,1,0,0,0,123,
-		121,1,0,0,0,124,125,5,5,0,0,125,11,1,0,0,0,126,136,5,6,0,0,127,135,3,14,
-		7,0,128,130,3,16,8,0,129,131,5,1,0,0,130,129,1,0,0,0,131,132,1,0,0,0,132,
-		130,1,0,0,0,132,133,1,0,0,0,133,135,1,0,0,0,134,127,1,0,0,0,134,128,1,
-		0,0,0,135,138,1,0,0,0,136,134,1,0,0,0,136,137,1,0,0,0,137,139,1,0,0,0,
-		138,136,1,0,0,0,139,140,5,7,0,0,140,13,1,0,0,0,141,145,3,38,19,0,142,145,
-		3,44,22,0,143,145,3,46,23,0,144,141,1,0,0,0,144,142,1,0,0,0,144,143,1,
-		0,0,0,145,15,1,0,0,0,146,151,3,18,9,0,147,151,3,22,11,0,148,151,3,34,17,
-		0,149,151,5,22,0,0,150,146,1,0,0,0,150,147,1,0,0,0,150,148,1,0,0,0,150,
-		149,1,0,0,0,151,17,1,0,0,0,152,155,3,20,10,0,153,155,3,30,15,0,154,152,
-		1,0,0,0,154,153,1,0,0,0,155,19,1,0,0,0,156,157,5,23,0,0,157,159,5,53,0,
-		0,158,160,5,29,0,0,159,158,1,0,0,0,159,160,1,0,0,0,160,161,1,0,0,0,161,
-		162,5,54,0,0,162,166,5,28,0,0,163,164,5,23,0,0,164,166,5,28,0,0,165,156,
-		1,0,0,0,165,163,1,0,0,0,166,21,1,0,0,0,167,171,3,24,12,0,168,171,3,26,
-		13,0,169,171,3,28,14,0,170,167,1,0,0,0,170,168,1,0,0,0,170,169,1,0,0,0,
-		171,23,1,0,0,0,172,173,3,48,24,0,173,174,7,0,0,0,174,175,3,32,16,0,175,
-		182,1,0,0,0,176,177,7,1,0,0,177,182,3,48,24,0,178,179,3,48,24,0,179,180,
-		7,1,0,0,180,182,1,0,0,0,181,172,1,0,0,0,181,176,1,0,0,0,181,178,1,0,0,
-		0,182,25,1,0,0,0,183,184,3,18,9,0,184,185,5,46,0,0,185,186,3,32,16,0,186,
-		27,1,0,0,0,187,188,3,30,15,0,188,189,5,46,0,0,189,190,3,32,16,0,190,29,
-		1,0,0,0,191,192,5,3,0,0,192,197,3,20,10,0,193,194,5,4,0,0,194,196,3,20,
-		10,0,195,193,1,0,0,0,196,199,1,0,0,0,197,195,1,0,0,0,197,198,1,0,0,0,198,
-		200,1,0,0,0,199,197,1,0,0,0,200,201,5,5,0,0,201,31,1,0,0,0,202,203,6,16,
-		-1,0,203,204,5,8,0,0,204,237,3,32,16,22,205,206,7,2,0,0,206,237,3,32,16,
-		20,207,237,3,24,12,0,208,237,3,48,24,0,209,237,3,34,17,0,210,212,5,35,
-		0,0,211,210,1,0,0,0,211,212,1,0,0,0,212,213,1,0,0,0,213,237,5,30,0,0,214,
-		216,5,35,0,0,215,214,1,0,0,0,215,216,1,0,0,0,216,217,1,0,0,0,217,237,5,
-		29,0,0,218,237,5,26,0,0,219,237,5,27,0,0,220,221,5,3,0,0,221,222,3,32,
-		16,0,222,223,5,5,0,0,223,237,1,0,0,0,224,233,5,6,0,0,225,230,3,32,16,0,
-		226,227,5,4,0,0,227,229,3,32,16,0,228,226,1,0,0,0,229,232,1,0,0,0,230,
-		228,1,0,0,0,230,231,1,0,0,0,231,234,1,0,0,0,232,230,1,0,0,0,233,225,1,
-		0,0,0,233,234,1,0,0,0,234,235,1,0,0,0,235,237,5,7,0,0,236,202,1,0,0,0,
-		236,205,1,0,0,0,236,207,1,0,0,0,236,208,1,0,0,0,236,209,1,0,0,0,236,211,
-		1,0,0,0,236,215,1,0,0,0,236,218,1,0,0,0,236,219,1,0,0,0,236,220,1,0,0,
-		0,236,224,1,0,0,0,237,272,1,0,0,0,238,239,10,19,0,0,239,240,7,3,0,0,240,
-		271,3,32,16,20,241,242,10,18,0,0,242,243,7,4,0,0,243,271,3,32,16,19,244,
-		245,10,17,0,0,245,246,7,5,0,0,246,271,3,32,16,18,247,248,10,16,0,0,248,
-		249,5,9,0,0,249,271,3,32,16,17,250,251,10,15,0,0,251,252,5,10,0,0,252,
-		271,3,32,16,16,253,254,10,14,0,0,254,255,5,11,0,0,255,271,3,32,16,15,256,
-		257,10,13,0,0,257,258,5,52,0,0,258,271,3,32,16,14,259,260,10,12,0,0,260,
-		261,7,6,0,0,261,271,3,32,16,13,262,263,10,11,0,0,263,264,5,12,0,0,264,
-		271,3,32,16,12,265,266,10,10,0,0,266,267,5,13,0,0,267,271,3,32,16,11,268,
-		269,10,21,0,0,269,271,7,1,0,0,270,238,1,0,0,0,270,241,1,0,0,0,270,244,
-		1,0,0,0,270,247,1,0,0,0,270,250,1,0,0,0,270,253,1,0,0,0,270,256,1,0,0,
-		0,270,259,1,0,0,0,270,262,1,0,0,0,270,265,1,0,0,0,270,268,1,0,0,0,271,
-		274,1,0,0,0,272,270,1,0,0,0,272,273,1,0,0,0,273,33,1,0,0,0,274,272,1,0,
-		0,0,275,277,5,21,0,0,276,275,1,0,0,0,276,277,1,0,0,0,277,278,1,0,0,0,278,
-		279,5,28,0,0,279,280,5,3,0,0,280,281,3,36,18,0,281,282,5,5,0,0,282,35,
-		1,0,0,0,283,288,3,32,16,0,284,285,5,4,0,0,285,287,3,32,16,0,286,284,1,
-		0,0,0,287,290,1,0,0,0,288,286,1,0,0,0,288,289,1,0,0,0,289,292,1,0,0,0,
-		290,288,1,0,0,0,291,283,1,0,0,0,291,292,1,0,0,0,292,37,1,0,0,0,293,294,
-		5,14,0,0,294,295,5,3,0,0,295,296,3,32,16,0,296,297,5,5,0,0,297,301,3,12,
-		6,0,298,300,3,40,20,0,299,298,1,0,0,0,300,303,1,0,0,0,301,299,1,0,0,0,
-		301,302,1,0,0,0,302,305,1,0,0,0,303,301,1,0,0,0,304,306,3,42,21,0,305,
-		304,1,0,0,0,305,306,1,0,0,0,306,39,1,0,0,0,307,308,5,15,0,0,308,309,5,
-		3,0,0,309,310,3,32,16,0,310,311,5,5,0,0,311,312,3,12,6,0,312,41,1,0,0,
-		0,313,314,5,16,0,0,314,315,3,12,6,0,315,43,1,0,0,0,316,317,5,17,0,0,317,
-		318,5,3,0,0,318,319,3,32,16,0,319,320,5,5,0,0,320,321,3,12,6,0,321,45,
-		1,0,0,0,322,323,5,18,0,0,323,324,5,3,0,0,324,325,3,26,13,0,325,326,5,1,
-		0,0,326,327,3,32,16,0,327,328,5,1,0,0,328,329,3,22,11,0,329,330,5,5,0,
-		0,330,331,3,12,6,0,331,47,1,0,0,0,332,333,5,28,0,0,333,334,5,53,0,0,334,
-		335,3,32,16,0,335,336,5,54,0,0,336,343,1,0,0,0,337,343,5,28,0,0,338,339,
-		5,3,0,0,339,340,3,48,24,0,340,341,5,5,0,0,341,343,1,0,0,0,342,332,1,0,
-		0,0,342,337,1,0,0,0,342,338,1,0,0,0,343,49,1,0,0,0,36,53,55,63,66,71,82,
-		85,90,95,98,109,121,132,134,136,144,150,154,159,165,170,181,197,211,215,
-		230,233,236,270,272,276,288,291,301,305,342
+		2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,1,0,1,0,1,0,5,0,58,8,
+		0,10,0,12,0,61,9,0,1,0,1,0,1,1,1,1,1,1,3,1,68,8,1,1,1,3,1,71,8,1,1,1,1,
+		1,1,1,3,1,76,8,1,1,1,1,1,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,87,8,2,1,2,3,
+		2,90,8,2,1,2,1,2,1,3,3,3,95,8,3,1,3,1,3,1,3,3,3,100,8,3,1,3,3,3,103,8,
+		3,1,3,1,3,1,4,1,4,1,4,1,4,1,4,5,4,112,8,4,10,4,12,4,115,9,4,1,4,1,4,1,
+		5,1,5,1,5,1,5,1,5,5,5,124,8,5,10,5,12,5,127,9,5,1,5,1,5,1,6,1,6,1,6,1,
+		6,4,6,135,8,6,11,6,12,6,136,5,6,139,8,6,10,6,12,6,142,9,6,1,6,1,6,1,7,
+		1,7,1,7,3,7,149,8,7,1,8,1,8,1,8,1,8,3,8,155,8,8,1,9,1,9,3,9,159,8,9,1,
+		10,3,10,162,8,10,1,10,1,10,1,11,3,11,167,8,11,1,11,1,11,1,12,1,12,1,12,
+		3,12,174,8,12,1,12,1,12,1,12,1,12,3,12,180,8,12,1,13,1,13,1,13,3,13,185,
+		8,13,1,14,1,14,1,14,1,14,1,14,1,14,1,14,1,14,1,14,3,14,196,8,14,1,15,1,
+		15,1,15,1,15,1,16,1,16,1,16,1,16,1,17,1,17,1,17,1,17,5,17,210,8,17,10,
+		17,12,17,213,9,17,1,17,1,17,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,
+		18,3,18,226,8,18,1,18,1,18,3,18,230,8,18,1,18,1,18,1,18,1,18,1,18,1,18,
+		1,18,1,18,1,18,1,18,1,18,5,18,243,8,18,10,18,12,18,246,9,18,3,18,248,8,
+		18,1,18,3,18,251,8,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,
+		1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,
+		1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,5,18,285,8,18,10,18,12,18,288,
+		9,18,1,19,3,19,291,8,19,1,19,1,19,1,19,1,19,1,19,1,20,1,20,1,20,5,20,301,
+		8,20,10,20,12,20,304,9,20,3,20,306,8,20,1,21,1,21,1,21,1,21,1,21,1,21,
+		5,21,314,8,21,10,21,12,21,317,9,21,1,21,3,21,320,8,21,1,22,1,22,1,22,1,
+		22,1,22,1,22,1,23,1,23,1,23,1,24,1,24,1,24,1,24,1,24,1,24,1,25,1,25,1,
+		25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,26,1,26,1,26,1,26,1,26,1,26,1,
+		26,1,26,1,26,1,26,3,26,357,8,26,1,26,0,1,36,27,0,2,4,6,8,10,12,14,16,18,
+		20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,0,7,1,0,47,52,1,0,39,
+		40,2,0,39,40,53,53,1,0,32,34,1,0,35,36,1,0,37,38,1,0,41,46,394,0,59,1,
+		0,0,0,2,64,1,0,0,0,4,79,1,0,0,0,6,94,1,0,0,0,8,106,1,0,0,0,10,118,1,0,
+		0,0,12,130,1,0,0,0,14,148,1,0,0,0,16,154,1,0,0,0,18,158,1,0,0,0,20,161,
+		1,0,0,0,22,166,1,0,0,0,24,179,1,0,0,0,26,184,1,0,0,0,28,195,1,0,0,0,30,
+		197,1,0,0,0,32,201,1,0,0,0,34,205,1,0,0,0,36,250,1,0,0,0,38,290,1,0,0,
+		0,40,305,1,0,0,0,42,307,1,0,0,0,44,321,1,0,0,0,46,327,1,0,0,0,48,330,1,
+		0,0,0,50,336,1,0,0,0,52,356,1,0,0,0,54,58,3,4,2,0,55,58,3,2,1,0,56,58,
+		3,6,3,0,57,54,1,0,0,0,57,55,1,0,0,0,57,56,1,0,0,0,58,61,1,0,0,0,59,57,
+		1,0,0,0,59,60,1,0,0,0,60,62,1,0,0,0,61,59,1,0,0,0,62,63,5,0,0,1,63,1,1,
+		0,0,0,64,70,5,23,0,0,65,67,5,54,0,0,66,68,5,30,0,0,67,66,1,0,0,0,67,68,
+		1,0,0,0,68,69,1,0,0,0,69,71,5,55,0,0,70,65,1,0,0,0,70,71,1,0,0,0,71,72,
+		1,0,0,0,72,75,5,29,0,0,73,74,5,47,0,0,74,76,3,36,18,0,75,73,1,0,0,0,75,
+		76,1,0,0,0,76,77,1,0,0,0,77,78,5,1,0,0,78,3,1,0,0,0,79,80,5,19,0,0,80,
+		81,5,41,0,0,81,82,5,27,0,0,82,83,5,43,0,0,83,84,5,29,0,0,84,86,5,2,0,0,
+		85,87,3,8,4,0,86,85,1,0,0,0,86,87,1,0,0,0,87,89,1,0,0,0,88,90,3,10,5,0,
+		89,88,1,0,0,0,89,90,1,0,0,0,90,91,1,0,0,0,91,92,5,1,0,0,92,5,1,0,0,0,93,
+		95,5,20,0,0,94,93,1,0,0,0,94,95,1,0,0,0,95,96,1,0,0,0,96,97,5,29,0,0,97,
+		99,5,2,0,0,98,100,3,8,4,0,99,98,1,0,0,0,99,100,1,0,0,0,100,102,1,0,0,0,
+		101,103,3,10,5,0,102,101,1,0,0,0,102,103,1,0,0,0,103,104,1,0,0,0,104,105,
+		3,12,6,0,105,7,1,0,0,0,106,107,5,24,0,0,107,108,5,3,0,0,108,113,3,20,10,
+		0,109,110,5,4,0,0,110,112,3,20,10,0,111,109,1,0,0,0,112,115,1,0,0,0,113,
+		111,1,0,0,0,113,114,1,0,0,0,114,116,1,0,0,0,115,113,1,0,0,0,116,117,5,
+		5,0,0,117,9,1,0,0,0,118,119,5,25,0,0,119,120,5,3,0,0,120,125,3,24,12,0,
+		121,122,5,4,0,0,122,124,3,24,12,0,123,121,1,0,0,0,124,127,1,0,0,0,125,
+		123,1,0,0,0,125,126,1,0,0,0,126,128,1,0,0,0,127,125,1,0,0,0,128,129,5,
+		5,0,0,129,11,1,0,0,0,130,140,5,6,0,0,131,139,3,14,7,0,132,134,3,16,8,0,
+		133,135,5,1,0,0,134,133,1,0,0,0,135,136,1,0,0,0,136,134,1,0,0,0,136,137,
+		1,0,0,0,137,139,1,0,0,0,138,131,1,0,0,0,138,132,1,0,0,0,139,142,1,0,0,
+		0,140,138,1,0,0,0,140,141,1,0,0,0,141,143,1,0,0,0,142,140,1,0,0,0,143,
+		144,5,7,0,0,144,13,1,0,0,0,145,149,3,42,21,0,146,149,3,48,24,0,147,149,
+		3,50,25,0,148,145,1,0,0,0,148,146,1,0,0,0,148,147,1,0,0,0,149,15,1,0,0,
+		0,150,155,3,18,9,0,151,155,3,26,13,0,152,155,3,38,19,0,153,155,5,22,0,
+		0,154,150,1,0,0,0,154,151,1,0,0,0,154,152,1,0,0,0,154,153,1,0,0,0,155,
+		17,1,0,0,0,156,159,3,24,12,0,157,159,3,34,17,0,158,156,1,0,0,0,158,157,
+		1,0,0,0,159,19,1,0,0,0,160,162,5,26,0,0,161,160,1,0,0,0,161,162,1,0,0,
+		0,162,163,1,0,0,0,163,164,3,24,12,0,164,21,1,0,0,0,165,167,5,26,0,0,166,
+		165,1,0,0,0,166,167,1,0,0,0,167,168,1,0,0,0,168,169,3,36,18,0,169,23,1,
+		0,0,0,170,171,5,23,0,0,171,173,5,54,0,0,172,174,5,30,0,0,173,172,1,0,0,
+		0,173,174,1,0,0,0,174,175,1,0,0,0,175,176,5,55,0,0,176,180,5,29,0,0,177,
+		178,5,23,0,0,178,180,5,29,0,0,179,170,1,0,0,0,179,177,1,0,0,0,180,25,1,
+		0,0,0,181,185,3,28,14,0,182,185,3,30,15,0,183,185,3,32,16,0,184,181,1,
+		0,0,0,184,182,1,0,0,0,184,183,1,0,0,0,185,27,1,0,0,0,186,187,3,52,26,0,
+		187,188,7,0,0,0,188,189,3,36,18,0,189,196,1,0,0,0,190,191,7,1,0,0,191,
+		196,3,52,26,0,192,193,3,52,26,0,193,194,7,1,0,0,194,196,1,0,0,0,195,186,
+		1,0,0,0,195,190,1,0,0,0,195,192,1,0,0,0,196,29,1,0,0,0,197,198,3,18,9,
+		0,198,199,5,47,0,0,199,200,3,36,18,0,200,31,1,0,0,0,201,202,3,34,17,0,
+		202,203,5,47,0,0,203,204,3,36,18,0,204,33,1,0,0,0,205,206,5,3,0,0,206,
+		211,3,24,12,0,207,208,5,4,0,0,208,210,3,24,12,0,209,207,1,0,0,0,210,213,
+		1,0,0,0,211,209,1,0,0,0,211,212,1,0,0,0,212,214,1,0,0,0,213,211,1,0,0,
+		0,214,215,5,5,0,0,215,35,1,0,0,0,216,217,6,18,-1,0,217,218,5,8,0,0,218,
+		251,3,36,18,22,219,220,7,2,0,0,220,251,3,36,18,20,221,251,3,28,14,0,222,
+		251,3,52,26,0,223,251,3,38,19,0,224,226,5,36,0,0,225,224,1,0,0,0,225,226,
+		1,0,0,0,226,227,1,0,0,0,227,251,5,31,0,0,228,230,5,36,0,0,229,228,1,0,
+		0,0,229,230,1,0,0,0,230,231,1,0,0,0,231,251,5,30,0,0,232,251,5,27,0,0,
+		233,251,5,28,0,0,234,235,5,3,0,0,235,236,3,36,18,0,236,237,5,5,0,0,237,
+		251,1,0,0,0,238,247,5,6,0,0,239,244,3,36,18,0,240,241,5,4,0,0,241,243,
+		3,36,18,0,242,240,1,0,0,0,243,246,1,0,0,0,244,242,1,0,0,0,244,245,1,0,
+		0,0,245,248,1,0,0,0,246,244,1,0,0,0,247,239,1,0,0,0,247,248,1,0,0,0,248,
+		249,1,0,0,0,249,251,5,7,0,0,250,216,1,0,0,0,250,219,1,0,0,0,250,221,1,
+		0,0,0,250,222,1,0,0,0,250,223,1,0,0,0,250,225,1,0,0,0,250,229,1,0,0,0,
+		250,232,1,0,0,0,250,233,1,0,0,0,250,234,1,0,0,0,250,238,1,0,0,0,251,286,
+		1,0,0,0,252,253,10,19,0,0,253,254,7,3,0,0,254,285,3,36,18,20,255,256,10,
+		18,0,0,256,257,7,4,0,0,257,285,3,36,18,19,258,259,10,17,0,0,259,260,7,
+		5,0,0,260,285,3,36,18,18,261,262,10,16,0,0,262,263,5,9,0,0,263,285,3,36,
+		18,17,264,265,10,15,0,0,265,266,5,10,0,0,266,285,3,36,18,16,267,268,10,
+		14,0,0,268,269,5,11,0,0,269,285,3,36,18,15,270,271,10,13,0,0,271,272,5,
+		53,0,0,272,285,3,36,18,14,273,274,10,12,0,0,274,275,7,6,0,0,275,285,3,
+		36,18,13,276,277,10,11,0,0,277,278,5,12,0,0,278,285,3,36,18,12,279,280,
+		10,10,0,0,280,281,5,13,0,0,281,285,3,36,18,11,282,283,10,21,0,0,283,285,
+		7,1,0,0,284,252,1,0,0,0,284,255,1,0,0,0,284,258,1,0,0,0,284,261,1,0,0,
+		0,284,264,1,0,0,0,284,267,1,0,0,0,284,270,1,0,0,0,284,273,1,0,0,0,284,
+		276,1,0,0,0,284,279,1,0,0,0,284,282,1,0,0,0,285,288,1,0,0,0,286,284,1,
+		0,0,0,286,287,1,0,0,0,287,37,1,0,0,0,288,286,1,0,0,0,289,291,5,21,0,0,
+		290,289,1,0,0,0,290,291,1,0,0,0,291,292,1,0,0,0,292,293,5,29,0,0,293,294,
+		5,3,0,0,294,295,3,40,20,0,295,296,5,5,0,0,296,39,1,0,0,0,297,302,3,22,
+		11,0,298,299,5,4,0,0,299,301,3,22,11,0,300,298,1,0,0,0,301,304,1,0,0,0,
+		302,300,1,0,0,0,302,303,1,0,0,0,303,306,1,0,0,0,304,302,1,0,0,0,305,297,
+		1,0,0,0,305,306,1,0,0,0,306,41,1,0,0,0,307,308,5,14,0,0,308,309,5,3,0,
+		0,309,310,3,36,18,0,310,311,5,5,0,0,311,315,3,12,6,0,312,314,3,44,22,0,
+		313,312,1,0,0,0,314,317,1,0,0,0,315,313,1,0,0,0,315,316,1,0,0,0,316,319,
+		1,0,0,0,317,315,1,0,0,0,318,320,3,46,23,0,319,318,1,0,0,0,319,320,1,0,
+		0,0,320,43,1,0,0,0,321,322,5,15,0,0,322,323,5,3,0,0,323,324,3,36,18,0,
+		324,325,5,5,0,0,325,326,3,12,6,0,326,45,1,0,0,0,327,328,5,16,0,0,328,329,
+		3,12,6,0,329,47,1,0,0,0,330,331,5,17,0,0,331,332,5,3,0,0,332,333,3,36,
+		18,0,333,334,5,5,0,0,334,335,3,12,6,0,335,49,1,0,0,0,336,337,5,18,0,0,
+		337,338,5,3,0,0,338,339,3,30,15,0,339,340,5,1,0,0,340,341,3,36,18,0,341,
+		342,5,1,0,0,342,343,3,26,13,0,343,344,5,5,0,0,344,345,3,12,6,0,345,51,
+		1,0,0,0,346,347,5,29,0,0,347,348,5,54,0,0,348,349,3,36,18,0,349,350,5,
+		55,0,0,350,357,1,0,0,0,351,357,5,29,0,0,352,353,5,3,0,0,353,354,3,52,26,
+		0,354,355,5,5,0,0,355,357,1,0,0,0,356,346,1,0,0,0,356,351,1,0,0,0,356,
+		352,1,0,0,0,357,53,1,0,0,0,38,57,59,67,70,75,86,89,94,99,102,113,125,136,
+		138,140,148,154,158,161,166,173,179,184,195,211,225,229,244,247,250,284,
+		286,290,302,305,315,319,356
 	};
 
 	public static readonly ATN _ATN =

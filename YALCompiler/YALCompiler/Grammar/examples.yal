@@ -1,43 +1,8 @@
-external <"arduino.h"> delay: in(int32 ms);
-
-async main: {
+main: {
     int32 i = 0;
-    bool b = i > 0;
-    bool c = true;
-    funcc(c);
-    int16 g = 4;
-    int32 r = g++;
-    delay(45);
-    //int32 g = add(1, 3) + 4;
+    add(ref i, "s");
 }
 
-async add: in (int32 a, int32 b) out (int32 c) {
-    c = a + b;
-}
-
-async funcc: in(bool by) out (bool n) {n=true;}
-
-async func1: in (bool sIn) out (bool s) {
-    s = true;
-}
-
-async func2: in (bool sIn) out (bool b, int32 f, bool g, string s) {
-    s = "true";
-    f = 5;
-    g = false;
-    b = true;
-    (string sss, int32 fff) = await func3();
-    return;
-}
-
-async func3: out (string s, int32 f) {
-    s = "true";
-    f = 5;
-    return;
-}
-
-async func4: out (string s, int32 f) {
-    s = "true";
-    f = 5;
-    return;
+add: in (ref int32 i, string s) {
+    i = i + 1;
 }
