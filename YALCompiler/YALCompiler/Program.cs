@@ -59,7 +59,7 @@ public static class Program
 
             Console.WriteLine(generatedCode);
 
-            string filePath = Path.Combine("C:\\Users\\Test\\Documents", "GenCode.txt");
+            string filePath = Path.Combine($"{path}", "GenCode.txt");
 
             File.WriteAllText(filePath, generatedCode);
 
