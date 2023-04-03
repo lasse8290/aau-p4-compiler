@@ -10,6 +10,6 @@ public class CompoundPredicate: Boolean
     public Expression Right { get; set; }
     public override string ToString()
     {
-        return $"({Left} {Operator} {Right})";
+        return $"({Left} {Operator.ToStringValue()} {Right})";
     }
 }

@@ -34,4 +34,6 @@ public abstract class ASTNode
             throw new VariableAlreadyExistsException(function.Id);
         }
     }
+    
+    public override string ToString() => GetType().Name;
 }

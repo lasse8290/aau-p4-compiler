@@ -49,6 +49,8 @@ public static class Program {
             Console.WriteLine(warningsHandler.GetAsString());
             Console.WriteLine(errorHandler.GetAsString());
             Console.WriteLine("Type and scope checked AST in " + sw.ElapsedMilliseconds + "ms");
+            if (errorHandler.Errors.Count > 0)
+                return;
             sw.Restart();
             CodeGenTraverser cgt = new(node);
             cgt.BeginTraverse();

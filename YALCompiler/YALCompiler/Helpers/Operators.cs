@@ -62,6 +62,7 @@ public static class Operators
         PreDecrement = 0x1 << 7 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float,
         PostIncrement = 0x1 << 8 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float,
         PostDecrement = 0x1 << 9 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float,
+        BitwiseNot = 0x1 << 10 ^ TypeMasks.IntUint ^ TypeMasks.Char,
     }
 
     public enum TypeMasks
@@ -88,7 +89,7 @@ public static class Operators
         return ((int)TypeMaskMatching[type] & (int)@operator) != 0;
     }
 
-    public static string ToString(this ExpressionOperator @operator) => @operator switch {
+    public static string ToStringValue(this ExpressionOperator @operator) => @operator switch {
         ExpressionOperator.Multiplication => "*",
         ExpressionOperator.Division => "/",
         ExpressionOperator.Modulo => "%",
@@ -107,7 +108,7 @@ public static class Operators
         _ => throw new ArgumentOutOfRangeException(nameof(@operator), @operator, null)
     };
     
-    public static string ToString(this AssignmentOperator @operator) => @operator switch {
+    public static string ToStringValue(this AssignmentOperator @operator) => @operator switch {
         AssignmentOperator.Equals => "=",
         AssignmentOperator.AdditionAssignment => "+=",
         AssignmentOperator.SubtractionAssignment => "-=",
@@ -118,10 +119,11 @@ public static class Operators
         AssignmentOperator.PreDecrement => "--",
         AssignmentOperator.PostIncrement => "++",
         AssignmentOperator.PostDecrement => "--",
+        AssignmentOperator.BitwiseNot => "~",
         _ => throw new ArgumentOutOfRangeException(nameof(@operator), @operator, null)
     };
     
-    public static string ToString(this PredicateOperator @operator) => @operator switch {
+    public static string ToStringValue(this PredicateOperator @operator) => @operator switch {
         PredicateOperator.LessThan => "<",
         PredicateOperator.LessThanOrEqual => "<=",
         PredicateOperator.GreaterThan => ">",

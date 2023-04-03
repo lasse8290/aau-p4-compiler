@@ -25,9 +25,10 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         switch (node.Target)
         {
             case Identifier identifier:
-                if (CompilerUtilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
+                if (CompilerUtilities.FindSymbol(identifier.Name, node) is Symbol symbol)
                 {
                     targetType = symbol.Type;
+                    symbol.Initialized = true;
                     if (identifier is ArrayElementIdentifier arrayElementIdentifier)
                     {
                         targetParentArrayType = symbol.Type;
@@ -45,15 +46,20 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 }
                 else
                 {
-                    _errorHandler.AddError(new IdentifierNotFoundException(identifier.IdValue), node.LineNumber);
+                    _errorHandler.AddError(new IdentifierNotFoundException(identifier.Name), node.LineNumber);
                 }
 
                 break;
             case VariableDeclaration variableDeclaration:
                 targetType = variableDeclaration.Variable.Type;
+                variableDeclaration.Variable.Initialized = true;
                 break;
             case TupleDeclaration tupleDeclaration:
                 targetType = new TupleType(tupleDeclaration.Variables.Select(v => (SingleType)v.Type).ToArray());
+                foreach (var variable in tupleDeclaration.Variables)
+                {
+                    variable.Initialized = true;
+                }
                 break;
         }
 
@@ -90,33 +96,37 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     internal override object? Visit(UnaryAssignment node)
     {
         YALType? targetType = null;
-        if (node.Target is Identifier identifier)
+        switch (node.Target)
         {
-            if (CompilerUtilities.FindSymbol(identifier.IdValue, node) is Symbol symbol)
-            {
-                targetType = symbol.Type;
-                switch (targetType)
+            case Identifier identifier:
+                if (CompilerUtilities.FindSymbol(identifier.Name, node) is Symbol symbol)
                 {
-                    case SingleType singleType:
-                        if (!Operators.CheckOperationIsValid(singleType.Type, node.Operator))
-                        {
-                            _errorHandler.AddError(new InvalidOperatorException(node.Operator, singleType.Type), node.LineNumber);
-                        }
-
-                        break;
-                    case TupleType tupleType:
-                        _errorHandler.AddError(new InvalidOperatorException(node.Operator, tupleType), node.LineNumber);
-                        break;
+                    targetType = symbol.Type;
+                    symbol.Initialized = true;
                 }
-            }
-            else
-            {
-                _errorHandler.AddError(new IdentifierNotFoundException(identifier.IdValue), node.LineNumber);
-            }
+                else
+                {
+                    _errorHandler.AddError(new IdentifierNotFoundException(identifier.Name), node.LineNumber);
+                }
+
+                break;
+            default:
+                _errorHandler.AddError(new InvalidAssignment(node), node.LineNumber);
+                return targetType;
         }
-        else
+        
+        switch (targetType)
         {
-            _errorHandler.AddError(new InvalidAssignment(node), node.LineNumber);
+            case SingleType singleType:
+                if (!Operators.CheckOperationIsValid(singleType.Type, node.Operator))
+                {
+                    _errorHandler.AddError(new InvalidOperatorException(node.Operator, singleType.Type), node.LineNumber);
+                }
+
+                break;
+            case TupleType tupleType:
+                _errorHandler.AddError(new InvalidOperatorException(node.Operator, tupleType), node.LineNumber);
+                break;
         }
 
         return targetType;
@@ -140,18 +150,28 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 node.LineNumber);
         }
         
+        List<SingleType?> actualParams = new();
+        bool hasError = false;
         for (int i = 0; i < function.InputParameters.Count; i++)
         {
-            if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, Visit(node.InputParameters[i]) as YALType))
+            var actualParam = Visit(node.InputParameters[i]) as SingleType;
+            actualParams.Add(actualParam);
+            if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, actualParam))
             {
-                _errorHandler.AddError(
-                    new InvalidFunctionCallInputParameters(
-                        function.InputParameters.Select(s => s.Type as SingleType).ToList(),
-                        node.InputParameters.Select(s => Visit(s) as SingleType).ToList()),
-                    node.LineNumber);
-                break;
+                hasError = true;
             }
         }
+
+        if (hasError)
+        {
+            _errorHandler.AddError(
+                new InvalidFunctionCallInputParameters(
+                    function.InputParameters.Select(s => s.Type as SingleType).ToList(),
+                    actualParams),
+                node.LineNumber);    
+        }
+        
+        
         
         //check if await is used that it is within an async function
         if (node.Await)
@@ -170,6 +190,10 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
             if (!function.IsAsync)
                 _errorHandler.AddError(new CannotAwaitNonAsyncFunctionException(), node.LineNumber);
+        }
+        else if (function.IsAsync && !node.Parent.Children.Contains(node))
+        {
+            _errorHandler.AddError(new CannotUseAsyncFunctionAsExpressionWithoutAwaitException(), node.LineNumber);
         }
         
         node.Function = function;
@@ -237,16 +261,19 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
     internal override object? Visit(Identifier node)
     {
-        if (CompilerUtilities.FindSymbol(node.IdValue, node) is Symbol symbol)
+        if (CompilerUtilities.FindSymbol(node.Name, node) is Symbol symbol)
         {
+            if (!symbol.Initialized && !(node.Parent is BinaryAssignment binaryAssignment && binaryAssignment.Target == node))
+                _errorHandler.AddError(new UninitializedVariableException(node.Name), node.LineNumber);
+                
             return symbol.Type;
-        } else if (CompilerUtilities.FindFunction(node.IdValue, node) is Function function)
+        } else if (CompilerUtilities.FindFunction(node.Name, node) is Function function)
         {
             return function.ReturnType;
         }
         else
         {
-            _errorHandler.AddError(new IdentifierNotFoundException(node.IdValue), node.LineNumber);
+            _errorHandler.AddError(new IdentifierNotFoundException(node.Name), node.LineNumber);
             return null;
         }
     }
@@ -277,6 +304,16 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
         
         return node.Type;
+    }
+
+    internal override object? Visit(UnaryCompoundExpression node)
+    {
+        SingleType? type = Visit(node.Expression) as SingleType;
+
+        if(type is not null && !Operators.CheckOperationIsValid(type.Type, node.Operator))
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, type.Type), node.LineNumber);
+
+        return type;
     }
 
     internal override object? Visit(StringLiteral node)
