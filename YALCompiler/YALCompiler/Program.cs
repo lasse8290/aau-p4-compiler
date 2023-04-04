@@ -1,24 +1,24 @@
 using System.Diagnostics;
 using StringTemplating;
 using Antlr4.Runtime;
-using BenchmarkDotNet.Running;
-using Microsoft.VisualBasic.CompilerServices;
-using YALCompiler;
 using YALCompiler.ErrorHandlers;
-using YALCompiler.Helpers;
-
+using System.Reflection;
 
 namespace YALCompiler;
 public static class Program
 {
     public static void Main()
     {
+        var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        Console.WriteLine(path);
+
         try
         {
+
             Stopwatch sw = new();
             sw.Start();
-            Template.LoadTemplates("Templates", "txt");
-            var text = File.ReadAllText("Grammar/examples.yal");
+            Template.LoadTemplates($"{path}/Templates", "txt");
+            var text = File.ReadAllText($"{path}/Grammar/examples.yal");
             var errorHandler = new ErrorHandler();
             var warningsHandler = new WarningsHandler();
             sw.Stop();
@@ -59,6 +59,9 @@ public static class Program
 
             Console.WriteLine(generatedCode);
 
+            string filePath = Path.Combine($"{path}", "GenCode.txt");
+
+            File.WriteAllText(filePath, generatedCode);
 
 
             Console.WriteLine("Done");

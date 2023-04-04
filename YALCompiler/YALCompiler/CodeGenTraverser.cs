@@ -112,48 +112,58 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(Function function)
     {
-        var declarationInputParametersBuilder = new StringBuilder();
-        foreach (var symbol in function.InputParameters)
-            declarationInputParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id};");
-        
-        var declarationOutputParametersBuilder = new StringBuilder();
-        foreach (var symbol in function.OutputParameters)
-            declarationOutputParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id};");
-        
-        var declarationTemplate = new Template("function_declaration");
-        declarationTemplate.SetKeys(new List<Tuple<string, string>>
-        {
-            new("name", function.Id),
-            new("input_parameters", declarationInputParametersBuilder.ToString()),
-            new("output_parameters", declarationOutputParametersBuilder.ToString()),
-        });
-        _declarationsBuilder.AppendLine(declarationTemplate.ReplacePlaceholders());
-            
-        var inputParametersBuilder = new StringBuilder();
-        foreach (var symbol in function.InputParameters)
-            inputParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMS_{function.Id}->input->{symbol.Id};");
+        Template inputTemplate = new("parameter_input_struct");
+        inputTemplate.SetKeys(new List<Tuple<string, string>>
+            {
+                new("name", function.Id),
+                new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType()} {symbol.Id};\n")))
+            });
 
-        var outputParametersBuilder = new StringBuilder();
-        foreach (var symbol in function.OutputParameters)
-            outputParametersBuilder.AppendLine($"_COMPILER_PARAMS_{function.Id}->output->{symbol.Id} = {symbol.Id};");
-        
-        var bodyBuilder = new StringBuilder();
-        foreach (var child in function.Children)
+        Template outputTemplate = new("parameter_output_struct");
+        outputTemplate.SetKeys(new List<Tuple<string, string>>
+            {
+                new("name", function.Id),
+                new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType()} {symbol.Id};\n"))),
+            });
+
+        _declarationsBuilder.AppendLine(inputTemplate.ReplacePlaceholders());
+        _declarationsBuilder.AppendLine(outputTemplate.ReplacePlaceholders());
+        _declarationsBuilder.AppendLine($"#define COMPILER_PARAMETERS_{function.Id} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Id}, COMPILER_OUTPUT_STRUCT_{function.Id}>");
+
+        Template template;
+        if (function.IsAsync)
         {
-            bodyBuilder.Append((string)InvokeVisitor(child));
-            bodyBuilder.AppendLine(";");
+
+            StringBuilder initializedParametersBuilder = new();
+            foreach (var symbol in function.InputParameters)
+                initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->input->{symbol.Id};");
+
+            foreach (var symbol in function.OutputParameters)
+                initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->output->{symbol.Id};");
+
+
+            StringBuilder outputParametersBuilder = new();
+            foreach (var symbol in function.OutputParameters)
+                outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Id} = {symbol.Id};");
+
+            var bodyBuilder = new StringBuilder();
+            foreach (var child in function.Children)
+                bodyBuilder.Append($"{InvokeVisitor(child) ?? ""};");
+
+            template = new Template("async_function");
+            template.SetKeys(new List<Tuple<string, string>>
+            {
+                new("name", function.Id),
+                new("initialized_parameters", initializedParametersBuilder.ToString()),
+                new("body", bodyBuilder.ToString()),
+                new("output_parameters", outputParametersBuilder.ToString()),
+            });
         }
-
-        var template = new Template("function");
-        template.SetKeys(new List<Tuple<string, string>>
+        else
         {
-            new("name", function.Id),
-            new("input_parameters", inputParametersBuilder.ToString()),
-            new("output_initialization", declarationOutputParametersBuilder.ToString()),
-            new("body", bodyBuilder.ToString()),
-            new("output_parameters", outputParametersBuilder.ToString())
-        });
-
+            template = new Template("function");
+        }
+        
         return template.ReplacePlaceholders();
     }
 
@@ -349,22 +359,30 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(FunctionCall functionCall)
     {
-        var functionName = functionCall.Identifier;
-        var argumentList = new StringBuilder();
-        for (var i = 0; i < functionCall.InputParameters.Count; i++)
+        StringBuilder argumentsBuilder = new StringBuilder();
+        foreach (var expression in functionCall.InputParameters)
+            argumentsBuilder.Append($"{(string) InvokeVisitor(expression)},");
+
+        // Suffix hotfix
+        string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Id}" : ""; 
+
+        Template template;
+        if (functionCall.Function.IsAsync)
         {
-            argumentList.Append((string)InvokeVisitor(functionCall.InputParameters[i]));
-            if (i < functionCall.InputParameters.Count - 1) argumentList.Append(", ");
+            template = new Template("function_call_async");
+            template.SetKeys(new List<Tuple<string, string>>
+            {
+                new("function", functionCall.Function.Id),
+                new("arguments", argumentsBuilder.ToString()),
+                new("suffix", suffix),
+            });
+        }
+        else
+        {
+            template = new Template("string_literal");
         }
 
-        var template = new Template("function_call");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("function_name", functionName),
-            new("arguments", argumentList.ToString())
-        });
-
-        return template.ReplacePlaceholders();
+        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(CompoundExpression compoundExpression)
