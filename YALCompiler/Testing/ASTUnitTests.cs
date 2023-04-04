@@ -3,12 +3,13 @@ using Antlr4.Runtime;
 using YALCompiler;
 using YALCompiler.DataTypes;
 using YALCompiler.Helpers;
+using YALCompiler.ErrorHandlers;
 
 namespace Testing;
 
 public class ASTUnitTests
 {
-    YALGrammerVisitor visitor = new YALGrammerVisitor();
+    YALGrammerVisitor visitor = new YALGrammerVisitor(new ErrorHandler(), new WarningsHandler());
 
     public IParseTree Parse(YALGrammerParser parser, string methodName) => (IParseTree)parser.GetType().GetMethod(methodName).Invoke(parser, null);
 
@@ -28,6 +29,7 @@ public class ASTUnitTests
         IParseTree tree = Parse(parser, methodName);
 
         ASTNode node = (ASTNode)visitor.Visit(tree);
+
         LinkerASTTraverser linker = new(node);
         linker.BeginTraverse();
 
@@ -99,7 +101,7 @@ public class ASTUnitTests
 
     [Theory]
     [MemberData(nameof(InputParametersData))]
-    public void Assert_Formal_Parameters(string parameters, List<Types.ValueType> expectedParameterTypes)
+    public void Assert_Formal_Parameters(string parameters, List<Types.ValueType> expected)
     {
         IParseTree tree;
         switch (parameters.Split(" ")[0])
@@ -115,9 +117,9 @@ public class ASTUnitTests
         }
         List<Symbol> list = (List<Symbol>)visitor.Visit(tree);
 
-        for (int i = 0; i < expectedParameterTypes.Count; i++)
+        for (int i = 0; i < expected.Count; i++)
         {
-            Types.ValueType expectedType = expectedParameterTypes[i];
+            Types.ValueType expectedType = expected[i];
             Symbol param = (Symbol)list[i];
 
             Assert.Equal(expectedType, ((SingleType)param.Type!).Type);
@@ -129,11 +131,11 @@ public class ASTUnitTests
     [InlineData("my_function: { int32 hej = 1+2; }", 1)]
     [InlineData("my_function: { int32 hej = 3+4; int32 hej2 = 4+5; }", 2)]
     [InlineData("my_function: { int32 hej = 5+6; int32 hej3 = 6+7; int32 hej4 = 7+8 }", 3)]
-    public void Assert_Correct_Amount_Of_BlockStatements(string input, int expectedStatementsCount)
+    public void Assert_Correct_Amount_Of_BlockStatements(string input, int expected)
     {
         Function func = (Function)Setup(input, nameof(YALGrammerParser.functionDeclaration));
 
-        Assert.Equal(expectedStatementsCount, func.Children.Count);
+        Assert.Equal(expected, func.Children.Count);
     }
 
     [Theory]
@@ -141,22 +143,22 @@ public class ASTUnitTests
     [InlineData("functionCall();", typeof(FunctionCall))]
     [InlineData("int32 i;", typeof(VariableDeclaration))]
     [InlineData("i++;", typeof(UnaryAssignment))]
-    public void Assert_Correct_SingleStatement_Type(string input, Type expectedStatementType)
+    public void Assert_Correct_SingleStatement_Type(string input, Type expected)
     {
         var stmt = Setup(input, nameof(YALGrammerParser.singleStatement));
 
-        Assert.Equal(expectedStatementType, stmt.GetType());
+        Assert.Equal(expected, stmt.GetType());
     }
 
     [Theory]
     [InlineData("for (int32 i = 5; i < 5; i++) { }", typeof(ForStatement))]
     [InlineData("while (i < 5) { }", typeof(WhileStatement))]
     [InlineData("if (i < 5) { }", typeof(IfStatement))]
-    public void Assert_BlockStatement_Type(string input, Type expectedStatementType)
+    public void Assert_BlockStatement_Type(string input, Type expected)
     {
         var stmt = Setup(input, nameof(YALGrammerParser.blockStatement));
 
-        Assert.Equal(expectedStatementType, stmt.GetType());
+        Assert.Equal(expected, stmt.GetType());
     }
 
     [Theory]
@@ -180,11 +182,16 @@ public class ASTUnitTests
     [InlineData("5 | 10", typeof(CompoundExpression))]
     [InlineData("5 ~ 10", typeof(CompoundExpression))]
     [InlineData(@"hi = ""whaaat""", typeof(BinaryAssignment))]
-    [InlineData(@"myCall(param1, param2)", typeof(FunctionCall))]
-    public void Assert_Expression_Type(string input, Type expectedExpressionType)
+    [InlineData("myCall(param1, param2)", typeof(FunctionCall))]
+    [InlineData("-5", typeof(SignedNumber))]
+    [InlineData("5", typeof(SignedNumber))]
+    [InlineData("-0.4", typeof(SignedFloat))]
+    [InlineData("0.4", typeof(SignedFloat))]
+    [InlineData("{ 5+2, 3+2 }", typeof(ArrayLiteral))]
+    public void Assert_Expression_Type(string input, Type expected)
     {
         var expr = Setup(input, nameof(YALGrammerParser.expression));
 
-        Assert.Equal(expectedExpressionType, expr.GetType());
+        Assert.Equal(expected, expr.GetType());
     }
 }

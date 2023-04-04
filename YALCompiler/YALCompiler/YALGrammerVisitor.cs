@@ -10,8 +10,8 @@ namespace YALCompiler;
 
 public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
-    private readonly ErrorHandler _errorHandler;
-    private readonly WarningsHandler _warningsHandler;
+    public readonly ErrorHandler _errorHandler;
+    public readonly WarningsHandler _warningsHandler;
 
     Stack<Table<Symbol>> symStack = new();
     public YALGrammerVisitor(ErrorHandler errorHandler, WarningsHandler warningsHandler)
@@ -19,8 +19,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         _errorHandler = errorHandler;
         _warningsHandler = warningsHandler;
     }
-    
-    public YALGrammerVisitor() {}
 
     public override object VisitProgram(YALGrammerParser.ProgramContext context)
     {
