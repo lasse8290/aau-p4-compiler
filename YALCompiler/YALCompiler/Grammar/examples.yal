@@ -1,8 +1,7 @@
-main: {
-    int32 i = 0;
-    add(ref i, "s");
+async expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
+	area = width * length;
 }
 
-add: in (ref int32 i, string s) {
-    i = i + 1;
+async test: {
+	int32 test = expensiveSquareArea(10, 10);
 }

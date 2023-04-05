@@ -7,6 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Templates\NewFile1.txt" />
+      <None Remove="Templates\NewFile3.txt" />
+      <None Remove="Templates\ParameterStruct.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Templates\async_function.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="Templates\function.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
@@ -17,6 +26,15 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Templates\else_if.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Templates\function_call_async.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Templates\parameter_input_struct.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Templates\parameter_output_struct.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Templates\program.txt">
