@@ -1,7 +1,0 @@
-async expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
-	area = width * length;
-}
-
-async test: {
-	int32 test = expensiveSquareArea(10, 10);
-}

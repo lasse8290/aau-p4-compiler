@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+      <ProjectReference Include="..\StringTemplating\StringTemplating.csproj" />
+      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Grammar\examples.yal">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+</Project>

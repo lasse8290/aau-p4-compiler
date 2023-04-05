@@ -1,7 +1,7 @@
-﻿sumAndDiffFromTwoNumbers: in(int32 a, int32 b) out(int32 sum, int32 diff) {
-    sum = a + b;
-    diff = a - b;
+async expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
+	area = width * length;
 }
-main: {
-    (int32 a, int32 b) = sumAndDiffFromTwoNumbers(1, 2)
+
+async test: {
+	int32 test = expensiveSquareArea(10, 10);
 }
