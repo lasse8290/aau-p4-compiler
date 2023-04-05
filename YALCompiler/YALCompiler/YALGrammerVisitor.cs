@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using Antlr4.Runtime.Atn;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -13,7 +11,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     private readonly ErrorHandler _errorHandler;
     private readonly WarningsHandler _warningsHandler;
 
-    Stack<Table<Symbol>> symStack = new();
     public YALGrammerVisitor(ErrorHandler errorHandler, WarningsHandler warningsHandler)
     {
         _errorHandler = errorHandler;
@@ -127,6 +124,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
+                    symbol.Initialized = true;
                     func.AddSymbolOrFunction(symbol);
                     func.InputParameters.Add(symbol);
                 }
@@ -182,6 +180,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
+                    symbol.Initialized = true;
                     func.AddSymbolOrFunction(symbol);
                     func.InputParameters.Add(symbol);
                 }
@@ -234,6 +233,9 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 _errorHandler.AddError(e, context);                    
             }
         }
+        
+        if (func.Children.LastOrDefault() is not ReturnStatement)
+            func.Children.Add(new ReturnStatement());
 
         func.LineNumber = context.Start.Line;
         return func;
@@ -242,7 +244,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitFormalInputParams(YALGrammerParser.FormalInputParamsContext context)
     {
         var paramVars = new List<Symbol>();
-        foreach (var varDecl in context.variableDeclarationFormat())
+        
+        foreach (var varDecl in context.referenceableVariableDeclarationFormat())
         {
             if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
             {
@@ -263,6 +266,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
         }
         return paramVars;
+    }
+
+    public override object VisitReferenceableVariableDeclarationFormat(YALGrammerParser.ReferenceableVariableDeclarationFormatContext context)
+    {
+        var variable = Visit(context.variableDeclarationFormat()) as VariableDeclaration;
+        if (variable is not null) variable.Variable.IsRef = context.REF() != null;
+        return variable;
     }
 
     public override object VisitArrayDeclaration(YALGrammerParser.ArrayDeclarationContext context)
@@ -633,6 +643,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
     #region ExpressionVisitors
 
+    public override object VisitReferenceableExpression(YALGrammerParser.ReferenceableExpressionContext context)
+    {
+        var referenceable = Visit(context.expression()) as Expression;
+        if (referenceable is not null) referenceable.IsRef = context.REF() != null;
+        return referenceable;
+    }
+    
     public override object VisitVariable(YALGrammerParser.VariableContext context)
     {
         return Visit(context.identifier());
@@ -776,17 +793,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitPostIncrementDecrement(YALGrammerParser.PostIncrementDecrementContext context)
     {
-        var compoundExpression = new UnaryCompoundExpression()
+        var compoundExpression = new UnaryAssignment()
         {
-            Expression = Visit(context.expression()) as Expression,
+            Target = Visit(context.expression()) as Expression,
         };
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.INCREMENT:
-                compoundExpression.Operator = Operators.ExpressionOperator.PostIncrement;
+                compoundExpression.Operator = Operators.AssignmentOperator.PostIncrement;
                 break;
             case YALGrammerLexer.DECREMENT:
-                compoundExpression.Operator = Operators.ExpressionOperator.PostDecrement;
+                compoundExpression.Operator = Operators.AssignmentOperator.PostDecrement;
                 break;
         }
         compoundExpression.LineNumber = context.Start.Line;
@@ -795,20 +812,20 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
     public override object VisitPrefixUnary(YALGrammerParser.PrefixUnaryContext context)
     {
-        var compoundExpression = new UnaryCompoundExpression()
+        var compoundExpression = new UnaryAssignment()
         {
-            Expression = Visit(context.expression()) as Expression,
+            Target = Visit(context.expression()) as Expression,
         };
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.INCREMENT:
-                compoundExpression.Operator = Operators.ExpressionOperator.PreIncrement;
+                compoundExpression.Operator = Operators.AssignmentOperator.PreIncrement;
                 break;
             case YALGrammerLexer.DECREMENT:
-                compoundExpression.Operator = Operators.ExpressionOperator.PreDecrement;
+                compoundExpression.Operator = Operators.AssignmentOperator.PreDecrement;
                 break;
             case YALGrammerLexer.BITWISE_NOT:
-                compoundExpression.Operator = Operators.ExpressionOperator.BitwiseNot;
+                compoundExpression.Operator = Operators.AssignmentOperator.BitwiseNot;
                 break;
         }
         compoundExpression.LineNumber = context.Start.Line;
@@ -833,10 +850,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitActualInputParams(YALGrammerParser.ActualInputParamsContext context)
     {
         List<Expression> actualInputParams = new();
-        foreach (var expression in context.expression())
+        foreach (var expression in context.referenceableExpression())
         {
             if (Visit(expression) is Expression expr)
+            {
+                expr.LineNumber = context.Start.Line;
+
                 actualInputParams.Add(expr);
+            }
         }
 
         return actualInputParams;
@@ -879,6 +900,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 assignment.Operator = Operators.AssignmentOperator.ModuloAssignment;
                 break;
         }
+        assignment.LineNumber = context.Start.Line;
         return assignment;
     }
 
@@ -897,6 +919,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 assignment.Operator = Operators.AssignmentOperator.PostDecrement;
                 break;
         }
+        assignment.LineNumber = context.Start.Line;
         return assignment;
     }
     
@@ -915,6 +938,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 assignment.Operator = Operators.AssignmentOperator.PreDecrement;
                 break;
         }
+        assignment.LineNumber = context.Start.Line;
         return assignment;
     }
 
@@ -929,6 +953,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Value = Visit(context.expression()) as Expression
         };
 
+        assignment.LineNumber = context.Start.Line;
         return assignment;
     }
     
@@ -947,6 +972,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (assignment.Value is not null)
             assignment.Value.Parent = assignment;
         
+        assignment.LineNumber = context.Start.Line;
         return assignment;
     }
     
@@ -958,13 +984,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             if (Visit(variableDeclaration) is VariableDeclaration { Variable: Symbol symbol})
             tupleDeclaration.Variables.Add(symbol);
         }
-
+        tupleDeclaration.LineNumber = context.Start.Line;
         return tupleDeclaration;
     }
 
     public override object VisitSimpleIdentifier(YALGrammerParser.SimpleIdentifierContext context)
     {
-        return new Identifier(context.ID().GetText());
+        return new Identifier(context.ID().GetText()) {LineNumber = context.Start.Line};
     }
     
     public override object VisitParenthesizedIdentifier(YALGrammerParser.ParenthesizedIdentifierContext context)
@@ -974,7 +1000,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitArrayElementIdentifier(YALGrammerParser.ArrayElementIdentifierContext context)
     {
-        return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression);
+        return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression)  {LineNumber = context.Start.Line};
     }
 
     public override object VisitArrayLiteral(YALGrammerParser.ArrayLiteralContext context)
@@ -986,6 +1012,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 arrayLiteral.Values.Add(expr);
         }
 
+        arrayLiteral.LineNumber = context.Start.Line;
         return arrayLiteral;
     }
 } 

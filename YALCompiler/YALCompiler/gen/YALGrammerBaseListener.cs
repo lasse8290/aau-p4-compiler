@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
+// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -171,6 +171,30 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitTupleVariableDeclaration([NotNull] YALGrammerParser.TupleVariableDeclarationContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="YALGrammerParser.referenceableVariableDeclarationFormat"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterReferenceableVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceableVariableDeclarationFormatContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="YALGrammerParser.referenceableVariableDeclarationFormat"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitReferenceableVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceableVariableDeclarationFormatContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="YALGrammerParser.referenceableExpression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterReferenceableExpression([NotNull] YALGrammerParser.ReferenceableExpressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="YALGrammerParser.referenceableExpression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitReferenceableExpression([NotNull] YALGrammerParser.ReferenceableExpressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ArrayDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.

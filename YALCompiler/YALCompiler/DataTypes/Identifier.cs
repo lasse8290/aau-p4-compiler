@@ -2,15 +2,14 @@ namespace YALCompiler.DataTypes;
 
 public class Identifier : Predicate
 {
-    public string IdValue { get; }
-
-    public Identifier(string idValue)
+    public string Name { get; }
+    public Identifier(string name)
     {
-        IdValue = idValue;
+        Name = name;
     }
 
     public override string ToString()
     {
-        return IdValue;
+        return Name;
     }
 }

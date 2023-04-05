@@ -8,7 +8,7 @@ externalFunctionDeclaration: EXTERNAL '<' STRING '>' ID ':' formalInputParams? f
 
 functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statementBlock;
 
-formalInputParams:  IN  '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
+formalInputParams:  IN  '(' referenceableVariableDeclarationFormat (',' referenceableVariableDeclarationFormat)* ')';
 formalOutputParams: OUT '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
 
 statementBlock: '{' ( blockStatement | singleStatement ';'+ )* '}' ;
@@ -27,6 +27,10 @@ singleStatement: variableDeclaration
 variableDeclaration: variableDeclarationFormat  # SimpleVariableDeclarationFormat
                     | tupleDeclaration          # TupleVariableDeclaration
                     ;
+
+referenceableVariableDeclarationFormat: REF? variableDeclarationFormat ;
+
+referenceableExpression: REF? expression ;
 
 variableDeclarationFormat: TYPE '[' POSITIVE_NUMBER? ']' ID     # ArrayDeclaration 
                            | TYPE ID                            # SimpleVariableDeclaration
@@ -75,7 +79,7 @@ expression: '!' expression                                      # Not
 
 functionCall:       AWAIT? ID '(' actualInputParams ')';
 
-actualInputParams:  (expression (',' expression)*)? ;
+actualInputParams:  (referenceableExpression (',' referenceableExpression)*)? ;
             
 ifStatement:        'if' '(' expression ')' statementBlock elseIfStatement* elseStatement? ;
 elseIfStatement:    'else if' '(' expression ')' statementBlock ;
@@ -112,6 +116,8 @@ TYPE:                   'int8' | 'int16' | 'int32' | 'int64' |
             
 IN:                     'in';
 OUT:                    'out';
+
+REF:                    'ref' ;  
     
 STRING:                   (SINGLE_QUOTATION_MARK ( '\\' SINGLE_QUOTATION_MARK | . )*? SINGLE_QUOTATION_MARK)
                         | (DOUBLE_QUOTATION_MARK ( '\\' DOUBLE_QUOTATION_MARK | . )*? DOUBLE_QUOTATION_MARK) ;
