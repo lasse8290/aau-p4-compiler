@@ -5,7 +5,7 @@ namespace YALCompiler.DataTypes;
 
 public class UnaryCompoundExpression : Expression
 {
-    public YALType Type { get; } = new SingleType(Types.ValueType.@bool);
+    public YALType Type { get; set; }
     public ExpressionOperator Operator { get; set; }
     public Expression Expression { get; set; }
 }

@@ -4,13 +4,13 @@ public class ArrayElementIdentifier: Identifier
 {
     public Expression Index { get; }
     
-    public ArrayElementIdentifier(string idValue, Expression index) : base(idValue)
+    public ArrayElementIdentifier(string name, Expression index) : base(name)
     {
         Index = index;
     }
 
     public override string ToString()
     {
-        return $"{IdValue}[{Index}]";
+        return $"{Name}[{Index}]";
     }
 }
