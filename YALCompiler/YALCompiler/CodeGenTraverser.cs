@@ -294,7 +294,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("identifier");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("name", identifier.IdValue)
+            new("name", identifier.Name)
         });
 
         return (identifier.Negated ? "!" : "") + template.ReplacePlaceholders();
@@ -350,7 +350,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("array_element_identifier");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("array_name", arrayElementIdentifier.IdValue),
+            new("array_name", arrayElementIdentifier.Name),
             new("index", (string)InvokeVisitor(arrayElementIdentifier.Index))
         });
 
