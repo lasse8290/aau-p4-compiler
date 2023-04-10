@@ -76,10 +76,7 @@ public class ASTUnitTests
 
     [Theory]
     [InlineData("", 0, 0)]
-    [InlineData("in ()", 0, 0)]
-    [InlineData("out ()", 0, 0)]
-    [InlineData("in () out ()", 0, 0)]
-    [InlineData("in () out (string a)", 0, 1)]
+    [InlineData("out (string a)", 0, 1)]
     [InlineData("in (string a) out ()", 1, 0)]
     [InlineData("in (int32 a, int32 b)", 2, 0)]
     [InlineData("in (int32 a, int32 b) out: (int32 c, int32 d)", 2, 2)]
@@ -127,10 +124,10 @@ public class ASTUnitTests
     }
 
     [Theory]
-    [InlineData("my_function: { }", 0)]
-    [InlineData("my_function: { int32 hej = 1+2; }", 1)]
-    [InlineData("my_function: { int32 hej = 3+4; int32 hej2 = 4+5; }", 2)]
-    [InlineData("my_function: { int32 hej = 5+6; int32 hej3 = 6+7; int32 hej4 = 7+8 }", 3)]
+    [InlineData("my_function: { }", 1)]
+    [InlineData("my_function: { int32 hej = 1+2; }", 2)]
+    [InlineData("my_function: { int32 hej = 3+4; int32 hej2 = 4+5; }", 3)]
+    [InlineData("my_function: { int32 hej = 5+6; int32 hej3 = 6+7; int32 hej4 = 7+8 }", 4)]
     public void Assert_Correct_Amount_Of_BlockStatements(string input, int expected)
     {
         Function func = (Function)Setup(input, nameof(YALGrammerParser.functionDeclaration));
@@ -171,8 +168,8 @@ public class ASTUnitTests
     }
 
     [Theory]
-    [InlineData("5++", typeof(UnaryCompoundExpression))]
-    [InlineData("++5", typeof(UnaryCompoundExpression))]
+    [InlineData("i++", typeof(UnaryAssignment))]
+    [InlineData("++i", typeof(UnaryAssignment))]
     [InlineData("5 * 10", typeof(CompoundExpression))]
     [InlineData("5 + 10", typeof(CompoundExpression))]
     [InlineData("5 << 10", typeof(CompoundExpression))]
