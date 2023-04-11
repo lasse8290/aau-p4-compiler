@@ -32,6 +32,8 @@ public class ASTUnitTests
 
         LinkerASTTraverser linker = new(node);
         linker.BeginTraverse();
+        
+        node.LineNumber = 0;
 
         return node;
     }
@@ -192,19 +194,18 @@ public class ASTUnitTests
         Assert.IsType(expected, expr);
     }
 
-    public static TheoryData<string, object, Type> expressions =>
+    public static TheoryData<string, object> Expressions =>
         new() {
-            { "0.4", new SignedFloat(0.4), typeof(SignedFloat) },
+            { "0.4", new SignedFloat(0.4) },
         };
 
     [Theory]
-    [MemberData(nameof(expressions))]
-    public void CorrectNode(string input, Expression expected, Type expectedType)
+    [MemberData(nameof(Expressions))]
+    public void CorrectNode(string input, Expression expected)
     {
         var expr = Setup(input, nameof(YALGrammerParser.expression));
 
-        Console.WriteLine("test");
-
-        Assert.Equal(expr, expected);
+        Assert.IsType(expected.GetType(), expr);
+        Assert.Equivalent(expected, expr);
     }
 }

@@ -9,6 +9,8 @@ public static class Program
 {
     public static void Main()
     {
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+        
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         Console.WriteLine(path);
 

@@ -7,15 +7,15 @@ public abstract class ASTNode
 {
     public List<ASTNode> Children { get; } = new();
     public ASTNode? Parent { get; set; } = default;
-    public Table<Symbol> SymbolTable { get; } = new();   
-    public Table<Function> FunctionTable { get; } = new();
+    public Dictionary<string, Symbol> SymbolTable { get; } = new();   
+    public Dictionary<string, Function> FunctionTable { get; } = new();
     public int LineNumber { get; set; }
 
     public void AddSymbolOrFunction(Symbol symbol)
     {
         if (!SymbolTable.ContainsKey(symbol.Id) && !FunctionTable.ContainsKey(symbol.Id))
         {
-            SymbolTable.Add(symbol);
+            SymbolTable.Add(symbol.Id, symbol);
         }
         else
         {
@@ -27,7 +27,7 @@ public abstract class ASTNode
     {
         if (!SymbolTable.ContainsKey(function.Id) && !FunctionTable.ContainsKey(function.Id))
         {
-            FunctionTable.Add(function);
+            FunctionTable.Add(function.Id, function);
         }
         else
         {

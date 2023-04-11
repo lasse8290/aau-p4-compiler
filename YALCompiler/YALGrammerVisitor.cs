@@ -1,3 +1,4 @@
+using System.Globalization;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -401,7 +402,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                ifPath.SymbolTable.Add(symbol);
+                ifPath.SymbolTable.Add(symbol.Id, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -435,7 +436,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 {
                     try
                     {
-                        elseIfPath.SymbolTable.Add(symbol);
+                        elseIfPath.SymbolTable.Add(symbol.Id, symbol);
                     }
                     catch (VariableAlreadyExistsException e)
                     {
@@ -462,7 +463,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
-                    elsePath.SymbolTable.Add(symbol);
+                    elsePath.SymbolTable.Add(symbol.Id, symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
@@ -500,7 +501,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                whileStatement.SymbolTable.Add(symbol);
+                whileStatement.SymbolTable.Add(symbol.Id, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -519,7 +520,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (declAssignment is BinaryAssignment { Target: VariableDeclaration varDecl })
         {
             forStatement.DeclarationAssignment = declAssignment;
-            forStatement.SymbolTable.Add(varDecl.Variable);
+            forStatement.SymbolTable.Add(varDecl.Variable.Id, varDecl.Variable);
         }
 
         if (Visit(context.expression()) is Expression expression)
@@ -544,7 +545,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                forStatement.SymbolTable.Add(symbol);
+                forStatement.SymbolTable.Add(symbol.Id, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -662,7 +663,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
     public override object VisitFloatLiteral(YALGrammerParser.FloatLiteralContext context)
     {
-        if (double.TryParse(context.MINUS() == null ? context.FLOAT().GetText() : "-" + context.FLOAT().GetText(), out var number))
+        if (double.TryParse(context.MINUS() == null ? context.FLOAT().GetText() : "-" + context.FLOAT().GetText(), CultureInfo.InvariantCulture, out var number))
             return new SignedFloat(number) { LineNumber = context.Start.Line};
         return null;
     }
