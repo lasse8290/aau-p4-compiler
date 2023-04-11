@@ -268,13 +268,24 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return paramVars;
     }
 
-    public override object VisitReferenceableVariableDeclarationFormat(YALGrammerParser.ReferenceableVariableDeclarationFormatContext context)
+    public override object VisitSimpleVariableDeclarationFormat(YALGrammerParser.SimpleVariableDeclarationFormatContext context)
     {
-        var variable = Visit(context.variableDeclarationFormat()) as VariableDeclaration;
-        if (variable is not null) variable.Variable.IsRef = context.REF() != null;
-        return variable;
+        if (context.variableDeclarationFormat().Count() == 1)
+        {
+            return Visit(context.variableDeclarationFormat()[0]);
+        }
+        else
+        {
+            var varDecls = new List<VariableDeclaration>();
+            foreach (var varDecl in context.variableDeclarationFormat())
+            {
+                varDecls.Add(Visit(varDecl) as VariableDeclaration);
+            }
+            return varDecls;
+        }
     }
 
+    
     public override object VisitArrayDeclaration(YALGrammerParser.ArrayDeclarationContext context)
     {
         var symbol = new Symbol(context.ID().GetText());
@@ -294,7 +305,15 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
 
         return new VariableDeclaration {Variable = symbol, LineNumber = context.Start.Line};
-    } 
+    }
+
+    public override object VisitReferenceVariableDeclarationFormat(YALGrammerParser.ReferenceVariableDeclarationFormatContext context)
+    {
+        var variable = Visit(context.variableDeclarationFormat()) as VariableDeclaration;
+        if (variable is not null) variable.Variable.IsRef = true;
+        return variable;
+    }
+
     
     public override object VisitSimpleVariableDeclaration(YALGrammerParser.SimpleVariableDeclarationContext context)
     {
@@ -643,12 +662,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
     #region ExpressionVisitors
 
-    public override object VisitReferenceableExpression(YALGrammerParser.ReferenceableExpressionContext context)
+    public override object VisitReferenceExpression(YALGrammerParser.ReferenceExpressionContext context)
     {
-        var referenceable = Visit(context.expression()) as Expression;
-        if (referenceable is not null) referenceable.IsRef = context.REF() != null;
-        return referenceable;
+        var expression = Visit(context.expression()) as Expression;
+        if (expression is not null) expression.IsRef = true;
+        return expression;
     }
+
     
     public override object VisitVariable(YALGrammerParser.VariableContext context)
     {
@@ -942,6 +962,20 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return assignment;
     }
 
+    public override object VisitExpressionList(YALGrammerParser.ExpressionListContext context)
+    {
+        var expressionList = new ExpressionList();
+        foreach (var expression in context.expression())
+        {
+            var expr = Visit(expression) as Expression;
+            if (expr is null) continue;
+            expr.Parent = expressionList;
+            expressionList.Expressions.Add(expr);
+        }
+
+        return expressionList;
+    }
+
     #endregion
 
     public override object VisitDeclarationAssignment(YALGrammerParser.DeclarationAssignmentContext context)
@@ -955,37 +989,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
         assignment.LineNumber = context.Start.Line;
         return assignment;
-    }
-    
-    public override object VisitTupleAssignment(YALGrammerParser.TupleAssignmentContext context)
-    {
-        var assignment = new BinaryAssignment()
-        {
-            Target = Visit(context.tupleDeclaration()) as ASTNode,
-            Operator = Operators.AssignmentOperator.Equals,
-            Value = Visit(context.expression()) as Expression
-        };
-        
-        if (assignment.Target is not null)
-            ((Identifier)assignment.Target).Parent = assignment;
-        
-        if (assignment.Value is not null)
-            assignment.Value.Parent = assignment;
-        
-        assignment.LineNumber = context.Start.Line;
-        return assignment;
-    }
-    
-    public override object VisitTupleDeclaration(YALGrammerParser.TupleDeclarationContext context)
-    {
-        var tupleDeclaration = new TupleDeclaration();
-        foreach (var variableDeclaration in context.variableDeclarationFormat())
-        {
-            if (Visit(variableDeclaration) is VariableDeclaration { Variable: Symbol symbol})
-            tupleDeclaration.Variables.Add(symbol);
-        }
-        tupleDeclaration.LineNumber = context.Start.Line;
-        return tupleDeclaration;
     }
 
     public override object VisitSimpleIdentifier(YALGrammerParser.SimpleIdentifierContext context)
@@ -1002,6 +1005,21 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression)  {LineNumber = context.Start.Line};
     }
+
+    public override object VisitIdentifierList(YALGrammerParser.IdentifierListContext context)
+    {
+        var identifierList = new IdentifierList();
+        foreach (var identifier in context.identifier())
+        {
+            var id = Visit(identifier) as Identifier;
+            if (id is null) continue;
+            id.Parent = identifierList;
+            identifierList.Identifiers.Add(id);
+        }
+
+        return identifierList;
+    }
+
 
     public override object VisitArrayLiteral(YALGrammerParser.ArrayLiteralContext context)
     {

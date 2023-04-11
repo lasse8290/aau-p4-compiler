@@ -4,5 +4,5 @@ namespace YALCompiler.DataTypes;
 
 public class VariableDeclaration : ASTNode
 {
-    public Symbol Variable { get; set; }
+    public List<Symbol> Variable { get; } = new();
 }

@@ -1,15 +1,19 @@
 namespace YALCompiler.DataTypes;
 
-public class Identifier : Predicate
+public class Identifier : Expression
 {
-    public string Name { get; }
+    public List<string> Names { get; } = new();
     public Identifier(string name)
     {
-        Name = name;
+        Names.Add(name);
+    }
+
+    public Identifier()
+    {
     }
 
     public override string ToString()
     {
-        return Name;
+        return string.Join(", ", Names);
     }
 }
