@@ -1,1 +1,1 @@
-%%function%%(%%arguments%%)
+(*((COMPILER_OUTPUT_STRUCT_%%function%%*) COMPILER_INVOKE(COMPILER_INPUT_STRUCT_%%function%% { %%arguments%% }, %%function%%, %%is_await%%)))%%suffix%%

@@ -370,21 +370,14 @@ public class CodeGenTraverser : ASTTraverser
         // Suffix hotfix
         string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Id}" : "";
 
-        Template template;
-        if (true)
-        {
-            template = new Template("function_call_async");
-            template.SetKeys(new List<Tuple<string, string>>
+        Template template = new Template("function_call");
+        template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", functionCall.Function.Id),
+                new("is_await", functionCall.Await ? "1" : "0"),
                 new("arguments", argumentsBuilder.ToString()),
                 new("suffix", suffix),
             });
-        }
-        else
-        {
-            template = new Template("string_literal");
-        }
 
         return template.ReplacePlaceholders(true);
     }

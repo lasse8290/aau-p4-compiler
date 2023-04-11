@@ -14,18 +14,23 @@ struct COMPILER_PARAMETERS {
 };
 
 template <typename I>
-void* COMPILER_AWAIT(I inputParameters, Func func) {
+void* COMPILER_INVOKE(I inputParameters, Func func, int isAwait) {
     TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
 
     COMPILER_PARAMETERS<void, void> parameters;
-    parameters.taskhandle = taskhandle;
+    if (isAwait)
+      parameters.taskhandle = taskhandle;
     parameters.input = &inputParameters;
 
     void* outputParameters;
     parameters.output = &outputParameters;
 
-    xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
-    xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+    if (isAwait) {
+      xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
+      xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+    } else {
+      func(&parameters);
+    }
 
     return parameters.output;
 }
