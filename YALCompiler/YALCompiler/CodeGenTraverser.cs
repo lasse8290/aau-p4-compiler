@@ -126,45 +126,31 @@ public class CodeGenTraverser : ASTTraverser
                 new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType()} {symbol.Id};\n"))),
             });
 
-        _declarationsBuilder.AppendLine(inputTemplate.ReplacePlaceholders());
-        _declarationsBuilder.AppendLine(outputTemplate.ReplacePlaceholders());
-        _declarationsBuilder.AppendLine($"#define COMPILER_PARAMETERS_{function.Id} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Id}, COMPILER_OUTPUT_STRUCT_{function.Id}>");
+        _declarationsBuilder
+        .AppendLine(inputTemplate.ReplacePlaceholders())
+        .AppendLine(outputTemplate.ReplacePlaceholders())
+        .AppendLine($"#define COMPILER_PARAMETERS_{function.Id} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Id}, COMPILER_OUTPUT_STRUCT_{function.Id}>");
 
-        Template template;
-        if (function.IsAsync)
+        StringBuilder initializedParametersBuilder = new();
+        foreach (var symbol in function.InputParameters)
+            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->input->{symbol.Id};");
+
+        foreach (var symbol in function.OutputParameters)
+            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->output->{symbol.Id};");
+
+        var bodyBuilder = new StringBuilder();
+        foreach (var child in function.Children)
+            bodyBuilder.Append($"{InvokeVisitor(child) ?? ""};");
+
+        Template template = new Template("async_function");
+        template.SetKeys(new List<Tuple<string, string>>
         {
-
-            StringBuilder initializedParametersBuilder = new();
-            foreach (var symbol in function.InputParameters)
-                initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->input->{symbol.Id};");
-
-            foreach (var symbol in function.OutputParameters)
-                initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->output->{symbol.Id};");
-
-
-            StringBuilder outputParametersBuilder = new();
-            foreach (var symbol in function.OutputParameters)
-                outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Id} = {symbol.Id};");
-
-            var bodyBuilder = new StringBuilder();
-            foreach (var child in function.Children)
-                bodyBuilder.Append($"{InvokeVisitor(child) ?? ""};");
-
-            template = new Template("async_function");
-            template.SetKeys(new List<Tuple<string, string>>
-            {
-                new("name", function.Id),
-                new("initialized_parameters", initializedParametersBuilder.ToString()),
-                new("body", bodyBuilder.ToString()),
-                new("output_parameters", outputParametersBuilder.ToString()),
-            });
-        }
-        else
-        {
-            template = new Template("function");
-        }
-        
-        return template.ReplacePlaceholders();
+            new("name", function.Id),
+            new("initialized_parameters", initializedParametersBuilder.ToString()),
+            new("body", bodyBuilder.ToString()),
+        });
+    
+        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(CompoundPredicate compoundPredicate)
@@ -224,6 +210,10 @@ public class CodeGenTraverser : ASTTraverser
 
         return template.ReplacePlaceholders();
     }
+
+    internal override object? Visit(SignedFloat signedFloat) {
+        return signedFloat.ToString();
+    }    
 
     internal override object? Visit(ForStatement forStatement)
     {
@@ -424,20 +414,22 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ReturnStatement returnStatement)
     {
-        StringBuilder returnString = new();
+        StringBuilder outputParametersBuilder = new();
+        foreach (var symbol in returnStatement.function.OutputParameters)
+            outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Id} = {symbol.Id};");
+
         if (returnStatement.function.IsAsync)
-        {
-            returnString.AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);");
-            returnString.AppendLine("vTaskDelete(NULL);");
-        }
+            outputParametersBuilder
+            .AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);")
+            .AppendLine("vTaskDelete(NULL);");
 
         var template = new Template("return_statement");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("return_statement", "return")
+            new("output_parameters", outputParametersBuilder.ToString())
         });
-        returnString.AppendLine(template.ReplacePlaceholders());
-        return returnString.ToString();
+
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(TupleDeclaration tupleDeclaration)
@@ -456,8 +448,7 @@ public class CodeGenTraverser : ASTTraverser
         {
             var symbol = tupleDeclaration.Variables[i];
             var outputSymbol = functionCall.Function.OutputParameters[i];
-            assignmentBuilder.AppendLine(
-                $"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMS_{functionCall.Identifier}.output->{outputSymbol.Id};");
+            assignmentBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMS_{functionCall.Identifier}.output->{outputSymbol.Id};");
         }
 
         var template = new Template("tuple_declaration");

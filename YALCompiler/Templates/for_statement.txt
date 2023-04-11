@@ -1,3 +1,0 @@
-for (%%declaration_assignment%%; %%run_condition%%; %%loop_assignment%%) {
-%%body%%
-}
