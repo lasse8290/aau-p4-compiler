@@ -6,6 +6,9 @@ obj/
 .vs/
 .antlr/
 
+**/bin
+**/obj
+
 *.user
 
 **/**/obj/*

@@ -39,7 +39,7 @@ public class ASTUnitTests
     [Theory]
     [InlineData(@"external <""my_library""> print1: in (string _string);", "print1")]
     [InlineData(@"external <""hej""> print2: in (string _string);", "print2")]
-    public void Assert_External_Function_Exists_In_Symbol_Table(string input, string expectedName)
+    public void External_Function_Exists_In_Symbol_Table(string input, string expectedName)
     {
         ExternalFunction externalVarDcl = (ExternalFunction)Setup(input, nameof(YALGrammerParser.externalFunctionDeclaration));
 
@@ -80,7 +80,7 @@ public class ASTUnitTests
     [InlineData("in (string a) out ()", 1, 0)]
     [InlineData("in (int32 a, int32 b)", 2, 0)]
     [InlineData("in (int32 a, int32 b) out: (int32 c, int32 d)", 2, 2)]
-    public void Assert_Correct_Function_Parameters_Count(string input, int expectedInputParametersCount, int expectedOutputParametersCount)
+    public void Correct_Function_Parameters_Count(string input, int expectedInputParametersCount, int expectedOutputParametersCount)
     {
         Function func = (Function)Setup($"my_function: {input} {{}}", nameof(YALGrammerParser.functionDeclaration));
 
@@ -98,7 +98,7 @@ public class ASTUnitTests
 
     [Theory]
     [MemberData(nameof(InputParametersData))]
-    public void Assert_Formal_Parameters(string parameters, List<Types.ValueType> expected)
+    public void Formal_Parameters(string parameters, List<Types.ValueType> expected)
     {
         IParseTree tree;
         switch (parameters.Split(" ")[0])
@@ -128,7 +128,7 @@ public class ASTUnitTests
     [InlineData("my_function: { int32 hej = 1+2; }", 2)]
     [InlineData("my_function: { int32 hej = 3+4; int32 hej2 = 4+5; }", 3)]
     [InlineData("my_function: { int32 hej = 5+6; int32 hej3 = 6+7; int32 hej4 = 7+8 }", 4)]
-    public void Assert_Correct_Amount_Of_BlockStatements(string input, int expected)
+    public void Correct_Amount_Of_BlockStatements(string input, int expected)
     {
         Function func = (Function)Setup(input, nameof(YALGrammerParser.functionDeclaration));
 
@@ -140,31 +140,31 @@ public class ASTUnitTests
     [InlineData("functionCall();", typeof(FunctionCall))]
     [InlineData("int32 i;", typeof(VariableDeclaration))]
     [InlineData("i++;", typeof(UnaryAssignment))]
-    public void Assert_Correct_SingleStatement_Type(string input, Type expected)
+    public void Correct_SingleStatement_Type(string input, Type expected)
     {
         var stmt = Setup(input, nameof(YALGrammerParser.singleStatement));
 
-        Assert.Equal(expected, stmt.GetType());
+        Assert.IsType(expected, stmt);
     }
 
     [Theory]
     [InlineData("for (int32 i = 5; i < 5; i++) { }", typeof(ForStatement))]
     [InlineData("while (i < 5) { }", typeof(WhileStatement))]
     [InlineData("if (i < 5) { }", typeof(IfStatement))]
-    public void Assert_BlockStatement_Type(string input, Type expected)
+    public void BlockStatement_Type(string input, Type expected)
     {
         var stmt = Setup(input, nameof(YALGrammerParser.blockStatement));
 
-        Assert.Equal(expected, stmt.GetType());
+        Assert.IsType(expected, stmt);
     }
 
     [Theory]
     [InlineData("for (int32 i = 5; i < 10; i++) {}")]
-    public void Assert_For_Loop(string input)
+    public void For_Loop(string input)
     {
         var for_stmt = Setup(input, nameof(YALGrammerParser.forStatement));
 
-        Assert.Equal(typeof(ForStatement), for_stmt.GetType());
+        Assert.IsType(typeof(ForStatement), for_stmt);
     }
 
     [Theory]
@@ -185,10 +185,26 @@ public class ASTUnitTests
     [InlineData("-0.4", typeof(SignedFloat))]
     [InlineData("0.4", typeof(SignedFloat))]
     [InlineData("{ 5+2, 3+2 }", typeof(ArrayLiteral))]
-    public void Assert_Expression_Type(string input, Type expected)
+    public void Expression_Type(string input, Type expected)
     {
         var expr = Setup(input, nameof(YALGrammerParser.expression));
 
-        Assert.Equal(expected, expr.GetType());
+        Assert.IsType(expected, expr);
+    }
+
+    public static TheoryData<string, object, Type> expressions =>
+        new() {
+            { "0.4", new SignedFloat(0.4), typeof(SignedFloat) },
+        };
+
+    [Theory]
+    [MemberData(nameof(expressions))]
+    public void CorrectNode(string input, Expression expected, Type expectedType)
+    {
+        var expr = Setup(input, nameof(YALGrammerParser.expression));
+
+        Console.WriteLine("test");
+
+        Assert.Equal(expr, expected);
     }
 }
