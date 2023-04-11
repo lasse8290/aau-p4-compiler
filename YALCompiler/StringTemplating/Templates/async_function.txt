@@ -1,8 +1,0 @@
-﻿void %%name%% (%%input_arguments%%) {
-    COMPILER_PARAMETERS_%%name%% *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_%%name%%*) pvParameters;
-
-    %%initialized_parameters%%
-
-    %%body%%
-    %%output_parameters%%
-}
