@@ -30,7 +30,9 @@ void* COMPILER_AWAIT(I inputParameters, Func func) {
     return parameters.output;
 }
 
-
+void loop() {
+  delay(10);
+}
 
 %%declarations%%
 

@@ -15,7 +15,7 @@ public class CodeGenTraverser : ASTTraverser
     public CodeGenTraverser(ASTNode node) : base(node)
     {
     }
-    
+
     public override void BeginTraverse()
     {
         var stringBuilder = new StringBuilder();
@@ -28,7 +28,7 @@ public class CodeGenTraverser : ASTTraverser
             new("program", stringBuilder.ToString())
         });
     }
-    
+
     public string GetGeneratedCode()
     {
         return _template.ReplacePlaceholders();
@@ -54,7 +54,7 @@ public class CodeGenTraverser : ASTTraverser
 
         return sb.ToString();
     }
-    
+
     internal override object? Visit(If ifNode)
     {
         // Visit the predicate of the if statement
@@ -112,6 +112,17 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(Function function)
     {
+        StringBuilder initializedParametersBuilder = new();
+        string inputArguments = "void *pvParameters";
+        string ugabuga = "COMPILER_PARAMETERS_" + function.Id + " *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_" + function.Id + "*) pvParameters;";
+
+        if (function.Id == "main")
+        {
+            function.Id = "setup";
+            inputArguments = "";
+            ugabuga = "";
+        }
+
         Template inputTemplate = new("parameter_input_struct");
         inputTemplate.SetKeys(new List<Tuple<string, string>>
             {
@@ -131,7 +142,6 @@ public class CodeGenTraverser : ASTTraverser
         .AppendLine(outputTemplate.ReplacePlaceholders())
         .AppendLine($"#define COMPILER_PARAMETERS_{function.Id} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Id}, COMPILER_OUTPUT_STRUCT_{function.Id}>");
 
-        StringBuilder initializedParametersBuilder = new();
         foreach (var symbol in function.InputParameters)
             initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->input->{symbol.Id};");
 
@@ -142,32 +152,34 @@ public class CodeGenTraverser : ASTTraverser
         foreach (var child in function.Children)
             bodyBuilder.Append($"{InvokeVisitor(child) ?? ""};");
 
-        Template template = new Template("async_function");
+        Template template = new Template("function");
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Id),
+            new("ugabuga", ugabuga),
+            new("input_arguments", inputArguments),
             new("initialized_parameters", initializedParametersBuilder.ToString()),
             new("body", bodyBuilder.ToString()),
         });
-    
+
         return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(CompoundPredicate compoundPredicate)
     {
-        var left  = (string)InvokeVisitor(compoundPredicate.Left);
+        var left = (string)InvokeVisitor(compoundPredicate.Left);
         var right = (string)InvokeVisitor(compoundPredicate.Right);
 
         var op = compoundPredicate.Operator switch
         {
-            Operators.PredicateOperator.Equals             => "==",
-            Operators.PredicateOperator.NotEquals          => "!=",
-            Operators.PredicateOperator.LessThan           => "<",
-            Operators.PredicateOperator.GreaterThan        => ">",
-            Operators.PredicateOperator.LessThanOrEqual    => "<=",
+            Operators.PredicateOperator.Equals => "==",
+            Operators.PredicateOperator.NotEquals => "!=",
+            Operators.PredicateOperator.LessThan => "<",
+            Operators.PredicateOperator.GreaterThan => ">",
+            Operators.PredicateOperator.LessThanOrEqual => "<=",
             Operators.PredicateOperator.GreaterThanOrEqual => ">=",
-            Operators.PredicateOperator.And                => "&&",
-            _                                              => throw new InvalidOperationException($"Unknown predicate operator: {compoundPredicate.Operator}")
+            Operators.PredicateOperator.And => "&&",
+            _ => throw new InvalidOperationException($"Unknown predicate operator: {compoundPredicate.Operator}")
         };
 
         var template = new Template("compound_predicate");
@@ -211,16 +223,17 @@ public class CodeGenTraverser : ASTTraverser
         return template.ReplacePlaceholders();
     }
 
-    internal override object? Visit(SignedFloat signedFloat) {
+    internal override object? Visit(SignedFloat signedFloat)
+    {
         return signedFloat.ToString();
-    }    
+    }
 
     internal override object? Visit(ForStatement forStatement)
     {
         var declarationAssignment = (string)InvokeVisitor(forStatement.DeclarationAssignment);
-        var runCondition          = (string)InvokeVisitor(forStatement.RunCondition);
-        var loopAssignment        = (string)InvokeVisitor(forStatement.LoopAssignment);
-        var stringBuilder         = new StringBuilder();
+        var runCondition = (string)InvokeVisitor(forStatement.RunCondition);
+        var loopAssignment = (string)InvokeVisitor(forStatement.LoopAssignment);
+        var stringBuilder = new StringBuilder();
         foreach (var child in forStatement.Children)
         {
             stringBuilder.Append((string)InvokeVisitor(child));
@@ -245,16 +258,16 @@ public class CodeGenTraverser : ASTTraverser
     {
         if (binaryAssignment.Target is TupleDeclaration tupleDeclaration)
             return (string)InvokeVisitor(tupleDeclaration);
-        
+
         var op = binaryAssignment.Operator switch
         {
-            Operators.AssignmentOperator.Equals                   => "=",
-            Operators.AssignmentOperator.AdditionAssignment       => "+=",
-            Operators.AssignmentOperator.SubtractionAssignment    => "-=",
+            Operators.AssignmentOperator.Equals => "=",
+            Operators.AssignmentOperator.AdditionAssignment => "+=",
+            Operators.AssignmentOperator.SubtractionAssignment => "-=",
             Operators.AssignmentOperator.MultiplicationAssignment => "*=",
-            Operators.AssignmentOperator.DivisionAssignment       => "/=",
-            Operators.AssignmentOperator.ModuloAssignment         => "%=",
-            _                                                     => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
+            Operators.AssignmentOperator.DivisionAssignment => "/=",
+            Operators.AssignmentOperator.ModuloAssignment => "%=",
+            _ => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
         };
 
         var template = new Template("binary_assignment");
@@ -293,11 +306,12 @@ public class CodeGenTraverser : ASTTraverser
     internal override object? Visit(UnaryAssignment unaryAssignment)
     {
         var operand = (string)InvokeVisitor(unaryAssignment.Target);
-        
+
         var template = new Template("unary_assignment");
 
         template["operand"] = operand;
-        switch(unaryAssignment.Operator){
+        switch (unaryAssignment.Operator)
+        {
             case Operators.AssignmentOperator.PreIncrement:
                 template["pre_operator"] = "++";
                 break;
@@ -310,7 +324,7 @@ public class CodeGenTraverser : ASTTraverser
             case Operators.AssignmentOperator.PostDecrement:
                 template["post_operator"] = "--";
                 break;
-                
+
             default: throw new InvalidOperationException($"Unknown unary operator: {unaryAssignment.Operator}");
         }
 
@@ -351,13 +365,13 @@ public class CodeGenTraverser : ASTTraverser
     {
         StringBuilder argumentsBuilder = new StringBuilder();
         foreach (var expression in functionCall.InputParameters)
-            argumentsBuilder.Append($"{(string) InvokeVisitor(expression)},");
+            argumentsBuilder.Append($"{(string)InvokeVisitor(expression)},");
 
         // Suffix hotfix
-        string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Id}" : ""; 
+        string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Id}" : "";
 
         Template template;
-        if (functionCall.Function.IsAsync)
+        if (true)
         {
             template = new Template("function_call_async");
             template.SetKeys(new List<Tuple<string, string>>
@@ -377,17 +391,17 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(CompoundExpression compoundExpression)
     {
-        var left  = (string)InvokeVisitor(compoundExpression.Left);
+        var left = (string)InvokeVisitor(compoundExpression.Left);
         var right = (string)InvokeVisitor(compoundExpression.Right);
 
         var op = compoundExpression.Operator switch
         {
-            Operators.ExpressionOperator.Addition       => "+",
-            Operators.ExpressionOperator.Subtraction    => "-",
+            Operators.ExpressionOperator.Addition => "+",
+            Operators.ExpressionOperator.Subtraction => "-",
             Operators.ExpressionOperator.Multiplication => "*",
-            Operators.ExpressionOperator.Division       => "/",
-            Operators.ExpressionOperator.Modulo         => "%",
-            _                                           => throw new InvalidOperationException($"Unknown compound expression operator: {compoundExpression.Operator}")
+            Operators.ExpressionOperator.Division => "/",
+            Operators.ExpressionOperator.Modulo => "%",
+            _ => throw new InvalidOperationException($"Unknown compound expression operator: {compoundExpression.Operator}")
         };
 
         var template = new Template("compound_expression");
@@ -414,22 +428,25 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ReturnStatement returnStatement)
     {
-        StringBuilder outputParametersBuilder = new();
-        foreach (var symbol in returnStatement.function.OutputParameters)
-            outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Id} = {symbol.Id};");
-
-        if (returnStatement.function.IsAsync)
-            outputParametersBuilder
-            .AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);")
-            .AppendLine("vTaskDelete(NULL);");
-
         var template = new Template("return_statement");
-        template.SetKeys(new List<Tuple<string, string>>
+
+        if (returnStatement.function.Id != "setup")
+        {
+            StringBuilder outputParametersBuilder = new();
+            foreach (var symbol in returnStatement.function.OutputParameters)
+                outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Id} = {symbol.Id};");
+
+            if (returnStatement.function.IsAsync)
+                outputParametersBuilder
+                .AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);")
+                .AppendLine("vTaskDelete(NULL);");
+
+            template.SetKeys(new List<Tuple<string, string>>
         {
             new("output_parameters", outputParametersBuilder.ToString())
         });
-
-        return template.ReplacePlaceholders();
+        }
+        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(TupleDeclaration tupleDeclaration)
@@ -438,11 +455,12 @@ public class CodeGenTraverser : ASTTraverser
         var functionCall = binaryAssignment.Value as FunctionCall;
 
         var argumentsBuilder = new StringBuilder();
-        for (int i = 0; i < functionCall.Function.InputParameters.Count; i++) {
+        for (int i = 0; i < functionCall.Function.InputParameters.Count; i++)
+        {
             var symbol = functionCall.Function.InputParameters[i];
             argumentsBuilder.AppendLine($"_COMPILER_INPUT_ARGS_{functionCall.Identifier}.{symbol.Id} = {InvokeVisitor(functionCall.InputParameters[i])};");
         }
-        
+
         var assignmentBuilder = new StringBuilder();
         for (var i = 0; i < tupleDeclaration.Variables.Count; i++)
         {

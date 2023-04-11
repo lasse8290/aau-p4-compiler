@@ -1,3 +1,0 @@
-﻿async test: {
-    float32 t = 0.4;
-}

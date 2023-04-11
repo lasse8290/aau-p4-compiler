@@ -1,3 +1,7 @@
-async test: {
-    float32 t = 0.4;
+expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
+	area = width * length;
+}
+
+async main: {
+	int32 test = expensiveSquareArea(10, 10);
 }
