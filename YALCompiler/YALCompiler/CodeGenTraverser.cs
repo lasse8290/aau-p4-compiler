@@ -424,13 +424,20 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ReturnStatement returnStatement)
     {
+        StringBuilder returnString = new();
+        if (returnStatement.function.IsAsync)
+        {
+            returnString.AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);");
+            returnString.AppendLine("vTaskDelete(NULL);");
+        }
+
         var template = new Template("return_statement");
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("return_statement", "return")
         });
-
-        return template.ReplacePlaceholders();
+        returnString.AppendLine(template.ReplacePlaceholders());
+        return returnString.ToString();
     }
 
     internal override object? Visit(TupleDeclaration tupleDeclaration)

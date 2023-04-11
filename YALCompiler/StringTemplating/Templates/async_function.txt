@@ -5,7 +5,4 @@
 
     %%body%%
     %%output_parameters%%
-
-  xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
-  vTaskDelete(NULL);
 }

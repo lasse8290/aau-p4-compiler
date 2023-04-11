@@ -11,7 +11,6 @@ public static class Program
     {
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         Console.WriteLine(path);
-
         try
         {
 
