@@ -1,7 +1,7 @@
-async expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
-	area = width * length;
+main: {
+    int32 i;
+    float f = 0.5;
+    i = f;
 }
 
-async test: {
-	int32 test = expensiveSquareArea(10, 10);
-}
+func2: {}

@@ -23,19 +23,47 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         DataTypes.Program program = new();
 
-        foreach(var gvd in context.globalVariableDeclaration())
+        foreach(var gvd in context.variableDeclaration())
         {
-            if (Visit(gvd) is Symbol symbol)
+            if (Visit(gvd) is VariableDeclaration variableDeclaration)
             {
                 try
                 {
-                    program.AddSymbolOrFunction(symbol);
+                    program.AddSymbolOrFunction(variableDeclaration.Variable);
+                    program.Children.Add(variableDeclaration);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
                     _errorHandler.AddError(e, gvd);                    
                 }
             }
+        }
+        
+        foreach(var gvd in context.assignment())
+        {
+            var assignment = Visit(gvd);
+            if (assignment is BinaryAssignment binaryAssignment)
+            {
+                foreach (var target in binaryAssignment.Targets)
+                {
+                    try
+                    {
+                        if (target is VariableDeclaration variableDeclaration)
+                        {
+                            program.AddSymbolOrFunction(variableDeclaration.Variable);
+                            program.Children.Add(binaryAssignment);
+                            continue;
+                        }
+                        _errorHandler.AddError(new InvalidGlobalScopedAssignmentException(), gvd);
+                    }
+                    catch (VariableAlreadyExistsException e)
+                    {
+                        _errorHandler.AddError(e, gvd);                    
+                    }
+                }
+                continue;
+            }
+            _errorHandler.AddError(new InvalidGlobalScopedAssignmentException(), gvd);
         }
         
         foreach (var func in context.externalFunctionDeclaration())
@@ -70,42 +98,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
         }
         return program;
-    }
-    
-    public override object VisitGlobalVariableDeclaration(YALGrammerParser.GlobalVariableDeclarationContext context)
-    {
-        string id = context.ID().GetText();
-        SingleType? type = null;
-        try
-        {
-            type = new(context.TYPE().GetText());
-        }
-        catch (TypeNotRecognizedException e)
-        {
-            _errorHandler.AddError(e, context);
-        }
-        
-        var symbol = new Symbol(id);
-
-        if (context.LBRACKET() != null && context.RBRACKET() != null)
-        {
-            type.IsArray = true;
-            
-            if (context.POSITIVE_NUMBER() != null && ulong.TryParse(context.POSITIVE_NUMBER().GetText(), out ulong size))
-            {
-                symbol.ArraySize = size;
-            }
-        }
-        
-        symbol.Type = type;
-        
-        if (context.expression() != null && Visit(context.expression()) is Expression expression)
-        {
-            symbol.Value = expression;
-            symbol.Initialized = true;
-        }
-        
-        return symbol;
     }
 
     public override object VisitExternalFunctionDeclaration(YALGrammerParser.ExternalFunctionDeclarationContext context)
@@ -157,7 +149,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             func.ReturnType = func.OutputParameters[0].Type;
         } else if (func.OutputParameters.Count > 1)
         {
-            func.ReturnType = new TupleType(func.OutputParameters.Select(param => param.Type as SingleType).ToArray());
+            func.ReturnType = new YALType(func.OutputParameters.Select(param => param.Type).ToArray());
         }
         
         return func;
@@ -171,8 +163,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             IsAsync = context.ASYNC() != null
         };
         
-        
-
         //handle input params
         if (context.formalInputParams() != null && Visit(context.formalInputParams()) is List<Symbol> inSymbols)
         {
@@ -213,7 +203,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             func.ReturnType = func.OutputParameters[0].Type;
         } else if (func.OutputParameters.Count > 1)
         {
-            func.ReturnType = new TupleType(func.OutputParameters.Select(param => param.Type as SingleType).ToArray());
+            func.ReturnType = new YALType(func.OutputParameters.Select(param => param.Type).ToArray());
         }
 
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -245,7 +235,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var paramVars = new List<Symbol>();
         
-        foreach (var varDecl in context.referenceableVariableDeclarationFormat())
+        foreach (var varDecl in context.variableDeclarationFormat())
         {
             if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
             {
@@ -270,19 +260,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitSimpleVariableDeclarationFormat(YALGrammerParser.SimpleVariableDeclarationFormatContext context)
     {
-        if (context.variableDeclarationFormat().Count() == 1)
+        var varDecls = new List<VariableDeclaration>();
+        foreach (var varDecl in context.variableDeclarationFormat())
         {
-            return Visit(context.variableDeclarationFormat()[0]);
+            varDecls.Add(Visit(varDecl) as VariableDeclaration);
         }
-        else
-        {
-            var varDecls = new List<VariableDeclaration>();
-            foreach (var varDecl in context.variableDeclarationFormat())
-            {
-                varDecls.Add(Visit(varDecl) as VariableDeclaration);
-            }
-            return varDecls;
-        }
+        return varDecls;
     }
 
     
@@ -292,7 +275,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         try
         {
-            symbol.Type = new SingleType(context.TYPE().GetText()) {IsArray = true};
+            symbol.Type = new YALType(context.TYPE().GetText(), true);
         }
         catch (TypeNotRecognizedException e)
         {
@@ -313,7 +296,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (variable is not null) variable.Variable.IsRef = true;
         return variable;
     }
-
     
     public override object VisitSimpleVariableDeclaration(YALGrammerParser.SimpleVariableDeclarationContext context)
     {
@@ -321,7 +303,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         
         try
         {
-            symbol.Type = new SingleType(context.TYPE().GetText());
+            symbol.Type = new YALType(context.TYPE().GetText());
         }
         catch (TypeNotRecognizedException e)
         {
@@ -349,11 +331,19 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 case TupleDeclaration tupleDecl:
                     statementBlock.LocalVariables.AddRange(tupleDecl.Variables);
                     break;
-                case BinaryAssignment { Target: VariableDeclaration variableDeclaration }:
-                    statementBlock.LocalVariables.Add(variableDeclaration.Variable);
-                    break;
-                case BinaryAssignment { Target: TupleDeclaration tupleDeclaration }:
-                    statementBlock.LocalVariables.AddRange(tupleDeclaration.Variables);
+                case BinaryAssignment binaryAssignment:
+                    foreach (var target in binaryAssignment.Targets)
+                    {
+                        switch (target)
+                        {
+                            case Symbol symbol:
+                                statementBlock.LocalVariables.Add(symbol);
+                                break;
+                            case VariableDeclaration variableDeclarationDecl:
+                                statementBlock.LocalVariables.Add(variableDeclarationDecl.Variable);
+                                break;
+                        }
+                    }
                     break;
             }
         }
@@ -409,7 +399,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -443,7 +433,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 else
                 {
-                    _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), elseIf);
+                    _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), elseIf);
                 }
                 
                 StatementBlock elseIfStatementBlock = Visit(elseIf.statementBlock()) as StatementBlock;
@@ -507,7 +497,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -537,10 +527,16 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var forStatement = new ForStatement();
         
         BinaryAssignment declAssignment = Visit(context.declarationAssignment()) as BinaryAssignment;
-        if (declAssignment is BinaryAssignment { Target: VariableDeclaration varDecl })
+        if (declAssignment is BinaryAssignment)
         {
-            forStatement.DeclarationAssignment = declAssignment;
-            forStatement.SymbolTable.Add(varDecl.Variable);
+            foreach (var target in declAssignment.Targets)
+            {
+                if (target is VariableDeclaration varDecl)
+                {
+                    forStatement.DeclarationAssignment = declAssignment;
+                    forStatement.SymbolTable.Add(varDecl.Variable);    
+                }
+            }
         }
 
         if (Visit(context.expression()) is Expression expression)
@@ -549,7 +545,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
 
         forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
@@ -857,7 +853,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitFunctionCall(YALGrammerParser.FunctionCallContext context)
     {
         var functionCall = new FunctionCall(context.ID().GetText(), context.AWAIT() != null);
-        functionCall.InputParameters = Visit(context.actualInputParams()) as List<Expression>;
+        functionCall.InputParameters = Visit(context.expression()) as List<Expression>;
         foreach (var inputParameter in functionCall.InputParameters)
         {
             inputParameter.Parent = functionCall;
@@ -867,38 +863,28 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return functionCall;
     }
 
-    public override object VisitActualInputParams(YALGrammerParser.ActualInputParamsContext context)
-    {
-        List<Expression> actualInputParams = new();
-        foreach (var expression in context.referenceableExpression())
-        {
-            if (Visit(expression) is Expression expr)
-            {
-                expr.LineNumber = context.Start.Line;
-
-                actualInputParams.Add(expr);
-            }
-        }
-
-        return actualInputParams;
-    }
-
     #region AssignmentVisitors
 
     public override object VisitIdAssignment(YALGrammerParser.IdAssignmentContext context)
     {
-        var assignment = new BinaryAssignment()
+        var assignment = new BinaryAssignment();
+        
+        List<Identifier> targets = Visit(context.identifier()) as List<Identifier>;
+        
+        foreach (var target in targets)
         {
-            Target = Visit(context.identifier()) as Identifier,
-            Value = Visit(context.expression()) as Expression
-        };
+            target.Parent = assignment;
+            assignment.Targets.Add(target);
+        }
         
-        if (assignment.Target is not null)
-            ((Identifier)assignment.Target).Parent = assignment;
-        
-        if (assignment.Value is not null)
-            assignment.Value.Parent = assignment;
-        
+        List<Expression> values = Visit(context.identifier()) as List<Expression>;
+
+        foreach (var value in values)
+        {
+            value.Parent = assignment;
+            assignment.Values.Add(value);
+        }
+
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.EQUAL:
@@ -926,10 +912,16 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitIdPostIncrementDecrementAssignment(YALGrammerParser.IdPostIncrementDecrementAssignmentContext context)
     {
-        var assignment = new UnaryAssignment()
+        var target = Visit(context.identifier());
+        var assignment = new UnaryAssignment();
+        if (target is Identifier identifier)
         {
-            Target = Visit(context.identifier()) as Identifier,
-        };
+            assignment.Target = identifier;
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidAssignmentException(context.GetText()), context);
+        }
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.INCREMENT:
@@ -945,10 +937,16 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
     public override object VisitIdPreIncrementDecrementAssignment(YALGrammerParser.IdPreIncrementDecrementAssignmentContext context)
     {
-        var assignment = new UnaryAssignment()
+        var target = Visit(context.identifier());
+        var assignment = new UnaryAssignment();
+        if (target is Identifier identifier)
         {
-            Target = Visit(context.identifier()) as Identifier,
-        };
+            assignment.Target = identifier;
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidAssignmentException(context.GetText()), context);
+        }
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.INCREMENT:
@@ -964,13 +962,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitExpressionList(YALGrammerParser.ExpressionListContext context)
     {
-        var expressionList = new ExpressionList();
+        var expressionList = new List<Expression>();
         foreach (var expression in context.expression())
         {
             var expr = Visit(expression) as Expression;
             if (expr is null) continue;
-            expr.Parent = expressionList;
-            expressionList.Expressions.Add(expr);
+            expressionList.Add(expr);
         }
 
         return expressionList;
@@ -982,10 +979,28 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment()
         {
-            Target = Visit(context.variableDeclaration()) as ASTNode,
             Operator = Operators.AssignmentOperator.Equals,
-            Value = Visit(context.expression()) as Expression
         };
+
+        var targets = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
+        if (targets is not null)
+        {
+            foreach (var target in targets)
+            {
+                target.Parent = assignment;
+                assignment.Targets.Add(target);                
+            }
+        }
+        
+        var values = Visit(context.expression()) as List<Expression>;
+        if (values is not null)
+        {
+            foreach (var value in values)
+            {
+                value.Parent = assignment;
+                assignment.Values.Add(value);                
+            }
+        }
 
         assignment.LineNumber = context.Start.Line;
         return assignment;
@@ -1008,13 +1023,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitIdentifierList(YALGrammerParser.IdentifierListContext context)
     {
-        var identifierList = new IdentifierList();
+        var identifierList = new List<Identifier>();
         foreach (var identifier in context.identifier())
         {
             var id = Visit(identifier) as Identifier;
             if (id is null) continue;
-            id.Parent = identifierList;
-            identifierList.Identifiers.Add(id);
+            identifierList.Add(id);
         }
 
         return identifierList;

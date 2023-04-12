@@ -1,47 +1,50 @@
-﻿namespace YALCompiler.Helpers;
+﻿using System.Text;
+using Microsoft.Extensions.Primitives;
 
-public abstract class YALType: IEquatable<YALType>
+namespace YALCompiler.Helpers;
+
+public class YALType: IEquatable<YALType>
 {
+    public List<(Types.ValueType Type, bool IsArray)> Types { get; }= new();
+
+    public YALType()
+    {
+        
+    }
+
+    public YALType(params (Types.ValueType type, bool isArray)[] types)
+    {
+        Types.AddRange(types);
+    }
+    
+    public YALType(params YALType[] types)
+    {
+        foreach (var type in types)
+        {
+            Types.AddRange(type.Types);
+        }
+    }
+    
+    public YALType(Types.ValueType type)
+    {
+        Types.Add((type, false));
+    }
+    
+    public YALType(Types.ValueType type, bool isArray)
+    {
+        Types.Add((type, isArray));
+    }
+
+    public YALType(string type, bool isArray = false)
+    {
+        Types.ValueType? t = YALCompiler.Helpers.Types.Match(type); 
+        if (t is not null) Types.Add((t, isArray));
+        throw new Exception($"Invalid type '{type}'");
+    }
+
     public bool Equals(YALType other)
     {
-        switch (other)
-        {
-            case (null):
-                return false;
-            case SingleType st:
-                if (this is SingleType st2 && st.Type == st2.Type && st.IsArray == st2.IsArray)
-                {
-                    return true;
-                }
-                else if (this is TupleType tt)
-                {
-                    return tt.Types.Count == 1 && tt.Types[0].Type == st.Type && tt.Types[0].IsArray == st.IsArray;
-                }
-
-                break;
-            case TupleType tt:
-                if (this is SingleType st1)
-                {
-                    return tt.Types.Count == 1 && tt.Types[0].Type == st1.Type && tt.Types[0].IsArray == st1.IsArray;
-                }
-                else if (this is TupleType tt2)
-                {
-                    if (tt.Types.Count != tt2.Types.Count)
-                        return false;
-                    
-                    for (int i = 0; i < tt.Types.Count; i++)
-                    {
-                        if (tt.Types[i] != tt2.Types[i])
-                            return false;
-                    }
-
-                    return true;
-                }
-                break;
-        }
-
-        return false;
-
+        return Types.SequenceEqual(other.Types);
     }
 
     public static bool operator ==(YALType first, YALType second)
@@ -57,5 +60,16 @@ public abstract class YALType: IEquatable<YALType>
             return true;
         
         return !first.Equals(second);
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new();
+        if (Types.Count > 1)
+            sb.Append("(");
+        sb.Append(string.Join(", ", Types.Select(t => t.Type + (t.IsArray ? "[]" : ""))));
+        if (Types.Count > 1)
+            sb.Append("}");
+        return sb.ToString();
     }
 }

@@ -32,7 +32,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                     if (identifier is ArrayElementIdentifier arrayElementIdentifier)
                     {
                         targetParentArrayType = symbol.Type;
-                        ((SingleType)targetType).IsArray = false;
+                        targetType.IsArray = false;
                         if (symbol.ArraySize is not null && 
                             arrayElementIdentifier.Index is SignedNumber index && 
                             index.Value > symbol.ArraySize!)
@@ -55,7 +55,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 variableDeclaration.Variable.Initialized = true;
                 break;
             case TupleDeclaration tupleDeclaration:
-                targetType = new TupleType(tupleDeclaration.Variables.Select(v => (SingleType)v.Type).ToArray());
+                targetType = new YALType(tupleDeclaration.Variables.Select(v => v.Type).ToArray());
                 foreach (var variable in tupleDeclaration.Variables)
                 {
                     variable.Initialized = true;
@@ -111,7 +111,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
                 break;
             default:
-                _errorHandler.AddError(new InvalidAssignment(node), node.LineNumber);
+                _errorHandler.AddError(new InvalidAssignmentException(node), node.LineNumber);
                 return targetType;
         }
         
@@ -392,7 +392,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType? type = Visit(node.Predicate) as YALType;
         if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
         {
-            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type?.ToString() ?? "null"), node.LineNumber);
+            _errorHandler.AddError(new InvalidPredicateException(node.Predicate.ToString(), type?.ToString() ?? "null"), node.LineNumber);
         }
 
         return null;
@@ -403,7 +403,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType? type = Visit(node.Predicate) as YALType;
         if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
         {
-            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type.ToString()), node.LineNumber);
+            _errorHandler.AddError(new InvalidPredicateException(node.Predicate.ToString(), type.ToString()), node.LineNumber);
         }
 
         return null;
@@ -414,7 +414,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType? type = Visit(node.Predicate) as YALType;
         if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
         {
-            _errorHandler.AddError(new InvalidPredicate(node.Predicate.ToString(), type.ToString()), node.LineNumber);
+            _errorHandler.AddError(new InvalidPredicateException(node.Predicate.ToString(), type.ToString()), node.LineNumber);
         }
 
         return null;
@@ -425,7 +425,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType? type = Visit(node.RunCondition) as YALType;
         if (type is not SingleType singleType || singleType.Type != Types.ValueType.@bool)
         {
-            _errorHandler.AddError(new InvalidPredicate(node.RunCondition.ToString(), type.ToString()), node.LineNumber);
+            _errorHandler.AddError(new InvalidPredicateException(node.RunCondition.ToString(), type.ToString()), node.LineNumber);
         }
 
         return null;
