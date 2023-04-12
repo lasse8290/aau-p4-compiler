@@ -11,14 +11,9 @@ obj/
 
 *.user
 
+bin
+obj
+
 **/**/obj/*
 
 YALCompiler/YALParser/gen/
-
-YALCompiler/YALParser/obj/
-
-YALCompiler/YALCompiler/obj/
-
-YALCompiler/YALCompiler/bin/Debug/net7.0/
-
-YALCompiler/YALCompiler/bin/Debug/
