@@ -56,6 +56,9 @@ public static class Program
             if (errorHandler.Errors.Count > 0)
                 return;
             sw.Restart();
+
+            return;
+
             CodeGenTraverser cgt = new(node);
             cgt.BeginTraverse();
             sw.Stop();
