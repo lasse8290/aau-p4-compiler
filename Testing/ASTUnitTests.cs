@@ -30,9 +30,10 @@ public class ASTUnitTests
 
         ASTNode node = (ASTNode)visitor.Visit(tree);
 
-        LinkerASTTraverser linker = new(node);
-        linker.BeginTraverse();
-        
+        // Not linking because Assert.Equivalence doesn't work with it because of parents
+        /* LinkerASTTraverser linker = new(node);
+        linker.BeginTraverse(); */
+
         node.LineNumber = 0;
 
         return node;
@@ -182,10 +183,6 @@ public class ASTUnitTests
     [InlineData("5 ~ 10", typeof(CompoundExpression))]
     [InlineData(@"hi = ""whaaat""", typeof(BinaryAssignment))]
     [InlineData("myCall(param1, param2)", typeof(FunctionCall))]
-    [InlineData("-5", typeof(SignedNumber))]
-    [InlineData("5", typeof(SignedNumber))]
-    [InlineData("-0.4", typeof(SignedFloat))]
-    [InlineData("0.4", typeof(SignedFloat))]
     [InlineData("{ 5+2, 3+2 }", typeof(ArrayLiteral))]
     public void Expression_Type(string input, Type expected)
     {
@@ -197,11 +194,31 @@ public class ASTUnitTests
     public static TheoryData<string, object> Expressions =>
         new() {
             { "0.4", new SignedFloat(0.4) },
+            { "-0.4", new SignedFloat(-0.4) },
+            { "5", new SignedNumber(5, isNegative: false) },
+            { "-5", new SignedNumber(5, isNegative: true) },
+            { "5+2", new CompoundExpression {
+                Left = new SignedNumber(5, isNegative: false) {
+                    LineNumber = 1
+                },
+                Right = new SignedNumber(2, isNegative: false) {
+                    LineNumber = 1
+                },
+                Operator = Operators.ExpressionOperator.Addition,
+                LineNumber = 0
+            }},
+            { "i++", new UnaryAssignment() {
+                Target = new Identifier("i") {
+                    LineNumber = 1
+                },
+                Operator = Operators.AssignmentOperator.PostIncrement,
+                LineNumber = 0,
+            } }
         };
 
     [Theory]
     [MemberData(nameof(Expressions))]
-    public void CorrectNode(string input, Expression expected)
+    public void Expression_Correct_Type_And_Values(string input, Expression expected)
     {
         var expr = Setup(input, nameof(YALGrammerParser.expression));
 
