@@ -3,17 +3,15 @@ using StringTemplating;
 using Antlr4.Runtime;
 using YALCompiler.ErrorHandlers;
 using System.Reflection;
+using YALCompiler.DataTypes;
 
 namespace YALCompiler;
 public static class Program
 {
-    public static void Main()
-    {
-        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-        
-        var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        Console.WriteLine(path);
 
+    public static void Main()
+    {               
+        var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         try
         {
 
@@ -41,8 +39,11 @@ public static class Program
             sw.Stop();
             Console.WriteLine("Built AST in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
-            LinkerASTTraverser linker = new(node);
+
+            Action<ASTNode, ASTNode> ParentsLinker = (parent, child) => child.Parent = parent;
+            LinkerASTTraverser linker = new(node, ParentsLinker);
             linker.BeginTraverse();
+
             sw.Stop();
             Console.WriteLine("Linked AST in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();

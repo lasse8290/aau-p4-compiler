@@ -3,12 +3,13 @@ using YALCompiler.DataTypes;
 
 namespace YALCompiler;
 
-/// <summary>
-/// Linking all nodes to their parents
-/// </summary>
 public class LinkerASTTraverser : ASTTraverser
 {
-    public LinkerASTTraverser(ASTNode node) : base(node) { }
+    Action<ASTNode, ASTNode> action;
+
+    public LinkerASTTraverser(ASTNode node, Action<ASTNode, ASTNode> action) : base(node) {
+        this.action = action;
+    }
     
     public override void BeginTraverse()
     {
@@ -29,7 +30,7 @@ public class LinkerASTTraverser : ASTTraverser
                 var pp = p.GetValue(node) as ASTNode;
                 if (pp != null)
                 {
-                    pp.Parent = node;
+                    action(node, pp);
                     stack.Push(pp);
                 }
             }
@@ -37,7 +38,7 @@ public class LinkerASTTraverser : ASTTraverser
             if (node.Children != null) {
                 for (int i = node.Children.Count - 1; i >= 0; i--) {
                     ASTNode child = node.Children[i];
-                    child.Parent = node; // Set the child's parent to the current node
+                    action(node, child);
                     stack.Push(child);
                 }
             }

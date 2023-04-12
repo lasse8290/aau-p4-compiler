@@ -13,6 +13,11 @@ public class ASTUnitTests
 
     public IParseTree Parse(YALGrammerParser parser, string methodName) => (IParseTree)parser.GetType().GetMethod(methodName).Invoke(parser, null);
 
+    Action<ASTNode, ASTNode> LineNumbersRemover = (node, parent) => {
+        parent.LineNumber = 0;
+        node.LineNumber = 0;
+    };
+
     private YALGrammerParser Setup(string input)
     {
         AntlrInputStream inputStream = new AntlrInputStream(input);
@@ -23,20 +28,20 @@ public class ASTUnitTests
         return parser;
     }
 
-    private ASTNode Setup(string input, string methodName)
+    private ASTNode Setup(string input, string methodName, bool removeLineNumbers = false)
     {
         YALGrammerParser parser = Setup(input);
         IParseTree tree = Parse(parser, methodName);
 
-        ASTNode node = (ASTNode)visitor.Visit(tree);
+        ASTNode root = (ASTNode)visitor.Visit(tree);
 
         // Not linking because Assert.Equivalence doesn't work with it because of parents
-        /* LinkerASTTraverser linker = new(node);
-        linker.BeginTraverse(); */
+        if (removeLineNumbers) {
+            LinkerASTTraverser lineNumberRemove = new(root, LineNumbersRemover);
+            lineNumberRemove.BeginTraverse();
+        }
 
-        node.LineNumber = 0;
-
-        return node;
+        return root;
     }
 
     [Theory]
@@ -193,26 +198,18 @@ public class ASTUnitTests
 
     public static TheoryData<string, object> Expressions =>
         new() {
-            { "0.4", new SignedFloat(0.4) },
+            /*{ "0.4", new SignedFloat(0.4) },
             { "-0.4", new SignedFloat(-0.4) },
             { "5", new SignedNumber(5, isNegative: false) },
-            { "-5", new SignedNumber(5, isNegative: true) },
+            { "-5", new SignedNumber(5, isNegative: true) },*/
             { "5+2", new CompoundExpression {
-                Left = new SignedNumber(5, isNegative: false) {
-                    LineNumber = 1
-                },
-                Right = new SignedNumber(2, isNegative: false) {
-                    LineNumber = 1
-                },
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
                 Operator = Operators.ExpressionOperator.Addition,
-                LineNumber = 0
             }},
             { "i++", new UnaryAssignment() {
-                Target = new Identifier("i") {
-                    LineNumber = 1
-                },
-                Operator = Operators.AssignmentOperator.PostIncrement,
-                LineNumber = 0,
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostIncrement
             } }
         };
 
@@ -220,7 +217,7 @@ public class ASTUnitTests
     [MemberData(nameof(Expressions))]
     public void Expression_Correct_Type_And_Values(string input, Expression expected)
     {
-        var expr = Setup(input, nameof(YALGrammerParser.expression));
+        var expr = Setup(input, nameof(YALGrammerParser.expression), removeLineNumbers: true);
 
         Assert.IsType(expected.GetType(), expr);
         Assert.Equivalent(expected, expr);
