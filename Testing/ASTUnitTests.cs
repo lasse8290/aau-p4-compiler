@@ -13,7 +13,8 @@ public class ASTUnitTests
 
     public IParseTree Parse(YALGrammerParser parser, string methodName) => (IParseTree)parser.GetType().GetMethod(methodName).Invoke(parser, null);
 
-    Action<ASTNode, ASTNode> LineNumbersRemover = (node, parent) => {
+    Action<ASTNode, ASTNode> LineNumbersRemover = (node, parent) =>
+    {
         parent.LineNumber = 0;
         node.LineNumber = 0;
     };
@@ -36,9 +37,11 @@ public class ASTUnitTests
         ASTNode root = (ASTNode)visitor.Visit(tree);
 
         // Not linking because Assert.Equivalence doesn't work with it because of parents
-        if (removeLineNumbers) {
+        if (removeLineNumbers)
+        {
             LinkerASTTraverser lineNumberRemove = new(root, LineNumbersRemover);
             lineNumberRemove.BeginTraverse();
+            root.LineNumber = 0;
         }
 
         return root;
@@ -201,7 +204,7 @@ public class ASTUnitTests
             /*{ "0.4", new SignedFloat(0.4) },
             { "-0.4", new SignedFloat(-0.4) },
             { "5", new SignedNumber(5, isNegative: false) },
-            { "-5", new SignedNumber(5, isNegative: true) },*/
+            { "-5", new SignedNumber(5, isNegative: true) },
             { "5+2", new CompoundExpression {
                 Left = new SignedNumber(5, isNegative: false),
                 Right = new SignedNumber(2, isNegative: false),
@@ -210,7 +213,21 @@ public class ASTUnitTests
             { "i++", new UnaryAssignment() {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostIncrement
-            } }
+            } },*/
+            { "{ 5+2, 3+2 }", new ArrayLiteral {
+                Values = {
+                    new CompoundExpression {
+                    Left = new SignedNumber(5, isNegative: false),
+                    Right = new SignedNumber(2, isNegative: false),
+                    Operator = Operators.ExpressionOperator.Addition,
+                    },
+                    new CompoundExpression {
+                        Left = new SignedNumber(3, isNegative: false),
+                        Right = new SignedNumber(2, isNegative: false),
+                        Operator = Operators.ExpressionOperator.Addition,
+                    }
+                }
+            }}
         };
 
     [Theory]
