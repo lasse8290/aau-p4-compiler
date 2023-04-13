@@ -37,9 +37,15 @@ public class YALType: IEquatable<YALType>
 
     public YALType(string type, bool isArray = false)
     {
-        Types.ValueType? t = YALCompiler.Helpers.Types.Match(type); 
-        if (t is not null) Types.Add((t, isArray));
-        throw new Exception($"Invalid type '{type}'");
+        Types.ValueType? t = YALCompiler.Helpers.Types.Match(type);
+        if (t is Types.ValueType vt)
+        {
+            Types.Add((vt, isArray));
+        }
+        else
+        {
+            throw new Exception($"Invalid type '{type}'");
+        }
     }
 
     public bool Equals(YALType other)

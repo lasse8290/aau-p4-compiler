@@ -133,7 +133,7 @@ public static class Types
         {
             foreach ((ValueType valueType, bool typeIsArray) in t.Types)
             {
-                if (valueType < leastAssignableType || leastAssignableType is null)
+                if (valueType < leastAssignableType || typeIsArray || leastAssignableType is null)
                 {
                     leastAssignableType = valueType;
                     isArray = typeIsArray;

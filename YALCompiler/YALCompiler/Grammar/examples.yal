@@ -1,6 +1,6 @@
 main: {
     int32 i;
-    float f = 0.5;
+    float32 f = 0.5;
     i = f;
 }
 

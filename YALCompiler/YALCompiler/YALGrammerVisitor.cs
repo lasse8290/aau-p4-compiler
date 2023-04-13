@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -104,7 +105,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var func = new ExternalFunction
         {
-            LibraryName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2),
+            LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/")),
+            FunctionName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").Last(),
             Id = context.ID().GetText(),
             
         };
@@ -233,32 +235,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     
     public override object VisitFormalInputParams(YALGrammerParser.FormalInputParamsContext context)
     {
-        var paramVars = new List<Symbol>();
-        
-        foreach (var varDecl in context.variableDeclarationFormat())
-        {
-            if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
-            {
-                paramVars.Add(symbol);
-            }
-        }
-        return paramVars;
+        var declaredVars = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
+        return declaredVars.Select(varDecl => varDecl.Variable).ToList();
     }
     
     public override object VisitFormalOutputParams(YALGrammerParser.FormalOutputParamsContext context)
     {
-        var paramVars = new List<Symbol>();
-        foreach (var varDecl in context.variableDeclarationFormat())
-        {
-            if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
-            {
-                paramVars.Add(symbol);
-            }
-        }
-        return paramVars;
+        var declaredVars = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
+        return declaredVars.Select(varDecl => varDecl.Variable).ToList();
     }
 
-    public override object VisitSimpleVariableDeclarationFormat(YALGrammerParser.SimpleVariableDeclarationFormatContext context)
+    public override object VisitVariableDeclaration(YALGrammerParser.VariableDeclarationContext context)
     {
         var varDecls = new List<VariableDeclaration>();
         foreach (var varDecl in context.variableDeclarationFormat())
@@ -290,7 +277,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return new VariableDeclaration {Variable = symbol, LineNumber = context.Start.Line};
     }
 
-    public override object VisitReferenceVariableDeclarationFormat(YALGrammerParser.ReferenceVariableDeclarationFormatContext context)
+    public override object VisitReferenceVariableDeclaration(YALGrammerParser.ReferenceVariableDeclarationContext context)
     {
         var variable = Visit(context.variableDeclarationFormat()) as VariableDeclaration;
         if (variable is not null) variable.Variable.IsRef = true;
@@ -328,8 +315,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 case VariableDeclaration varDecl:
                     statementBlock.LocalVariables.Add(varDecl.Variable);
                     break;
-                case TupleDeclaration tupleDecl:
-                    statementBlock.LocalVariables.AddRange(tupleDecl.Variables);
+                case List<VariableDeclaration> list:
+                    statementBlock.LocalVariables.AddRange(list.Select(v => v.Variable));
                     break;
                 case BinaryAssignment binaryAssignment:
                     foreach (var target in binaryAssignment.Targets)
@@ -869,15 +856,36 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var assignment = new BinaryAssignment();
         
-        List<Identifier> targets = Visit(context.identifier()) as List<Identifier>;
+        var targets = new List<Identifier>();
+        
+        var identifiers = Visit(context.identifier());
+        switch (identifiers)
+        {
+            case Identifier identifier:
+                targets.Add(identifier);
+                break;
+            case List<Identifier> list:
+                targets.AddRange(list);
+                break;
+        }
         
         foreach (var target in targets)
         {
             target.Parent = assignment;
             assignment.Targets.Add(target);
         }
-        
-        List<Expression> values = Visit(context.identifier()) as List<Expression>;
+
+        List<Expression> values = new();
+        var expressions = Visit(context.expression());
+        switch (expressions)
+        {
+            case Expression expression:
+                values.Add(expression);
+                break;
+            case List<Expression> list:
+                values.AddRange(list);
+                break;
+        }
 
         foreach (var value in values)
         {
@@ -965,9 +973,18 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         var expressionList = new List<Expression>();
         foreach (var expression in context.expression())
         {
-            var expr = Visit(expression) as Expression;
-            if (expr is null) continue;
-            expressionList.Add(expr);
+            var expr = Visit(expression);
+            switch (expr)
+            {
+                case Expression eExpr:
+                    expressionList.Add(eExpr);
+                    break;
+                case List<Expression> eList:
+                    expressionList.AddRange(eList);
+                    break;
+                default:
+                    continue;
+            }
         }
 
         return expressionList;
@@ -1038,10 +1055,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitArrayLiteral(YALGrammerParser.ArrayLiteralContext context)
     {
         ArrayLiteral arrayLiteral = new();
-        foreach (var expression in context.expression())
+        var expr = Visit(context.expression());
+        switch (expr)
         {
-            if (Visit(expression) is Expression expr)
-                arrayLiteral.Values.Add(expr);
+            case Expression eExpr:
+                arrayLiteral.Values.Add(eExpr);
+                break;
+            case List<Expression> eList:
+                arrayLiteral.Values.AddRange(eList);
+                break;
+            default:
+                break;
         }
 
         arrayLiteral.LineNumber = context.Start.Line;

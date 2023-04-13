@@ -80,19 +80,18 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSingleStatement([NotNull] YALGrammerParser.SingleStatementContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>SimpleVariableDeclarationFormat</c>
-	/// labeled alternative in <see cref="YALGrammerParser.variableDeclaration"/>.
+	/// Visit a parse tree produced by <see cref="YALGrammerParser.variableDeclaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitSimpleVariableDeclarationFormat([NotNull] YALGrammerParser.SimpleVariableDeclarationFormatContext context);
+	Result VisitVariableDeclaration([NotNull] YALGrammerParser.VariableDeclarationContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>ReferenceVariableDeclarationFormat</c>
+	/// Visit a parse tree produced by the <c>ReferenceVariableDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitReferenceVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceVariableDeclarationFormatContext context);
+	Result VisitReferenceVariableDeclaration([NotNull] YALGrammerParser.ReferenceVariableDeclarationContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>ArrayDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.

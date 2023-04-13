@@ -111,29 +111,27 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitSingleStatement([NotNull] YALGrammerParser.SingleStatementContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>SimpleVariableDeclarationFormat</c>
-	/// labeled alternative in <see cref="YALGrammerParser.variableDeclaration"/>.
+	/// Enter a parse tree produced by <see cref="YALGrammerParser.variableDeclaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterSimpleVariableDeclarationFormat([NotNull] YALGrammerParser.SimpleVariableDeclarationFormatContext context);
+	void EnterVariableDeclaration([NotNull] YALGrammerParser.VariableDeclarationContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>SimpleVariableDeclarationFormat</c>
-	/// labeled alternative in <see cref="YALGrammerParser.variableDeclaration"/>.
+	/// Exit a parse tree produced by <see cref="YALGrammerParser.variableDeclaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitSimpleVariableDeclarationFormat([NotNull] YALGrammerParser.SimpleVariableDeclarationFormatContext context);
+	void ExitVariableDeclaration([NotNull] YALGrammerParser.VariableDeclarationContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>ReferenceVariableDeclarationFormat</c>
+	/// Enter a parse tree produced by the <c>ReferenceVariableDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterReferenceVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceVariableDeclarationFormatContext context);
+	void EnterReferenceVariableDeclaration([NotNull] YALGrammerParser.ReferenceVariableDeclarationContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>ReferenceVariableDeclarationFormat</c>
+	/// Exit a parse tree produced by the <c>ReferenceVariableDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitReferenceVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceVariableDeclarationFormatContext context);
+	void ExitReferenceVariableDeclaration([NotNull] YALGrammerParser.ReferenceVariableDeclarationContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ArrayDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.

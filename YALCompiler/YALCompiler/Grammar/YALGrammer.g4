@@ -6,8 +6,8 @@ externalFunctionDeclaration: EXTERNAL '<' STRING '>' ID ':' formalInputParams? f
 
 functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statementBlock;
 
-formalInputParams:  IN  '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
-formalOutputParams: OUT '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
+formalInputParams:  IN  '(' variableDeclaration? ')';
+formalOutputParams: OUT '(' variableDeclaration? ')';
 
 statementBlock: '{' ( blockStatement | singleStatement ';'+ )* '}' ;
 
@@ -22,10 +22,9 @@ singleStatement: variableDeclaration
                  | RETURN 
                  ;
 
-variableDeclaration: variableDeclarationFormat (',' variableDeclarationFormat)*  # SimpleVariableDeclarationFormat
-                    ;
+variableDeclaration: variableDeclarationFormat (',' variableDeclarationFormat)* ;
 
-variableDeclarationFormat: REF variableDeclarationFormat        # ReferenceVariableDeclarationFormat
+variableDeclarationFormat: REF variableDeclarationFormat        # ReferenceVariableDeclaration
                            | TYPE '[' POSITIVE_NUMBER? ']' ID   # ArrayDeclaration 
                            | TYPE ID                            # SimpleVariableDeclaration
                            ;
@@ -64,8 +63,8 @@ expression: '!' expression                                      # Not
             | STRING                                            # StringLiteral
             | BOOLEAN                                           # BooleanLiteral
             | '(' expression ')'                                # ParenthesizedExpression
+            | '{' expression? '}'                               # ArrayLiteral
             | expression (',' expression)+                      # ExpressionList
-            | '{' (expression (',' expression)*)? '}'           # ArrayLiteral
             ;
 
 functionCall:       AWAIT? ID '(' expression? ')';

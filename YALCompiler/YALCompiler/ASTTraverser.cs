@@ -23,8 +23,6 @@ public abstract class ASTTraverser
     internal virtual object? Visit(Predicate               node) => node;
     internal virtual object? Visit(StringLiteral           node) => node;
     internal virtual object? Visit(ArrayLiteral            node) => node;
-    internal virtual object? Visit(TupleDeclaration        node) => node;
-    internal virtual object? Visit(UnaryCompoundExpression node) => node;
     internal virtual object? Visit(VariableDeclaration     node) => node;
     internal virtual object? Visit(StatementBlock          node) => node;
     internal virtual object? Visit(UnaryAssignment         node) => node;

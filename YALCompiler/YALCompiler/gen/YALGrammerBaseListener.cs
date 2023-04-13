@@ -132,33 +132,31 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitSingleStatement([NotNull] YALGrammerParser.SingleStatementContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>SimpleVariableDeclarationFormat</c>
-	/// labeled alternative in <see cref="YALGrammerParser.variableDeclaration"/>.
+	/// Enter a parse tree produced by <see cref="YALGrammerParser.variableDeclaration"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterSimpleVariableDeclarationFormat([NotNull] YALGrammerParser.SimpleVariableDeclarationFormatContext context) { }
+	public virtual void EnterVariableDeclaration([NotNull] YALGrammerParser.VariableDeclarationContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by the <c>SimpleVariableDeclarationFormat</c>
-	/// labeled alternative in <see cref="YALGrammerParser.variableDeclaration"/>.
+	/// Exit a parse tree produced by <see cref="YALGrammerParser.variableDeclaration"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitSimpleVariableDeclarationFormat([NotNull] YALGrammerParser.SimpleVariableDeclarationFormatContext context) { }
+	public virtual void ExitVariableDeclaration([NotNull] YALGrammerParser.VariableDeclarationContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>ReferenceVariableDeclarationFormat</c>
+	/// Enter a parse tree produced by the <c>ReferenceVariableDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterReferenceVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceVariableDeclarationFormatContext context) { }
+	public virtual void EnterReferenceVariableDeclaration([NotNull] YALGrammerParser.ReferenceVariableDeclarationContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by the <c>ReferenceVariableDeclarationFormat</c>
+	/// Exit a parse tree produced by the <c>ReferenceVariableDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitReferenceVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceVariableDeclarationFormatContext context) { }
+	public virtual void ExitReferenceVariableDeclaration([NotNull] YALGrammerParser.ReferenceVariableDeclarationContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ArrayDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.

@@ -115,8 +115,7 @@ public partial class YALGrammerBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// <return>The visitor result.</return>
 	public virtual Result VisitSingleStatement([NotNull] YALGrammerParser.SingleStatementContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>SimpleVariableDeclarationFormat</c>
-	/// labeled alternative in <see cref="YALGrammerParser.variableDeclaration"/>.
+	/// Visit a parse tree produced by <see cref="YALGrammerParser.variableDeclaration"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -124,9 +123,9 @@ public partial class YALGrammerBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitSimpleVariableDeclarationFormat([NotNull] YALGrammerParser.SimpleVariableDeclarationFormatContext context) { return VisitChildren(context); }
+	public virtual Result VisitVariableDeclaration([NotNull] YALGrammerParser.VariableDeclarationContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>ReferenceVariableDeclarationFormat</c>
+	/// Visit a parse tree produced by the <c>ReferenceVariableDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -135,7 +134,7 @@ public partial class YALGrammerBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitReferenceVariableDeclarationFormat([NotNull] YALGrammerParser.ReferenceVariableDeclarationFormatContext context) { return VisitChildren(context); }
+	public virtual Result VisitReferenceVariableDeclaration([NotNull] YALGrammerParser.ReferenceVariableDeclarationContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>ArrayDeclaration</c>
 	/// labeled alternative in <see cref="YALGrammerParser.variableDeclarationFormat"/>.
