@@ -1,4 +1,8 @@
-external  <"stdio.h/Serial.begin"> serial: in(int32 i);
+async k: {
+	int k = 1, 2, 3;
+}
+
+/*external  <"stdio.h/Serial.begin"> serial: in(int32 i);
 external  <"stdio.h/Serial.println"> print: in(string s);
 
 external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
@@ -22,4 +26,4 @@ async blink: {
 async main: {
 	pinMode(_LED_BUILTIN, _OUTPUT);
 	blink();
-} 
+} */

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Globalization;
 using System.Linq.Expressions;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
@@ -652,7 +653,7 @@ var func = new ExternalFunction
     
     public override object VisitFloatLiteral(YALGrammerParser.FloatLiteralContext context)
     {
-        if (double.TryParse(context.MINUS() == null ? context.FLOAT().GetText() : "-" + context.FLOAT().GetText(), out var number))
+        if (double.TryParse(context.MINUS() == null ? context.FLOAT().GetText() : "-" + context.FLOAT().GetText(), CultureInfo.InvariantCulture, out var number))
             return new SignedFloat(number) { LineNumber = context.Start.Line};
         return null;
     }

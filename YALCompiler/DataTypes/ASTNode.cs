@@ -8,7 +8,7 @@ public abstract class ASTNode
     public List<ASTNode> Children { get; } = new();
     public ASTNode? Parent { get; set; } = default;
     public Dictionary<string, Symbol> SymbolTable { get; } = new();   
-    public Dictionary<string, Function>FunctionTable { get; } = new();
+    public Dictionary<string, Function> FunctionTable { get; } = new();
     public int LineNumber { get; set; }
 
     public void AddSymbolOrFunction(Symbol symbol)

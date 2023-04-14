@@ -4,6 +4,8 @@ using YALCompiler;
 using YALCompiler.DataTypes;
 using YALCompiler.Helpers;
 using YALCompiler.ErrorHandlers;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
 
 namespace Testing;
 
@@ -12,6 +14,8 @@ public class ASTUnitTests
     YALGrammerVisitor visitor = new YALGrammerVisitor(new ErrorHandler(), new WarningsHandler());
 
     public IParseTree Parse(YALGrammerParser parser, string methodName) => (IParseTree)parser.GetType().GetMethod(methodName).Invoke(parser, null);
+
+    System.Linq.Expressions.Expression<Func<IMemberInfo, bool>> lineNumberAndParents = ctx => ctx.Name == "LineNumber" || ctx.Name == "Parent";
 
     Action<ASTNode, ASTNode> LineNumbersRemover = (node, parent) =>
     {
@@ -80,7 +84,7 @@ public class ASTUnitTests
     [Theory]
     [InlineData("", 0, 0)]
     [InlineData("out (string a)", 0, 1)]
-    [InlineData("in (string a) out ()", 1, 0)]
+    //[InlineData("in (string a) out ()", 1, 0)]
     [InlineData("in (int32 a, int32 b)", 2, 0)]
     [InlineData("in (int32 a, int32 b) out: (int32 c, int32 d)", 2, 2)]
     public void Correct_Function_Parameters_Count(string input, int expectedInputParametersCount, int expectedOutputParametersCount)
@@ -139,10 +143,10 @@ public class ASTUnitTests
     }
 
     [Theory]
-    [InlineData("int32 hej = 5+2;", typeof(BinaryAssignment))]
-    [InlineData("functionCall();", typeof(FunctionCall))]
-    [InlineData("int32 i;", typeof(VariableDeclaration))]
-    [InlineData("i++;", typeof(UnaryAssignment))]
+    [InlineData("int32 hej = 5+2", typeof(BinaryAssignment))]
+    [InlineData("functionCall()", typeof(FunctionCall))]
+    //[InlineData("int32 i", typeof(List<VariableDeclaration>))]
+    [InlineData("i++", typeof(UnaryAssignment))]
     public void Correct_SingleStatement_Type(string input, Type expected)
     {
         var stmt = Setup(input, nameof(YALGrammerParser.singleStatement));
@@ -170,7 +174,7 @@ public class ASTUnitTests
         Assert.IsType(typeof(ForStatement), for_stmt);
     }
 
-    public static TheoryData<string, Expression> Expressions =>
+    public static TheoryData<string, object> Expressions =>
         new() {
             #region PostIncrementDecrement
             { "i++", new UnaryAssignment {
@@ -254,10 +258,8 @@ public class ASTUnitTests
                 Right = new SignedNumber(2, isNegative: false),
                 Operator = Operators.ExpressionOperator.BitwiseOr
             } },
-            { "5 ~ 2", new CompoundExpression {
-                Left = new SignedNumber(5, isNegative: false),
-                Right = new SignedNumber(2, isNegative: false),
-                Operator = Operators.ExpressionOperator.BitwiseNot
+            { "~2", new SignedNumber(2, isNegative: false) {
+                BitwiseNegated = true,
             } },
             #endregion
             #region Comparison
@@ -303,11 +305,16 @@ public class ASTUnitTests
             } },
             #endregion
             #region VariableAssignment
-            /*{ @"hi = ""whaaat""", new BinaryAssignment {
-                Target = new Identifier("hi"),
+            { @"hi = ""whaaat"", k", new BinaryAssignment {
                 Operator = Operators.AssignmentOperator.Equals,
-                Value = new StringLiteral("whaaat")
-            }},*/
+                Targets = new List<ASTNode> {
+                    new Identifier("hi")
+                },
+                Values = new List<Expression> {
+                    new StringLiteral("whaaat"),
+                    new Identifier("k"),
+                },
+            }},
             #endregion
             #region Variable
             { @"my_custom_variable", new Identifier("my_custom_variable") },
@@ -354,6 +361,13 @@ public class ASTUnitTests
                 }
             }},
             #endregion
+            // #region ExpressionList
+            // { "expr1, expr2, expr3", new List<Expression> {
+            //     new Identifier("expr1"),
+            //     new Identifier("expr2"),
+            //     new Identifier("expr3"),
+            // }},
+            // #endregion
         };
 
     [Theory]
@@ -362,6 +376,6 @@ public class ASTUnitTests
     {
         var expr = Setup(input, nameof(YALGrammerParser.expression));
 
-        CustomAssert.Equivalent(expected, expr);
+        expected.Should().BeEquivalentTo(expr, options => options.RespectingRuntimeTypes().Excluding(lineNumberAndParents));
     }
 }

@@ -1,7 +1,0 @@
-﻿sumAndDiffFromTwoNumbers: in(int32 a, int32 b) out(int32 sum, int32 diff) {
-    sum = a + b;
-    diff = a - b;
-}
-main: {
-    (int32 a, int32 b) = sumAndDiffFromTwoNumbers(1, 2)
-}

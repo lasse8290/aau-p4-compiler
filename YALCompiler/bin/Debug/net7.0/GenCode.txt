@@ -1,0 +1,91 @@
+#include <string>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <Arduino.h>
+
+
+typedef void (*Func)(void*);
+
+template <typename I, typename O>
+struct COMPILER_PARAMETERS {
+  TaskHandle_t taskhandle; 
+  I *input;
+  O *output;
+};
+
+template <typename I>
+void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
+    TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
+
+    COMPILER_PARAMETERS<void, void> parameters;
+    parameters.taskhandle = taskhandle;
+    parameters.input = &inputParameters;
+
+    void* outputParameters;
+    parameters.output = &outputParameters;
+
+    if (isAsync) {
+      xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
+      if (isAwait) {
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+      }
+    } else {
+      func(&parameters);
+    }
+
+    return parameters.output;
+}
+
+void loop() {
+  delay(10);
+}
+
+typedef struct COMPILER_INPUT_STRUCT_blink {
+  
+} COMPILER_INPUT_STRUCT_blink;
+typedef struct COMPILER_OUTPUT_STRUCT_blink {
+  
+} COMPILER_OUTPUT_STRUCT_blink;
+#define COMPILER_PARAMETERS_blink COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_blink, COMPILER_OUTPUT_STRUCT_blink>
+typedef struct COMPILER_INPUT_STRUCT_setup {
+  
+} COMPILER_INPUT_STRUCT_setup;
+typedef struct COMPILER_OUTPUT_STRUCT_setup {
+  
+} COMPILER_OUTPUT_STRUCT_setup;
+#define COMPILER_PARAMETERS_setup COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_setup, COMPILER_OUTPUT_STRUCT_setup>
+
+
+int32_t _INPUT = 1;
+int32_t _OUTPUT = 3;
+int32_t _LED_BUILTIN = 2;
+void blink (void *pvParameters) {
+    COMPILER_PARAMETERS_blink *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_blink*) pvParameters;
+    
+
+    while (1) { 
+digitalWrite(_LED_BUILTIN,1);
+vTaskDelay(1000);
+digitalWrite(_LED_BUILTIN,0);
+vTaskDelay(1000);
+
+};
+xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
+vTaskDelete(NULL);
+
+return;
+
+    
+};
+void setup () {
+    
+    
+
+    pinMode(_LED_BUILTIN,_OUTPUT);
+(*((COMPILER_OUTPUT_STRUCT_blink*) COMPILER_INVOKE(COMPILER_INPUT_STRUCT_blink {  }, blink, 1, 0)));
+
+return;
+
+    
+};
