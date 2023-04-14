@@ -3,10 +3,11 @@ import puppeteer from "puppeteer";
 import clipboardy from "clipboardy";
 
 // Get the directory from the command line
-// --dir="C:\Users\user\Documents\Arduino\libraries\GenCode\examples\GenCode\GenCode.ino"
 
 const args = process.argv.slice(2);
-const dir = args[0].split("=")[1];
+
+const dir = args.find((arg) => arg.startsWith("--dir=")).split("=")[1];
+const url = args.find((arg) => arg.startsWith("--url=")).split("=")[1];
 
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
@@ -30,7 +31,7 @@ const dir = args[0].split("=")[1];
       // Make the browser window full screen
       const page = await browser.newPage();
       await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto("https://wokwi.com/projects/361970165060110337");
+      await page.goto(url);
 
       // Wait for the page to load
       await page.waitForSelector('div[class="react-draggable"]');
