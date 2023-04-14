@@ -1,15 +1,13 @@
 grammar YALGrammer;
 
-program: (externalFunctionDeclaration | globalVariableDeclaration | functionDeclaration)* EOF;
-
-globalVariableDeclaration: TYPE ('[' POSITIVE_NUMBER? ']')? ID ('=' expression)? ';';
+program: (externalFunctionDeclaration | variableDeclaration ';' | assignment ';' | functionDeclaration)* EOF;
 
 externalFunctionDeclaration: EXTERNAL '<' STRING '>' ID ':' formalInputParams? formalOutputParams? ';';
 
 functionDeclaration: ASYNC? ID ':' formalInputParams? formalOutputParams? statementBlock;
 
-formalInputParams:  IN  '(' referenceableVariableDeclarationFormat (',' referenceableVariableDeclarationFormat)* ')';
-formalOutputParams: OUT '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')';
+formalInputParams:  IN  '(' variableDeclaration? ')';
+formalOutputParams: OUT '(' variableDeclaration? ')';
 
 statementBlock: '{' ( blockStatement | singleStatement ';'+ )* '}' ;
 
@@ -24,21 +22,15 @@ singleStatement: variableDeclaration
                  | RETURN 
                  ;
 
-variableDeclaration: variableDeclarationFormat  # SimpleVariableDeclarationFormat
-                    | tupleDeclaration          # TupleVariableDeclaration
-                    ;
+variableDeclaration: variableDeclarationFormat (',' variableDeclarationFormat)* ;
 
-referenceableVariableDeclarationFormat: REF? variableDeclarationFormat ;
-
-referenceableExpression: REF? expression ;
-
-variableDeclarationFormat: TYPE '[' POSITIVE_NUMBER? ']' ID     # ArrayDeclaration 
+variableDeclarationFormat: REF variableDeclarationFormat        # ReferenceVariableDeclaration
+                           | TYPE '[' POSITIVE_NUMBER? ']' ID   # ArrayDeclaration 
                            | TYPE ID                            # SimpleVariableDeclaration
                            ;
                     
 assignment: simpleAssignment
             | declarationAssignment
-            | tupleAssignment
             ;
 
 
@@ -49,11 +41,8 @@ simpleAssignment: identifier operator=('=' | '+=' | '-=' | '*=' | '\\=' | '%=') 
             
 declarationAssignment:  variableDeclaration '=' expression;
 
-tupleAssignment:        tupleDeclaration '=' expression;
-
-tupleDeclaration:       '(' variableDeclarationFormat (',' variableDeclarationFormat)* ')' ;
-
 expression: '!' expression                                      # Not
+            | '~' expression                                    # BitwiseNot
             | expression operator=( '++' | '--' )               # PostIncrementDecrement
             | operator=( '++' | '--' | '~' ) expression         # PrefixUnary 
             | expression operator=('*' | '/' | '%') expression  # MultiplicationDivisionModulo 
@@ -62,10 +51,10 @@ expression: '!' expression                                      # Not
             | expression '&' expression                         # BitwiseAnd
             | expression '^' expression                         # BitwiseXor
             | expression '|' expression                         # BitwiseOr
-            | expression '~' expression                         # BitwiseNot
             | expression operator=('<' | '<=' | '>' | '>=' | '==' | '!=') expression  # Comparison
             | expression '&&' expression                        # And
             | expression '||' expression                        # Or
+            //| REF expression                                    # ReferenceExpression
             | simpleAssignment                                  # VariableAssignment
             | identifier                                        # Variable  
             | functionCall                                      # FunctionCallExpression
@@ -74,13 +63,12 @@ expression: '!' expression                                      # Not
             | STRING                                            # StringLiteral
             | BOOLEAN                                           # BooleanLiteral
             | '(' expression ')'                                # ParenthesizedExpression
-            | '{' (expression (',' expression)*)? '}'           # ArrayLiteral
+            | '{' expression? '}'                               # ArrayLiteral
+            | expression (',' expression)+                      # ExpressionList
             ;
 
-functionCall:       AWAIT? ID '(' actualInputParams ')';
+functionCall:       AWAIT? ID '(' expression? ')';
 
-actualInputParams:  (referenceableExpression (',' referenceableExpression)*)? ;
-            
 ifStatement:        'if' '(' expression ')' statementBlock elseIfStatement* elseStatement? ;
 elseIfStatement:    'else if' '(' expression ')' statementBlock ;
 elseStatement:      'else' statementBlock ;
@@ -91,6 +79,8 @@ forStatement:       'for' '(' declarationAssignment ';' expression ';' assignmen
 
 identifier:  ID '[' expression ']'  # ArrayElementIdentifier
             | ID                    # SimpleIdentifier
+            | REF identifier        # ReferenceIdentifier
+            | identifier (',' identifier)+  # IdentifierList
             | '(' identifier ')'    # ParenthesizedIdentifier
             ;
 

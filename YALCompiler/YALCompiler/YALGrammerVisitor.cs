@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Linq.Expressions;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -23,19 +25,47 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         DataTypes.Program program = new();
 
-        foreach(var gvd in context.globalVariableDeclaration())
+        foreach(var gvd in context.variableDeclaration())
         {
-            if (Visit(gvd) is Symbol symbol)
+            if (Visit(gvd) is VariableDeclaration variableDeclaration)
             {
                 try
                 {
-                    program.AddSymbolOrFunction(symbol);
+                    program.AddSymbolOrFunction(variableDeclaration.Variable);
+                    program.Children.Add(variableDeclaration);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
                     _errorHandler.AddError(e, gvd);                    
                 }
             }
+        }
+        
+        foreach(var gvd in context.assignment())
+        {
+            var assignment = Visit(gvd);
+            if (assignment is BinaryAssignment binaryAssignment)
+            {
+                foreach (var target in binaryAssignment.Targets)
+                {
+                    try
+                    {
+                        if (target is VariableDeclaration variableDeclaration)
+                        {
+                            program.AddSymbolOrFunction(variableDeclaration.Variable);
+                            program.Children.Add(binaryAssignment);
+                            continue;
+                        }
+                        _errorHandler.AddError(new InvalidGlobalScopedAssignmentException(), gvd);
+                    }
+                    catch (VariableAlreadyExistsException e)
+                    {
+                        _errorHandler.AddError(e, gvd);                    
+                    }
+                }
+                continue;
+            }
+            _errorHandler.AddError(new InvalidGlobalScopedAssignmentException(), gvd);
         }
         
         foreach (var func in context.externalFunctionDeclaration())
@@ -71,42 +101,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         }
         return program;
     }
-    
-    public override object VisitGlobalVariableDeclaration(YALGrammerParser.GlobalVariableDeclarationContext context)
-    {
-        string id = context.ID().GetText();
-        SingleType? type = null;
-        try
-        {
-            type = new(context.TYPE().GetText());
-        }
-        catch (TypeNotRecognizedException e)
-        {
-            _errorHandler.AddError(e, context);
-        }
-        
-        var symbol = new Symbol(id);
-
-        if (context.LBRACKET() != null && context.RBRACKET() != null)
-        {
-            type.IsArray = true;
-            
-            if (context.POSITIVE_NUMBER() != null && ulong.TryParse(context.POSITIVE_NUMBER().GetText(), out ulong size))
-            {
-                symbol.ArraySize = size;
-            }
-        }
-        
-        symbol.Type = type;
-        
-        if (context.expression() != null && Visit(context.expression()) is Expression expression)
-        {
-            symbol.Value = expression;
-            symbol.Initialized = true;
-        }
-        
-        return symbol;
-    }
 
     public override object VisitExternalFunctionDeclaration(YALGrammerParser.ExternalFunctionDeclarationContext context)
     {
@@ -114,7 +108,7 @@ var func = new ExternalFunction
         {
             LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").SkipLast(1).ToArray()),
             FunctionName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").Last(),
-            Id = context.ID().GetText()
+            Id = context.ID().GetText(),
         };
 
         //handle input params
@@ -157,7 +151,7 @@ var func = new ExternalFunction
             func.ReturnType = func.OutputParameters[0].Type;
         } else if (func.OutputParameters.Count > 1)
         {
-            func.ReturnType = new TupleType(func.OutputParameters.Select(param => param.Type as SingleType).ToArray());
+            func.ReturnType = new YALType(func.OutputParameters.Select(param => param.Type).ToArray());
         }
         
         return func;
@@ -171,8 +165,6 @@ var func = new ExternalFunction
             IsAsync = context.ASYNC() != null
         };
         
-        
-
         //handle input params
         if (context.formalInputParams() != null && Visit(context.formalInputParams()) is List<Symbol> inSymbols)
         {
@@ -213,7 +205,7 @@ var func = new ExternalFunction
             func.ReturnType = func.OutputParameters[0].Type;
         } else if (func.OutputParameters.Count > 1)
         {
-            func.ReturnType = new TupleType(func.OutputParameters.Select(param => param.Type as SingleType).ToArray());
+            func.ReturnType = new YALType(func.OutputParameters.Select(param => param.Type).ToArray());
         }
 
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -243,45 +235,34 @@ var func = new ExternalFunction
     
     public override object VisitFormalInputParams(YALGrammerParser.FormalInputParamsContext context)
     {
-        var paramVars = new List<Symbol>();
-        
-        foreach (var varDecl in context.referenceableVariableDeclarationFormat())
-        {
-            if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
-            {
-                paramVars.Add(symbol);
-            }
-        }
-        return paramVars;
+        var declaredVars = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
+        return declaredVars.Select(varDecl => varDecl.Variable).ToList();
     }
     
     public override object VisitFormalOutputParams(YALGrammerParser.FormalOutputParamsContext context)
     {
-        var paramVars = new List<Symbol>();
+        var declaredVars = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
+        return declaredVars.Select(varDecl => varDecl.Variable).ToList();
+    }
+
+    public override object VisitVariableDeclaration(YALGrammerParser.VariableDeclarationContext context)
+    {
+        var varDecls = new List<VariableDeclaration>();
         foreach (var varDecl in context.variableDeclarationFormat())
         {
-            if (Visit(varDecl) is VariableDeclaration {Variable: Symbol symbol})
-            {
-                paramVars.Add(symbol);
-            }
+            varDecls.Add(Visit(varDecl) as VariableDeclaration);
         }
-        return paramVars;
+        return varDecls;
     }
 
-    public override object VisitReferenceableVariableDeclarationFormat(YALGrammerParser.ReferenceableVariableDeclarationFormatContext context)
-    {
-        var variable = Visit(context.variableDeclarationFormat()) as VariableDeclaration;
-        if (variable is not null) variable.Variable.IsRef = context.REF() != null;
-        return variable;
-    }
-
+    
     public override object VisitArrayDeclaration(YALGrammerParser.ArrayDeclarationContext context)
     {
         var symbol = new Symbol(context.ID().GetText());
         
         try
         {
-            symbol.Type = new SingleType(context.TYPE().GetText()) {IsArray = true};
+            symbol.Type = new YALType(context.TYPE().GetText(), true);
         }
         catch (TypeNotRecognizedException e)
         {
@@ -294,7 +275,14 @@ var func = new ExternalFunction
         }
 
         return new VariableDeclaration {Variable = symbol, LineNumber = context.Start.Line};
-    } 
+    }
+
+    public override object VisitReferenceVariableDeclaration(YALGrammerParser.ReferenceVariableDeclarationContext context)
+    {
+        var variable = Visit(context.variableDeclarationFormat()) as VariableDeclaration;
+        if (variable is not null) variable.Variable.IsRef = true;
+        return variable;
+    }
     
     public override object VisitSimpleVariableDeclaration(YALGrammerParser.SimpleVariableDeclarationContext context)
     {
@@ -302,7 +290,7 @@ var func = new ExternalFunction
         
         try
         {
-            symbol.Type = new SingleType(context.TYPE().GetText());
+            symbol.Type = new YALType(context.TYPE().GetText());
         }
         catch (TypeNotRecognizedException e)
         {
@@ -321,20 +309,23 @@ var func = new ExternalFunction
             
             if (stmt is ASTNode node)
                 statementBlock.Statements.Add(node);
-            
+
             switch (stmt)
             {
-                case VariableDeclaration varDecl:
-                    statementBlock.LocalVariables.Add(varDecl.Variable);
+                case List<VariableDeclaration> list:
+                    statementBlock.LocalVariables.AddRange(list.Select(v => v.Variable));
+                    statementBlock.Statements.AddRange(list);
                     break;
-                case TupleDeclaration tupleDecl:
-                    statementBlock.LocalVariables.AddRange(tupleDecl.Variables);
-                    break;
-                case BinaryAssignment { Target: VariableDeclaration variableDeclaration }:
-                    statementBlock.LocalVariables.Add(variableDeclaration.Variable);
-                    break;
-                case BinaryAssignment { Target: TupleDeclaration tupleDeclaration }:
-                    statementBlock.LocalVariables.AddRange(tupleDeclaration.Variables);
+                case BinaryAssignment binaryAssignment:
+                    foreach (var target in binaryAssignment.Targets)
+                    {
+                        switch (target)
+                        {
+                            case VariableDeclaration variableDeclarationDecl:
+                                statementBlock.LocalVariables.Add(variableDeclarationDecl.Variable);
+                                break;
+                        }
+                    }
                     break;
             }
         }
@@ -361,9 +352,9 @@ var func = new ExternalFunction
 
     public override object VisitSingleStatement(YALGrammerParser.SingleStatementContext context)
     {
-        ASTNode node = null;
+        ASTNode? node = null;
         if (context.variableDeclaration() != null)
-            node = Visit(context.variableDeclaration()) as ASTNode;
+            return Visit(context.variableDeclaration()) as List<VariableDeclaration>;
         
         if (context.assignment() != null)
             node = Visit(context.assignment()) as ASTNode;
@@ -390,7 +381,7 @@ var func = new ExternalFunction
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -424,7 +415,7 @@ var func = new ExternalFunction
                 }
                 else
                 {
-                    _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), elseIf);
+                    _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), elseIf);
                 }
                 
                 StatementBlock elseIfStatementBlock = Visit(elseIf.statementBlock()) as StatementBlock;
@@ -488,7 +479,7 @@ var func = new ExternalFunction
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
         
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
@@ -518,10 +509,16 @@ var func = new ExternalFunction
         var forStatement = new ForStatement();
         
         BinaryAssignment declAssignment = Visit(context.declarationAssignment()) as BinaryAssignment;
-        if (declAssignment is BinaryAssignment { Target: VariableDeclaration varDecl })
+        if (declAssignment is BinaryAssignment)
         {
-            forStatement.DeclarationAssignment = declAssignment;
-            forStatement.SymbolTable.Add(varDecl.Variable.Id, varDecl.Variable);
+            foreach (var target in declAssignment.Targets)
+            {
+                if (target is VariableDeclaration varDecl)
+                {
+                    forStatement.DeclarationAssignment = declAssignment;
+                    forStatement.SymbolTable.Add(varDecl.Variable);    
+                }
+            }
         }
 
         if (Visit(context.expression()) is Expression expression)
@@ -530,7 +527,7 @@ var func = new ExternalFunction
         }
         else
         {
-            _errorHandler.AddError(new InvalidPredicate(context.expression().GetText()), context);
+            _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
 
         forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
@@ -556,8 +553,6 @@ var func = new ExternalFunction
         forStatement.LineNumber = context.Start.Line;
         return forStatement;
     }
-
-
 
     #region PredicateVisitors
 
@@ -642,14 +637,7 @@ var func = new ExternalFunction
     #endregion
     
     #region ExpressionVisitors
-
-    public override object VisitReferenceableExpression(YALGrammerParser.ReferenceableExpressionContext context)
-    {
-        var referenceable = Visit(context.expression()) as Expression;
-        if (referenceable is not null) referenceable.IsRef = context.REF() != null;
-        return referenceable;
-    }
-    
+   
     public override object VisitVariable(YALGrammerParser.VariableContext context)
     {
         return Visit(context.identifier());
@@ -671,7 +659,7 @@ var func = new ExternalFunction
 
     public override object VisitStringLiteral(YALGrammerParser.StringLiteralContext context)
     {
-        return new StringLiteral(context.STRING().GetText()) { LineNumber = context.Start.Line};
+        return new StringLiteral(context.STRING().GetText().Substring(1, context.STRING().GetText().Length - 2)) { LineNumber = context.Start.Line};
     }
 
     public override object VisitParenthesizedExpression(YALGrammerParser.ParenthesizedExpressionContext context)
@@ -681,10 +669,23 @@ var func = new ExternalFunction
 
     public override object VisitMultiplicationDivisionModulo(YALGrammerParser.MultiplicationDivisionModuloContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context);
+            return null;
+        }
+        var right = Visit(context.expression(1)) as Expression;
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context);
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         switch (context.@operator.Type)
         {
@@ -701,13 +702,26 @@ var func = new ExternalFunction
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
-    
+
     public override object VisitAdditionSubtraction(YALGrammerParser.AdditionSubtractionContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context);
+            return null;
+        }
+        var right = Visit(context.expression(1)) as Expression;
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context);
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         switch (context.@operator.Type)
         {
@@ -725,10 +739,23 @@ var func = new ExternalFunction
 
     public override object VisitLeftRightShift(YALGrammerParser.LeftRightShiftContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context);
+            return null;
+        }
+        var right = Visit(context.expression(1)) as Expression;
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context);
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         switch (context.@operator.Type)
         {
@@ -745,50 +772,97 @@ var func = new ExternalFunction
 
     public override object VisitBitwiseAnd(YALGrammerParser.BitwiseAndContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        var right = Visit(context.expression(1)) as Expression;
+
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context.expression(0));
+            return null;
+        }
+
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context.expression(1));
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
             Operator = Operators.ExpressionOperator.BitwiseAnd,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
-    
+
     public override object VisitBitwiseOr(YALGrammerParser.BitwiseOrContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        var right = Visit(context.expression(1)) as Expression;
+
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context.expression(0));
+            return null;
+        }
+
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context.expression(1));
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
             Operator = Operators.ExpressionOperator.BitwiseOr,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
-    
+
     public override object VisitBitwiseXor(YALGrammerParser.BitwiseXorContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        var right = Visit(context.expression(1)) as Expression;
+
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context.expression(0));
+            return null;
+        }
+
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context.expression(1));
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
             Operator = Operators.ExpressionOperator.BitwiseXor,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
+
     
     public override object VisitBitwiseNot(YALGrammerParser.BitwiseNotContext context)
     {
-        var compoundExpression = new CompoundExpression
+        var expression = Visit(context.expression()) as Expression;
+        if (expression is null)
         {
-            Operator = Operators.ExpressionOperator.BitwiseNot,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression,
-        };
-        compoundExpression.LineNumber = context.Start.Line;
-        return compoundExpression;
+            _errorHandler.AddError(new InvalidExpressionException(context.GetText()), context);
+            return null;
+        }
+        expression.BitwiseNegated = true;
+        expression.LineNumber = context.Start.Line;
+        return expression;
     }
 
     public override object VisitPostIncrementDecrement(YALGrammerParser.PostIncrementDecrementContext context)
@@ -837,48 +911,70 @@ var func = new ExternalFunction
     public override object VisitFunctionCall(YALGrammerParser.FunctionCallContext context)
     {
         var functionCall = new FunctionCall(context.ID().GetText(), context.AWAIT() != null);
-        functionCall.InputParameters = Visit(context.actualInputParams()) as List<Expression>;
-        foreach (var inputParameter in functionCall.InputParameters)
+        if (context.expression() != null)
         {
-            inputParameter.Parent = functionCall;
+            var expression = Visit(context.expression());
+            switch (expression)
+            {
+                case Expression exp:
+                    functionCall.InputParameters.Add(exp);
+                    break;
+                case IList list:
+                    functionCall.InputParameters.AddRange(list.Cast<Expression>());
+                    break;
+            }
+            foreach (var inputParameter in functionCall.InputParameters)
+            {
+                inputParameter.Parent = functionCall;
+            }    
         }
-
         functionCall.LineNumber = context.Start.Line;
         return functionCall;
-    }
-
-    public override object VisitActualInputParams(YALGrammerParser.ActualInputParamsContext context)
-    {
-        List<Expression> actualInputParams = new();
-        foreach (var expression in context.referenceableExpression())
-        {
-            if (Visit(expression) is Expression expr)
-            {
-                expr.LineNumber = context.Start.Line;
-
-                actualInputParams.Add(expr);
-            }
-        }
-
-        return actualInputParams;
     }
 
     #region AssignmentVisitors
 
     public override object VisitIdAssignment(YALGrammerParser.IdAssignmentContext context)
     {
-        var assignment = new BinaryAssignment()
+        var assignment = new BinaryAssignment();
+        
+        var targets = new List<Identifier>();
+        
+        var identifiers = Visit(context.identifier());
+        switch (identifiers)
         {
-            Target = Visit(context.identifier()) as Identifier,
-            Value = Visit(context.expression()) as Expression
-        };
+            case Identifier identifier:
+                targets.Add(identifier);
+                break;
+            case List<Identifier> list:
+                targets.AddRange(list);
+                break;
+        }
         
-        if (assignment.Target is not null)
-            ((Identifier)assignment.Target).Parent = assignment;
-        
-        if (assignment.Value is not null)
-            assignment.Value.Parent = assignment;
-        
+        foreach (var target in targets)
+        {
+            target.Parent = assignment;
+            assignment.Targets.Add(target);
+        }
+
+        List<Expression> values = new();
+        var expressions = Visit(context.expression());
+        switch (expressions)
+        {
+            case Expression expression:
+                values.Add(expression);
+                break;
+            case List<Expression> list:
+                values.AddRange(list);
+                break;
+        }
+
+        foreach (var value in values)
+        {
+            value.Parent = assignment;
+            assignment.Values.Add(value);
+        }
+
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.EQUAL:
@@ -906,10 +1002,16 @@ var func = new ExternalFunction
 
     public override object VisitIdPostIncrementDecrementAssignment(YALGrammerParser.IdPostIncrementDecrementAssignmentContext context)
     {
-        var assignment = new UnaryAssignment()
+        var target = Visit(context.identifier());
+        var assignment = new UnaryAssignment();
+        if (target is Identifier identifier)
         {
-            Target = Visit(context.identifier()) as Identifier,
-        };
+            assignment.Target = identifier;
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidAssignmentException(context.GetText()), context);
+        }
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.INCREMENT:
@@ -925,10 +1027,16 @@ var func = new ExternalFunction
     
     public override object VisitIdPreIncrementDecrementAssignment(YALGrammerParser.IdPreIncrementDecrementAssignmentContext context)
     {
-        var assignment = new UnaryAssignment()
+        var target = Visit(context.identifier());
+        var assignment = new UnaryAssignment();
+        if (target is Identifier identifier)
         {
-            Target = Visit(context.identifier()) as Identifier,
-        };
+            assignment.Target = identifier;
+        }
+        else
+        {
+            _errorHandler.AddError(new InvalidAssignmentException(context.GetText()), context);
+        }
         switch (context.@operator.Type)
         {
             case YALGrammerLexer.INCREMENT:
@@ -942,55 +1050,86 @@ var func = new ExternalFunction
         return assignment;
     }
 
+    public override object VisitExpressionList(YALGrammerParser.ExpressionListContext context)
+    {
+        var expressionList = new List<Expression>();
+        foreach (var expression in context.expression())
+        {
+            var expr = Visit(expression);
+            switch (expr)
+            {
+                case Expression eExpr:
+                    expressionList.Add(eExpr);
+                    break;
+                case IList iList:
+                    expressionList.AddRange(iList.Cast<Expression>());
+                    break;
+                default:
+                    continue;
+            }
+        }
+
+        return expressionList;
+    }
+
     #endregion
 
     public override object VisitDeclarationAssignment(YALGrammerParser.DeclarationAssignmentContext context)
     {
         var assignment = new BinaryAssignment()
         {
-            Target = Visit(context.variableDeclaration()) as ASTNode,
             Operator = Operators.AssignmentOperator.Equals,
-            Value = Visit(context.expression()) as Expression
         };
+
+        var targets = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
+        if (targets is not null)
+        {
+            foreach (var target in targets)
+            {
+                target.Parent = assignment;
+                assignment.Targets.Add(target);                
+            }
+        }
+        
+        List<Expression> values = new();
+        var expressions = Visit(context.expression());
+        switch (expressions)
+        {
+            case Expression expression:
+                values.Add(expression);
+                break;
+            case List<Expression> list:
+                values.AddRange(list);
+                break;
+        }
+        if (values is not null)
+        {
+            foreach (var value in values)
+            {
+                value.Parent = assignment;
+                assignment.Values.Add(value);                
+            }
+        }
 
         assignment.LineNumber = context.Start.Line;
         return assignment;
-    }
-    
-    public override object VisitTupleAssignment(YALGrammerParser.TupleAssignmentContext context)
-    {
-        var assignment = new BinaryAssignment()
-        {
-            Target = Visit(context.tupleDeclaration()) as ASTNode,
-            Operator = Operators.AssignmentOperator.Equals,
-            Value = Visit(context.expression()) as Expression
-        };
-        
-        if (assignment.Target is not null)
-            ((Identifier)assignment.Target).Parent = assignment;
-        
-        if (assignment.Value is not null)
-            assignment.Value.Parent = assignment;
-        
-        assignment.LineNumber = context.Start.Line;
-        return assignment;
-    }
-    
-    public override object VisitTupleDeclaration(YALGrammerParser.TupleDeclarationContext context)
-    {
-        var tupleDeclaration = new TupleDeclaration();
-        foreach (var variableDeclaration in context.variableDeclarationFormat())
-        {
-            if (Visit(variableDeclaration) is VariableDeclaration { Variable: Symbol symbol})
-            tupleDeclaration.Variables.Add(symbol);
-        }
-        tupleDeclaration.LineNumber = context.Start.Line;
-        return tupleDeclaration;
     }
 
     public override object VisitSimpleIdentifier(YALGrammerParser.SimpleIdentifierContext context)
     {
         return new Identifier(context.ID().GetText()) {LineNumber = context.Start.Line};
+    }
+    
+    public override object VisitReferenceIdentifier(YALGrammerParser.ReferenceIdentifierContext context)
+    {
+        var identifier = Visit(context.identifier());
+        if (identifier is Identifier id)
+        {
+            id.LineNumber = context.Start.Line;
+            id.IsRef = true;
+        }
+
+        return identifier;
     }
     
     public override object VisitParenthesizedIdentifier(YALGrammerParser.ParenthesizedIdentifierContext context)
@@ -1003,13 +1142,34 @@ var func = new ExternalFunction
         return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression)  {LineNumber = context.Start.Line};
     }
 
+    public override object VisitIdentifierList(YALGrammerParser.IdentifierListContext context)
+    {
+        var identifierList = new List<Identifier>();
+        foreach (var identifier in context.identifier())
+        {
+            var id = Visit(identifier) as Identifier;
+            if (id is null) continue;
+            identifierList.Add(id);
+        }
+
+        return identifierList;
+    }
+
+
     public override object VisitArrayLiteral(YALGrammerParser.ArrayLiteralContext context)
     {
         ArrayLiteral arrayLiteral = new();
-        foreach (var expression in context.expression())
+        var expr = Visit(context.expression());
+        switch (expr)
         {
-            if (Visit(expression) is Expression expr)
-                arrayLiteral.Values.Add(expr);
+            case Expression eExpr:
+                arrayLiteral.Values.Add(eExpr);
+                break;
+            case List<Expression> eList:
+                arrayLiteral.Values.AddRange(eList);
+                break;
+            default:
+                break;
         }
 
         arrayLiteral.LineNumber = context.Start.Line;

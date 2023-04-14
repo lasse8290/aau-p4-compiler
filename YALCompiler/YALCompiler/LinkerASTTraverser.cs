@@ -19,24 +19,20 @@ public class LinkerASTTraverser : ASTTraverser
         while (stack.Count > 0) {
             ASTNode node = stack.Pop();
             
-            var properties = GetNodeChildProperties(node.GetType());
-
-            foreach (PropertyInfo p in properties)
-            {
-                var pp = p.GetValue(node) as ASTNode;
-                if (pp != null)
-                {
-                    pp.Parent = node;
-                    stack.Push(pp);
-                }
-            }
-
             if (node.Children != null) {
                 for (int i = node.Children.Count - 1; i >= 0; i--) {
                     ASTNode child = node.Children[i];
                     child.Parent = node; // Set the child's parent to the current node
                     stack.Push(child);
                 }
+            }
+            
+            var nodeChildren = GetAllChildProperties(node);
+
+            foreach (ASTNode nodeChild in nodeChildren)
+            {
+                nodeChild.Parent = node;
+                stack.Push(nodeChild);
             }
         }
     }

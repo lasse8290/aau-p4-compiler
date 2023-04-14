@@ -22,20 +22,38 @@ public class InvalidOperatorException: Exception
         
     }
     
-    public InvalidOperatorException(Operators.PredicateOperator @operator, TupleType tupleType): 
-        base($"Invalid operator exception: cannot use operator {@operator.ToStringValue()} on type {tupleType}")
+    public InvalidOperatorException(Operators.PredicateOperator @operator, YALType type): 
+        base($"Invalid operator exception: cannot use operator {@operator.ToStringValue()} on type {
+            type.Types.Count switch {
+                0 => "null",
+                1 => type.Types[0].Type + (type.Types[0].IsArray ? "[]" : ""),
+                _ => $"({string.Join(", ", type.Types.Select(t => t.Type + (t.IsArray ? "[]" : "")).ToArray())})"
+            }
+        }")
     {
         
     }
     
-    public InvalidOperatorException(Operators.AssignmentOperator @operator, TupleType tupleType): 
-        base($"Invalid operator exception: cannot use operator {@operator.ToStringValue()} on type {tupleType}")
+    public InvalidOperatorException(Operators.AssignmentOperator @operator, YALType type): 
+        base($"Invalid operator exception: cannot use operator {@operator.ToStringValue()} on type {
+            type.Types.Count switch {
+                0 => "null",
+                1 => type.Types[0].Type + (type.Types[0].IsArray ? "[]" : ""),
+                _ => $"({string.Join(", ", type.Types.Select(t => t.Type + (t.IsArray ? "[]" : "")).ToArray())})"
+            }
+        }")
     {
         
     }
     
-    public InvalidOperatorException(Operators.ExpressionOperator @operator, TupleType tupleType): 
-        base($"Invalid operator exception: cannot use operator {@operator.ToStringValue()} on type {tupleType}")
+    public InvalidOperatorException(Operators.ExpressionOperator @operator, YALType type): 
+        base($"Invalid operator exception: cannot use operator {@operator.ToStringValue()} on type {
+            type.Types.Count switch {
+                0 => "null",
+                1 => type.Types[0].Type + (type.Types[0].IsArray ? "[]" : ""),
+                _ => $"({string.Join(", ", type.Types.Select(t => t.Type + (t.IsArray ? "[]" : "")).ToArray())})"
+            }
+        }")
     {
         
     }
