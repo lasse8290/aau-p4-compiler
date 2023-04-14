@@ -1,7 +1,22 @@
-async expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
-	area = width * length;
+main: {
+    int8 i = 5;
+    int8 e = 5;
+    string a, float32 b = func2(i);
+    int32 ax = 5;
+    f(ref ax, f2(), ref b, ax);
 }
 
-async test: {
-	int32 test = expensiveSquareArea(10, 10);
+f2: out(string a, string s) {
+    a = "hello";
+    s = "world";
+}
+
+f: in (ref int32 a, string s, string ss, ref float32 b, int32 c) {}
+
+func2: in(int16 a) out(string s, float32 f) {
+    s = "hello";
+    f = a;
+}
+
+func3: in(ref string aa, float32 bb) {
 }

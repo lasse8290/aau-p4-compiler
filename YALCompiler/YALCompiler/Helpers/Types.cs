@@ -4,6 +4,7 @@ public static class Types
 {
     public static List<(ValueType, ValueType)> AssignableTypes = new()
     {
+        // (target, source)
         ( ValueType.int16, ValueType.int8 ),
         ( ValueType.int16, ValueType.uint8 ),
 
@@ -84,12 +85,12 @@ public static class Types
         return ValueType.TryParse(type, out ValueType t) ? t : null;
     }
     
-    public static bool CheckTypesAreAssignable(ValueType target, ValueType source)
+    public static bool CheckTypesAreAssignable((ValueType Type, bool isArray) target, (ValueType Type, bool isArray) source)
     {
-        return target == source || AssignableTypes.Contains((target, source));
+        return target == source || (AssignableTypes.Contains((target.Type, source.Type)) && target.isArray == source.isArray);
     }
     
-    public static bool CheckTypesAreAssignable(ValueType[] target, ValueType[] source)
+    public static bool CheckTypesAreAssignable((ValueType type, bool isArray)[] target, (ValueType type, bool isArray)[] source)
     {
         if (target.Length != source.Length)
         {
@@ -114,63 +115,52 @@ public static class Types
             return false;
         }
         
-        if (target is SingleType targetSingleType && source is SingleType sourceSingleType)
-        {
-            return CheckTypesAreAssignable(targetSingleType.Type, sourceSingleType.Type) &&
-                   targetSingleType.IsArray == sourceSingleType.IsArray;
-        }
+        return CheckTypesAreAssignable(target.Types.ToArray(), source.Types.ToArray());
 
-        if (target is TupleType targetTupleType && source is SingleType sourceSingleType2)
-        {
-            return targetTupleType.Types.Count == 1 && 
-                   CheckTypesAreAssignable(targetTupleType.Types[0].Type, sourceSingleType2.Type)
-                   && targetTupleType.Types[0].IsArray == sourceSingleType2.IsArray;
-        }
-        
-        if (target is SingleType targetSingleType2 && source is TupleType sourceTupleType)
-        {
-            return sourceTupleType.Types.Count == 1 && 
-                   CheckTypesAreAssignable(targetSingleType2.Type, sourceTupleType.Types[0].Type)
-                   && sourceTupleType.Types[0].IsArray == targetSingleType2.IsArray;
-        }
-        
-        if (target is TupleType targetSingleType3 && source is TupleType sourceTupleType3)
-        {
-            return CheckTypesAreAssignable(
-                targetSingleType3.Types.Select(t => t.Type).ToArray(), 
-                sourceTupleType3.Types.Select(t => t.Type).ToArray())
-                && targetSingleType3.Types.Select(t => t.IsArray).
-                    SequenceEqual(sourceTupleType3.Types.Select(t => t.IsArray));
-        }
-        
-        return false;
-        
     }
 
     public static bool CheckCompoundExpressionTypesAreValid(YALType leftType, YALType rightType)
     {
-        if (leftType is SingleType && rightType is SingleType)
+        return CheckTypesAreAssignable(leftType, rightType) || CheckTypesAreAssignable(rightType, leftType);
+    }
+    
+    public static YALType? GetLeastAssignableType(params YALType[] types)
+    {
+        YALType? type = null;
+        ValueType? leastAssignableType = null;
+        bool isArray = false;
+
+        foreach (var t in types)
         {
-            return CheckTypesAreAssignable(leftType, rightType) || CheckTypesAreAssignable(rightType, leftType);
+            foreach ((ValueType valueType, bool typeIsArray) in t.Types)
+            {
+                if (valueType < leastAssignableType || typeIsArray || leastAssignableType is null)
+                {
+                    leastAssignableType = valueType;
+                    isArray = typeIsArray;
+                }
+            }
         }
 
-        return false;
+        if (leastAssignableType is ValueType vLeastAssignableType)
+            type = new YALType(vLeastAssignableType, isArray);
+        
+        return type;
     }
 
-    public static SingleType? GetLeastAssignableType(SingleType leftType, SingleType rightType)
+    public static List<string> ToCPPType(this YALType? type)
     {
-        return new SingleType(leftType.Type < rightType.Type ? leftType.Type : rightType.Type);
-    }
-
-    public static string? ToCPPType(this YALType? type)
-    {
-        if (type is SingleType singleType)
+        var types = new List<string>();
+        if (type is not null)
         {
-            string? cType = null;
-            TypesInCPP.TryGetValue(singleType.Type, out cType);
-            return cType;
+            foreach (var t in type.Types)
+            {
+                string? cType = null;
+                TypesInCPP.TryGetValue(t.Type, out cType);
+                if (cType is not null)
+                    types.Add(cType);
+            }
         }
-
-        return null;
+        return types;
     }
 }

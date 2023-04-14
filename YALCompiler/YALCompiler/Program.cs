@@ -53,17 +53,17 @@ public static class Program
             if (errorHandler.Errors.Count > 0)
                 return;
             sw.Restart();
-            CodeGenTraverser cgt = new(node);
-            cgt.BeginTraverse();
-            sw.Stop();
-            Console.WriteLine("Generated code in " + sw.ElapsedMilliseconds + "ms");
-            string generatedCode = cgt.GetGeneratedCode();
-
-            Console.WriteLine(generatedCode);
-
-            string filePath = Path.Combine($"{path}", "GenCode.txt");
-
-            File.WriteAllText(filePath, generatedCode);
+            // CodeGenTraverser cgt = new(node);
+            // cgt.BeginTraverse();
+            // sw.Stop();
+            // Console.WriteLine("Generated code in " + sw.ElapsedMilliseconds + "ms");
+            // string generatedCode = cgt.GetGeneratedCode();
+            //
+            // Console.WriteLine(generatedCode);
+            //
+            // string filePath = Path.Combine($"{path}", "GenCode.txt");
+            //
+            // File.WriteAllText(filePath, generatedCode);
 
 
             Console.WriteLine("Done");

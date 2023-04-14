@@ -74,19 +74,26 @@ public static class Operators
         @Bool = 0x1 << 27,
     }
 
-    public static bool CheckOperationIsValid(Types.ValueType type, ExpressionOperator @operator)
+    public static bool CheckOperationIsValid(YALType type, ExpressionOperator @operator)
     {
-        return ((int)TypeMaskMatching[type] & (int)@operator) != 0;
+        return type.Types is [{ IsArray: false } _] &&
+               ((int)TypeMaskMatching[type.Types[0].Type] & (int)@operator) != 0;
     }
 
-    public static bool CheckOperationIsValid(Types.ValueType type, AssignmentOperator @operator)
+    public static bool CheckOperationIsValid(YALType type, AssignmentOperator @operator)
     {
-        return ((int)TypeMaskMatching[type] & (int)@operator) != 0;
+        if (type.Types.Count > 1 || type.Types[0].IsArray)
+        {
+            return @operator == AssignmentOperator.Equals;
+        }
+
+        return ((int)TypeMaskMatching[type.Types[0].Type] & (int)@operator) != 0;
     }
 
-    public static bool CheckOperationIsValid(Types.ValueType type, PredicateOperator @operator)
+    public static bool CheckOperationIsValid(YALType type, PredicateOperator @operator)
     {
-        return ((int)TypeMaskMatching[type] & (int)@operator) != 0;
+        return type.Types is [{ IsArray: false } _] &&
+               ((int)TypeMaskMatching[type.Types[0].Type] & (int)@operator) != 0;
     }
 
     public static string ToStringValue(this ExpressionOperator @operator) => @operator switch {
