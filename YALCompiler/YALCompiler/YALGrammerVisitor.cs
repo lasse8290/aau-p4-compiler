@@ -516,7 +516,7 @@ var func = new ExternalFunction
                 if (target is VariableDeclaration varDecl)
                 {
                     forStatement.DeclarationAssignment = declAssignment;
-                    forStatement.SymbolTable.Add(varDecl.Variable);    
+                    forStatement.AddSymbolOrFunction(varDecl.Variable);    
                 }
             }
         }

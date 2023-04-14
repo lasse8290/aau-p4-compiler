@@ -29,8 +29,9 @@ public class CodeGenTraverser : ASTTraverser
                 var x = (string)InvokeVisitor(child.Value);
             }
         }
+
         foreach (var child in _startNode.Children){
-            stringBuilder.AppendLine((string)InvokeVisitor(child));
+            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
         }
 
         _template.SetKeys(new List<Tuple<string, string>>
@@ -272,9 +273,6 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
-        if (binaryAssignment.Target is TupleDeclaration tupleDeclaration)
-            return (string)InvokeVisitor(tupleDeclaration);
-
         var op = binaryAssignment.Operator switch
         {
             Operators.AssignmentOperator.Equals => "=",
@@ -289,8 +287,8 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("binary_assignment");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("left", (string)InvokeVisitor(binaryAssignment.Target)),
-            new("right", (string)InvokeVisitor(binaryAssignment.Value)),
+            new("left", (string)InvokeVisitor(binaryAssignment.Targets.First())),
+            new("right", (string)InvokeVisitor(binaryAssignment.Values.First())),
             new("op", op)
         });
 
@@ -302,7 +300,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("variable_declaration");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("type", variableDeclaration.Variable.Type.ToCPPType()),
+            new("type", variableDeclaration.Variable.Type.ToCPPType().First()),
             new("identifier", variableDeclaration.Variable.Id)
         });
         return template.ReplacePlaceholders();
@@ -470,36 +468,5 @@ public class CodeGenTraverser : ASTTraverser
         });
         }
         return template.ReplacePlaceholders(true);
-    }
-
-    internal override object? Visit(TupleDeclaration tupleDeclaration)
-    {
-        var binaryAssignment = tupleDeclaration.Parent as BinaryAssignment;
-        var functionCall = binaryAssignment.Value as FunctionCall;
-
-        var argumentsBuilder = new StringBuilder();
-        for (int i = 0; i < functionCall.Function.InputParameters.Count; i++)
-        {
-            var symbol = functionCall.Function.InputParameters[i];
-            argumentsBuilder.AppendLine($"_COMPILER_INPUT_ARGS_{functionCall.Identifier}.{symbol.Id} = {InvokeVisitor(functionCall.InputParameters[i])};");
-        }
-
-        var assignmentBuilder = new StringBuilder();
-        for (var i = 0; i < tupleDeclaration.Variables.Count; i++)
-        {
-            var symbol = tupleDeclaration.Variables[i];
-            var outputSymbol = functionCall.Function.OutputParameters[i];
-            assignmentBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMS_{functionCall.Identifier}.output->{outputSymbol.Id};");
-        }
-
-        var template = new Template("tuple_declaration");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("arguments", argumentsBuilder.ToString()),
-            new("function", functionCall.Identifier),
-            new("declarations", assignmentBuilder.ToString())
-        });
-
-        return template.ReplacePlaceholders();
     }
 }
