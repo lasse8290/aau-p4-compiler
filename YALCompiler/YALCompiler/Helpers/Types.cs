@@ -4,6 +4,7 @@ public static class Types
 {
     public static List<(ValueType, ValueType)> AssignableTypes = new()
     {
+        // (target, source)
         ( ValueType.int16, ValueType.int8 ),
         ( ValueType.int16, ValueType.uint8 ),
 

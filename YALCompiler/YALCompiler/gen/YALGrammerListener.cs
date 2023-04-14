@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.12.0
+// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -453,18 +453,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPostIncrementDecrement([NotNull] YALGrammerParser.PostIncrementDecrementContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>MultiplicationDivisionModulo</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterMultiplicationDivisionModulo([NotNull] YALGrammerParser.MultiplicationDivisionModuloContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>MultiplicationDivisionModulo</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitMultiplicationDivisionModulo([NotNull] YALGrammerParser.MultiplicationDivisionModuloContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>BitwiseNot</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -476,6 +464,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitBitwiseNot([NotNull] YALGrammerParser.BitwiseNotContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>MultiplicationDivisionModulo</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterMultiplicationDivisionModulo([NotNull] YALGrammerParser.MultiplicationDivisionModuloContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>MultiplicationDivisionModulo</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitMultiplicationDivisionModulo([NotNull] YALGrammerParser.MultiplicationDivisionModuloContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ExpressionList</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.

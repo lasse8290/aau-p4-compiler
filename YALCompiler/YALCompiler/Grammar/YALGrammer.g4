@@ -42,6 +42,7 @@ simpleAssignment: identifier operator=('=' | '+=' | '-=' | '*=' | '\\=' | '%=') 
 declarationAssignment:  variableDeclaration '=' expression;
 
 expression: '!' expression                                      # Not
+            | '~' expression                                    # BitwiseNot
             | expression operator=( '++' | '--' )               # PostIncrementDecrement
             | operator=( '++' | '--' | '~' ) expression         # PrefixUnary 
             | expression operator=('*' | '/' | '%') expression  # MultiplicationDivisionModulo 
@@ -50,7 +51,6 @@ expression: '!' expression                                      # Not
             | expression '&' expression                         # BitwiseAnd
             | expression '^' expression                         # BitwiseXor
             | expression '|' expression                         # BitwiseOr
-            | expression '~' expression                         # BitwiseNot
             | expression operator=('<' | '<=' | '>' | '>=' | '==' | '!=') expression  # Comparison
             | expression '&&' expression                        # And
             | expression '||' expression                        # Or

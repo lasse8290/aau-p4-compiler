@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 using System.Reflection;
 using YALCompiler.DataTypes;
 using Boolean = YALCompiler.DataTypes.Boolean;
@@ -97,11 +98,46 @@ public abstract class ASTTraverser
 
         return visitMethod;
     }
+
+    internal static List<ASTNode> GetAllChildProperties(ASTNode node)
+    {
+        var propertyNodes = new List<ASTNode>();
+        Type nodeType = node.GetType();
+        var p = nodeType.GetProperties()
+            .Where(pp => pp.PropertyType.IsGenericType &&
+                         pp.Name != "Children" &&
+                         pp.PropertyType.GetGenericTypeDefinition() == typeof(List<>) &&
+                         typeof(ASTNode).IsAssignableFrom(pp.PropertyType.GetGenericArguments()[0]))
+            .Select(pp => (IList)pp.GetValue(node))
+            .ToList();
+        
+        foreach (IList list in p)
+        {
+            foreach (var item in list)
+            {
+                if (item is ASTNode astNode)
+                    propertyNodes.Add(astNode);
+            }
+        }
+        
+        propertyNodes.AddRange(nodeType
+            .GetProperties()
+            .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")
+            .Select(p => (ASTNode)p.GetValue(node))
+            .Where(p => p is not null));
+
+        return propertyNodes;
+    }
     
     internal static List<PropertyInfo> GetNodeChildProperties(Type nodeType)
     {
         if (!_propertyCache.TryGetValue(nodeType, out var properties))
         {
+            var p = nodeType.GetProperties()
+                .Where(pp => pp.PropertyType.IsGenericType &&
+                             pp.PropertyType.GetGenericTypeDefinition() == typeof(List<>) &&
+                             typeof(ASTNode).IsAssignableFrom(pp.PropertyType.GetGenericArguments()[0]))
+                .ToList();
             properties = nodeType
                          .GetProperties()
                          .Where(p => typeof(ASTNode).IsAssignableFrom(p.PropertyType) && p.Name != "Parent")

@@ -1,6 +1,6 @@
 namespace YALCompiler.DataTypes;
 
-public class Identifier : Expression, IAssignable
+public class Identifier : Expression
 {
     public string Name { get; set; }
     public Identifier(string name)

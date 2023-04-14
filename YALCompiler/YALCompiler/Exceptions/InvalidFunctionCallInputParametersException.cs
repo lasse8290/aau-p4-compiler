@@ -9,6 +9,12 @@ public class InvalidFunctionCallInputParameters: Exception
     {
         
     }
+    
+    public InvalidFunctionCallInputParameters(YALType? expected, YALType? actual): 
+        base($"Invalid function call: expected {expected?.ToString() ?? "null"} but got {expected?.ToString() ?? "null"}")
+    {
+        
+    }
 
     public InvalidFunctionCallInputParameters(List<Symbol> expected, List<string> actual) :
         base($"Invalid function call: expected ({string.Join(", ", expected.Select(s => (s.IsRef ? "ref " : "") + s?.Type?.ToString() ?? "null"))}) but got ({string.Join(", ", actual)})")

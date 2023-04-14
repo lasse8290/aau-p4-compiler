@@ -75,7 +75,7 @@ public class YALType: IEquatable<YALType>
             sb.Append("(");
         sb.Append(string.Join(", ", Types.Select(t => t.Type + (t.IsArray ? "[]" : ""))));
         if (Types.Count > 1)
-            sb.Append("}");
+            sb.Append(")");
         return sb.ToString();
     }
 }

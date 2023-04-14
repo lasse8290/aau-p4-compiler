@@ -40,7 +40,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                                     index.Value, symbol.ArraySize.Value), node.LineNumber);
                             }
                         }
-
+                        targetTypes.Add(symbol.Type);
                         symbol.Initialized = true;
                     }
                     else
@@ -153,35 +153,60 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
         
         //check input params are correct too
-        if (function.InputParameters.Count != node.InputParameters.Count)
+        // if (function.InputParameters.Count != node.InputParameters.Count)
+        // {
+        //     _errorHandler.AddError(
+        //         new InvalidFunctionCallInputParameters(
+        //             function.InputParameters.Count, node.InputParameters.Count),
+        //         node.LineNumber);
+        // }
+        
+        List<YALType?> formalInputParams = new();
+        
+        foreach (var inputParameter in function.InputParameters)
         {
-            _errorHandler.AddError(
-                new InvalidFunctionCallInputParameters(
-                    function.InputParameters.Count, node.InputParameters.Count),
-                node.LineNumber);
+            formalInputParams.Add(inputParameter.Type);
         }
         
-        List<YALType?> actualParams = new();
-        List<string> actualParamTypes = new();
         bool hasError = false;
-        for (int i = 0; i < function.InputParameters.Count; i++)
+        
+        List<YALType?> actualParams = new();
+        
+        foreach (var inputParameter in node.InputParameters)
         {
-            var actualParam = Visit(node.InputParameters[i]) as YALType;
-            actualParams.Add(actualParam);
-            actualParamTypes.Add((node.InputParameters[i].IsRef ? "ref " : "") + (actualParam?.ToString() ?? "null"));
-            if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, actualParam) ||
-                function.InputParameters[i].IsRef != node.InputParameters[i].IsRef)
-            {
-                hasError = true;
-            }
+            actualParams.Add(Visit(inputParameter) as YALType);
         }
+
+        YALType finalFormalInputParam = new YALType(formalInputParams.ToArray());
+        YALType finalActualInputParam = new YALType(actualParams.ToArray());
+
+        if (!Types.CheckTypesAreAssignable(finalFormalInputParam, finalActualInputParam))
+            //|| function.InputParameters[i].IsRef != node.InputParameters[i].IsRef)
+        {
+            //missing to check refs
+            hasError = true;
+        }
+        
+        // List<string> actualParamTypes = new();
+        // bool hasError = false;
+        // for (int i = 0; i < function.InputParameters.Count; i++)
+        // {
+        //     var actualParam = Visit(node.InputParameters[i]) as YALType;
+        //     actualParams.Add(actualParam);
+        //     actualParamTypes.Add((node.InputParameters[i].IsRef ? "ref " : "") + (actualParam?.ToString() ?? "null"));
+        //     if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, actualParam) ||
+        //         function.InputParameters[i].IsRef != node.InputParameters[i].IsRef)
+        //     {
+        //         hasError = true;
+        //     }
+        // }
 
         if (hasError)
         {
             _errorHandler.AddError(
                 new InvalidFunctionCallInputParameters(
-                    function.InputParameters,
-                    actualParamTypes),
+                    finalFormalInputParam,
+                    finalActualInputParam),
                 node.LineNumber);    
         }
 

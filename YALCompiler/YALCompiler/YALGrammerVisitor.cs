@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+using System.Collections;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -105,7 +105,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var func = new ExternalFunction
         {
-            LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/")),
+            LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").SkipLast(1).ToArray()),
             FunctionName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").Last(),
             Id = context.ID().GetText(),
             
@@ -309,23 +309,18 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             
             if (stmt is ASTNode node)
                 statementBlock.Statements.Add(node);
-            
+
             switch (stmt)
             {
-                case VariableDeclaration varDecl:
-                    statementBlock.LocalVariables.Add(varDecl.Variable);
-                    break;
                 case List<VariableDeclaration> list:
                     statementBlock.LocalVariables.AddRange(list.Select(v => v.Variable));
+                    statementBlock.Statements.AddRange(list);
                     break;
                 case BinaryAssignment binaryAssignment:
                     foreach (var target in binaryAssignment.Targets)
                     {
                         switch (target)
                         {
-                            case Symbol symbol:
-                                statementBlock.LocalVariables.Add(symbol);
-                                break;
                             case VariableDeclaration variableDeclarationDecl:
                                 statementBlock.LocalVariables.Add(variableDeclarationDecl.Variable);
                                 break;
@@ -357,9 +352,9 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitSingleStatement(YALGrammerParser.SingleStatementContext context)
     {
-        ASTNode node = null;
+        ASTNode? node = null;
         if (context.variableDeclaration() != null)
-            node = Visit(context.variableDeclaration()) as ASTNode;
+            return Visit(context.variableDeclaration()) as List<VariableDeclaration>;
         
         if (context.assignment() != null)
             node = Visit(context.assignment()) as ASTNode;
@@ -559,8 +554,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return forStatement;
     }
 
-
-
     #region PredicateVisitors
 
     public override object VisitNot(YALGrammerParser.NotContext context)
@@ -648,7 +641,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitReferenceExpression(YALGrammerParser.ReferenceExpressionContext context)
     {
         var expression = Visit(context.expression()) as Expression;
-        if (expression is not null) expression.IsRef = true;
+        if (expression is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression().GetText()), context);
+        }
+        else
+        {
+            expression.IsRef = true;
+        }
         return expression;
     }
 
@@ -674,7 +674,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitStringLiteral(YALGrammerParser.StringLiteralContext context)
     {
-        return new StringLiteral(context.STRING().GetText()) { LineNumber = context.Start.Line};
+        return new StringLiteral(context.STRING().GetText().Substring(1, context.STRING().GetText().Length - 2)) { LineNumber = context.Start.Line};
     }
 
     public override object VisitParenthesizedExpression(YALGrammerParser.ParenthesizedExpressionContext context)
@@ -684,10 +684,23 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitMultiplicationDivisionModulo(YALGrammerParser.MultiplicationDivisionModuloContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context);
+            return null;
+        }
+        var right = Visit(context.expression(1)) as Expression;
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context);
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         switch (context.@operator.Type)
         {
@@ -704,13 +717,26 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
-    
+
     public override object VisitAdditionSubtraction(YALGrammerParser.AdditionSubtractionContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context);
+            return null;
+        }
+        var right = Visit(context.expression(1)) as Expression;
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context);
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         switch (context.@operator.Type)
         {
@@ -728,10 +754,23 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitLeftRightShift(YALGrammerParser.LeftRightShiftContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context);
+            return null;
+        }
+        var right = Visit(context.expression(1)) as Expression;
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context);
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         switch (context.@operator.Type)
         {
@@ -748,50 +787,97 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitBitwiseAnd(YALGrammerParser.BitwiseAndContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        var right = Visit(context.expression(1)) as Expression;
+
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context.expression(0));
+            return null;
+        }
+
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context.expression(1));
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
             Operator = Operators.ExpressionOperator.BitwiseAnd,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
-    
+
     public override object VisitBitwiseOr(YALGrammerParser.BitwiseOrContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        var right = Visit(context.expression(1)) as Expression;
+
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context.expression(0));
+            return null;
+        }
+
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context.expression(1));
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
             Operator = Operators.ExpressionOperator.BitwiseOr,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
-    
+
     public override object VisitBitwiseXor(YALGrammerParser.BitwiseXorContext context)
     {
+        var left = Visit(context.expression(0)) as Expression;
+        var right = Visit(context.expression(1)) as Expression;
+
+        if (left is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(0).GetText()), context.expression(0));
+            return null;
+        }
+
+        if (right is null)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(context.expression(1).GetText()), context.expression(1));
+            return null;
+        }
+
         var compoundExpression = new CompoundExpression
         {
             Operator = Operators.ExpressionOperator.BitwiseXor,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression
+            Left = left,
+            Right = right
         };
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
+
     
     public override object VisitBitwiseNot(YALGrammerParser.BitwiseNotContext context)
     {
-        var compoundExpression = new CompoundExpression
+        var expression = Visit(context.expression()) as Expression;
+        if (expression is null)
         {
-            Operator = Operators.ExpressionOperator.BitwiseNot,
-            Left = Visit(context.expression(0)) as Expression,
-            Right = Visit(context.expression(1)) as Expression,
-        };
-        compoundExpression.LineNumber = context.Start.Line;
-        return compoundExpression;
+            _errorHandler.AddError(new InvalidExpressionException(context.GetText()), context);
+            return null;
+        }
+        expression.BitwiseNegated = true;
+        expression.LineNumber = context.Start.Line;
+        return expression;
     }
 
     public override object VisitPostIncrementDecrement(YALGrammerParser.PostIncrementDecrementContext context)
@@ -840,12 +926,23 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitFunctionCall(YALGrammerParser.FunctionCallContext context)
     {
         var functionCall = new FunctionCall(context.ID().GetText(), context.AWAIT() != null);
-        functionCall.InputParameters = Visit(context.expression()) as List<Expression>;
-        foreach (var inputParameter in functionCall.InputParameters)
+        if (context.expression() != null)
         {
-            inputParameter.Parent = functionCall;
+            var expression = Visit(context.expression());
+            switch (expression)
+            {
+                case Expression exp:
+                    functionCall.InputParameters.Add(exp);
+                    break;
+                case IList list:
+                    functionCall.InputParameters.AddRange(list.Cast<Expression>());
+                    break;
+            }
+            foreach (var inputParameter in functionCall.InputParameters)
+            {
+                inputParameter.Parent = functionCall;
+            }    
         }
-
         functionCall.LineNumber = context.Start.Line;
         return functionCall;
     }
@@ -1009,7 +1106,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
         }
         
-        var values = Visit(context.expression()) as List<Expression>;
+        List<Expression> values = new();
+        var expressions = Visit(context.expression());
+        switch (expressions)
+        {
+            case Expression expression:
+                values.Add(expression);
+                break;
+            case List<Expression> list:
+                values.AddRange(list);
+                break;
+        }
         if (values is not null)
         {
             foreach (var value in values)

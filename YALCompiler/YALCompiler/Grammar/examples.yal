@@ -1,7 +1,14 @@
 main: {
-    int32 i;
-    float32 f = 0.5;
-    i = f;
+    int8 i = 5;
+    int8 e = 5;
+    string a, float32 b = func2(i);
+    func3(ref func2(i));
 }
 
-func2: {}
+func2: in(int16 a) out(string s, float32 f) {
+    s = "hello";
+    f = a;
+}
+
+func3: in(ref string aa, float32 bb) {
+}

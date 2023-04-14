@@ -2,7 +2,7 @@
 
 namespace YALCompiler.Helpers;
 
-public class Symbol : ISymbol, IAssignable
+public class Symbol : ISymbol
 {
     public string Id { get; set; }
     public object? Value { get; set; }
