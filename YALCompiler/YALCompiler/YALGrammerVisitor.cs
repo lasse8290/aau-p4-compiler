@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq.Expressions;
 using YALCompiler.DataTypes;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.Exceptions;
@@ -637,22 +638,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     #endregion
     
     #region ExpressionVisitors
-
-    public override object VisitReferenceExpression(YALGrammerParser.ReferenceExpressionContext context)
-    {
-        var expression = Visit(context.expression()) as Expression;
-        if (expression is null)
-        {
-            _errorHandler.AddError(new InvalidExpressionException(context.expression().GetText()), context);
-        }
-        else
-        {
-            expression.IsRef = true;
-        }
-        return expression;
-    }
-
-    
+   
     public override object VisitVariable(YALGrammerParser.VariableContext context)
     {
         return Visit(context.identifier());
@@ -1076,8 +1062,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 case Expression eExpr:
                     expressionList.Add(eExpr);
                     break;
-                case List<Expression> eList:
-                    expressionList.AddRange(eList);
+                case IList iList:
+                    expressionList.AddRange(iList.Cast<Expression>());
                     break;
                 default:
                     continue;
@@ -1133,6 +1119,18 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitSimpleIdentifier(YALGrammerParser.SimpleIdentifierContext context)
     {
         return new Identifier(context.ID().GetText()) {LineNumber = context.Start.Line};
+    }
+    
+    public override object VisitReferenceIdentifier(YALGrammerParser.ReferenceIdentifierContext context)
+    {
+        var identifier = Visit(context.identifier());
+        if (identifier is Identifier id)
+        {
+            id.LineNumber = context.Start.Line;
+            id.IsRef = true;
+        }
+
+        return identifier;
     }
     
     public override object VisitParenthesizedIdentifier(YALGrammerParser.ParenthesizedIdentifierContext context)

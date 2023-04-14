@@ -429,18 +429,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitBitwiseAnd([NotNull] YALGrammerParser.BitwiseAndContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>ReferenceExpression</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterReferenceExpression([NotNull] YALGrammerParser.ReferenceExpressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>ReferenceExpression</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitReferenceExpression([NotNull] YALGrammerParser.ReferenceExpressionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>PostIncrementDecrement</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -560,6 +548,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitForStatement([NotNull] YALGrammerParser.ForStatementContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>ReferenceIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>ReferenceIdentifier</c>
+	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ParenthesizedIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.

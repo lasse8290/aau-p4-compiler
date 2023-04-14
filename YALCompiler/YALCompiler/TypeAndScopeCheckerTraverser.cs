@@ -151,15 +151,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             _errorHandler.AddError(new IdentifierNotFoundException(node.Identifier), node.LineNumber);
             return null;
         }
-        
-        //check input params are correct too
-        // if (function.InputParameters.Count != node.InputParameters.Count)
-        // {
-        //     _errorHandler.AddError(
-        //         new InvalidFunctionCallInputParameters(
-        //             function.InputParameters.Count, node.InputParameters.Count),
-        //         node.LineNumber);
-        // }
+
+        bool hasError = false;
         
         List<YALType?> formalInputParams = new();
         
@@ -167,8 +160,6 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         {
             formalInputParams.Add(inputParameter.Type);
         }
-        
-        bool hasError = false;
         
         List<YALType?> actualParams = new();
         
@@ -181,32 +172,31 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         YALType finalActualInputParam = new YALType(actualParams.ToArray());
 
         if (!Types.CheckTypesAreAssignable(finalFormalInputParam, finalActualInputParam))
-            //|| function.InputParameters[i].IsRef != node.InputParameters[i].IsRef)
         {
-            //missing to check refs
             hasError = true;
         }
         
-        // List<string> actualParamTypes = new();
-        // bool hasError = false;
-        // for (int i = 0; i < function.InputParameters.Count; i++)
-        // {
-        //     var actualParam = Visit(node.InputParameters[i]) as YALType;
-        //     actualParams.Add(actualParam);
-        //     actualParamTypes.Add((node.InputParameters[i].IsRef ? "ref " : "") + (actualParam?.ToString() ?? "null"));
-        //     if (!Types.CheckTypesAreAssignable(function.InputParameters[i].Type, actualParam) ||
-        //         function.InputParameters[i].IsRef != node.InputParameters[i].IsRef)
-        //     {
-        //         hasError = true;
-        //     }
-        // }
+        int relativeIndex = 0;
+        List<string> formattedInputParams = new();
+
+        for (int i = 0; i < node.InputParameters.Count; i++)
+        {
+            if (node.InputParameters[i] is Identifier id &&
+                function.InputParameters[relativeIndex].IsRef != id.IsRef)
+            {
+                hasError = true;
+            }
+            relativeIndex += actualParams[i].Types.Count;
+            formattedInputParams.Add((node.InputParameters[i] is Identifier {IsRef:true} ? "ref " : "") + actualParams[i]);
+        }
+        
 
         if (hasError)
         {
             _errorHandler.AddError(
                 new InvalidFunctionCallInputParameters(
-                    finalFormalInputParam,
-                    finalActualInputParam),
+                    function.InputParameters,
+                    formattedInputParams),
                 node.LineNumber);    
         }
 
@@ -300,7 +290,9 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     {
         if (CompilerUtilities.FindSymbol(node.Name, node) is Symbol symbol)
         {
-            if (!symbol.Initialized && !(node.Parent is BinaryAssignment binaryAssignment && binaryAssignment.Targets.Contains(node)))
+            if (!symbol.Initialized && 
+                !(node.Parent is BinaryAssignment binaryAssignment && binaryAssignment.Targets.Contains(node)) && 
+                !node.IsRef)
                 _errorHandler.AddError(new UninitializedVariableException(node.Name), node.LineNumber);
                 
             return symbol.Type;
@@ -324,20 +316,17 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         {
             _errorHandler.AddError(new TypeMismatchException(leftType.ToString(), rightType.ToString()), node.LineNumber);
         }
-        
-        YALType leftYALType = (YALType)leftType;
-        YALType rightYALType = (YALType)rightType;
 
-        if (!Operators.CheckOperationIsValid(leftYALType, node.Operator))
+        if (!Operators.CheckOperationIsValid(leftType, node.Operator))
         {
-            _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftYALType), node.LineNumber);
-        } else if (!Operators.CheckOperationIsValid(rightYALType, node.Operator))
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftType), node.LineNumber);
+        } else if (!Operators.CheckOperationIsValid(rightType, node.Operator))
         {
-            _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightYALType), node.LineNumber);
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, rightType), node.LineNumber);
         }
         else
         {
-            node.Type = Types.GetLeastAssignableType(leftYALType, rightYALType);
+            node.Type = Types.GetLeastAssignableType(leftType, rightType);
         }
         
         return node.Type;

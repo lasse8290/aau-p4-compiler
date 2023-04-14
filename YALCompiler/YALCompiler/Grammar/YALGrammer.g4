@@ -54,7 +54,7 @@ expression: '!' expression                                      # Not
             | expression operator=('<' | '<=' | '>' | '>=' | '==' | '!=') expression  # Comparison
             | expression '&&' expression                        # And
             | expression '||' expression                        # Or
-            | REF expression                                    # ReferenceExpression
+            //| REF expression                                    # ReferenceExpression
             | simpleAssignment                                  # VariableAssignment
             | identifier                                        # Variable  
             | functionCall                                      # FunctionCallExpression
@@ -79,6 +79,7 @@ forStatement:       'for' '(' declarationAssignment ';' expression ';' assignmen
 
 identifier:  ID '[' expression ']'  # ArrayElementIdentifier
             | ID                    # SimpleIdentifier
+            | REF identifier        # ReferenceIdentifier
             | identifier (',' identifier)+  # IdentifierList
             | '(' identifier ')'    # ParenthesizedIdentifier
             ;
