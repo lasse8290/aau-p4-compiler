@@ -1,4 +1,4 @@
-﻿namespace YALCompiler.DataTypes;
+namespace YALCompiler.DataTypes;
 
 public class ExternalFunction: Function
 {

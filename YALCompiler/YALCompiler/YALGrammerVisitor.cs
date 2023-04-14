@@ -104,12 +104,11 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitExternalFunctionDeclaration(YALGrammerParser.ExternalFunctionDeclarationContext context)
     {
-        var func = new ExternalFunction
+var func = new ExternalFunction
         {
             LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").SkipLast(1).ToArray()),
             FunctionName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").Last(),
             Id = context.ID().GetText(),
-            
         };
 
         //handle input params
@@ -395,7 +394,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                ifPath.SymbolTable.Add(symbol);
+                ifPath.SymbolTable.Add(symbol.Id, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -429,7 +428,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 {
                     try
                     {
-                        elseIfPath.SymbolTable.Add(symbol);
+                        elseIfPath.SymbolTable.Add(symbol.Id, symbol);
                     }
                     catch (VariableAlreadyExistsException e)
                     {
@@ -456,7 +455,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
-                    elsePath.SymbolTable.Add(symbol);
+                    elsePath.SymbolTable.Add(symbol.Id, symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
@@ -494,7 +493,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                whileStatement.SymbolTable.Add(symbol);
+                whileStatement.SymbolTable.Add(symbol.Id, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -544,7 +543,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                forStatement.SymbolTable.Add(symbol);
+                forStatement.SymbolTable.Add(symbol.Id, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {

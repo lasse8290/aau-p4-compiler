@@ -1,5 +1,0 @@
-PT_THREAD(%functionName%(struct pt *pt)) {
-  PT_BEGIN(pt);
-  %%body%%
-  PT_END(pt);
-}

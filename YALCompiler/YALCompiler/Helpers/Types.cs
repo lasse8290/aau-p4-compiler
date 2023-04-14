@@ -48,7 +48,7 @@ public static class Types
     
     public static Dictionary<ValueType, string> TypesInCPP = new()
     {
-        { ValueType.@string, "string" },
+        { ValueType.@string, "String" },
         { ValueType.@bool, "bool" },
         { ValueType.float64, "double" },
         { ValueType.float32, "float" },

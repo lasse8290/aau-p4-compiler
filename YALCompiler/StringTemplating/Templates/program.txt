@@ -1,8 +1,7 @@
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
-#include <Arduino.h>
-
+%%includes%%
 
 typedef void (*Func)(void*);
 
@@ -14,7 +13,7 @@ struct COMPILER_PARAMETERS {
 };
 
 template <typename I>
-void* COMPILER_AWAIT(I inputParameters, Func func) {
+void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
     TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
 
     COMPILER_PARAMETERS<void, void> parameters;
@@ -24,13 +23,21 @@ void* COMPILER_AWAIT(I inputParameters, Func func) {
     void* outputParameters;
     parameters.output = &outputParameters;
 
-    xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
-    xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+    if (isAsync) {
+      xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
+      if (isAwait) {
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+      }
+    } else {
+      func(&parameters);
+    }
 
     return parameters.output;
 }
 
-
+void loop() {
+  delay(10);
+}
 
 %%declarations%%
 

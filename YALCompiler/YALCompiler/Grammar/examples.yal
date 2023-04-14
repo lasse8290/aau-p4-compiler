@@ -1,22 +1,38 @@
-main: {
-    int8 i = 5;
-    int8 e = 5;
-    string a, float32 b = func2(i);
-    int32 ax = 5;
-    f(ref ax, f2(), ref b, ax);
+external  <"stdio.h/Serial.begin"> serial: in(int32 i);
+external  <"stdio.h/Serial.println"> print: in(string s);
+
+external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
+external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
+external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
+external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
+
+int32 INPUT = 1;
+int32 OUTPUT = 3;
+int32 LED_BUILTIN = 2;
+
+async blink: {
+	while (true) {
+		digitalWrite(LED_BUILTIN, 1);
+		delay(1000);
+		digitalWrite(LED_BUILTIN, 0);
+		delay(1000);
+	}
 }
 
-f2: out(string a, string s) {
-    a = "hello";
-    s = "world";
+async blinkRedLED: {
+	while (true) {
+		digitalWrite(4, 1);
+		delay(2000);
+		digitalWrite(4, 0);
+		delay(2000);
+	}
 }
+ 
+async main: {
+	serial(115200);
+	pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(4, OUTPUT);
 
-f: in (ref int32 a, string s, string ss, ref float32 b, int32 c) {}
-
-func2: in(int16 a) out(string s, float32 f) {
-    s = "hello";
-    f = a;
-}
-
-func3: in(ref string aa, float32 bb) {
-}
+	blink();
+	blinkRedLED();
+} 

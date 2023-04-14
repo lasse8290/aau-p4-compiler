@@ -457,10 +457,12 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             tempNode = tempNode.Parent;
             if (tempNode is Function functionNode)
                 parentFunction = functionNode;
+                
         }
 
         if (parentFunction is not null)
         {
+            node.function = parentFunction;
             foreach (Symbol outParam in parentFunction.OutputParameters)
             {
                 if (!outParam.Initialized)

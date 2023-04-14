@@ -11,7 +11,6 @@ public static class Program
     {
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         Console.WriteLine(path);
-
         try
         {
 
@@ -64,7 +63,6 @@ public static class Program
             // string filePath = Path.Combine($"{path}", "GenCode.txt");
             //
             // File.WriteAllText(filePath, generatedCode);
-
 
             Console.WriteLine("Done");
 

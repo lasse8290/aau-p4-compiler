@@ -1,1 +1,2 @@
-%%return_statement%%
+%%output_parameters%%
+return
