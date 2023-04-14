@@ -70,8 +70,9 @@ public class CodeGenTraverser : ASTTraverser
     {
         StringBuilder sb = new();
 
-        foreach (ASTNode node in ifStatementNode.Children)
+        foreach (ASTNode node in ifStatementNode.Children) {
             sb.Append((string)InvokeVisitor(node));
+        }
 
         return sb.ToString();
     }
@@ -83,7 +84,8 @@ public class CodeGenTraverser : ASTTraverser
 
         // Visit the children of the if statement
         var childrenBuilder = new StringBuilder();
-        foreach (var child in ifNode.Children) childrenBuilder.AppendLine((string)InvokeVisitor(child));
+        foreach (var child in ifNode.Children)
+            childrenBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
         // Generate the if statement code using a template
         var template = new Template("if");
@@ -229,10 +231,7 @@ public class CodeGenTraverser : ASTTraverser
     {
         var stringBuilder = new StringBuilder();
         foreach (var child in whileLoop.Children)
-        {
-            stringBuilder.Append((string)InvokeVisitor(child));
-            stringBuilder.AppendLine(";");
-        }
+            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
         var template = new Template("while");
         template.SetKeys(new List<Tuple<string, string>>
@@ -256,11 +255,7 @@ public class CodeGenTraverser : ASTTraverser
         var loopAssignment = (string)InvokeVisitor(forStatement.LoopAssignment);
         var stringBuilder = new StringBuilder();
         foreach (var child in forStatement.Children)
-        {
-            stringBuilder.Append((string)InvokeVisitor(child));
-            stringBuilder.AppendLine(";");
-        }
-
+            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
         var template = new Template("for_statement");
         template.SetKeys(new List<Tuple<string, string>>
