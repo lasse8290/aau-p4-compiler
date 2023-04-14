@@ -407,6 +407,7 @@ public class CodeGenTraverser : ASTTraverser
             template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", functionCall.Function.Id),
+                new("is_async", functionCall.Function.IsAsync ? "1" : "0"),
                 new("is_await", functionCall.Await ? "1" : "0"),
                 new("arguments", argumentsBuilder.ToString()),
                 new("suffix", suffix),
