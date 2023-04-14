@@ -185,9 +185,14 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 function.InputParameters[relativeIndex].IsRef != id.IsRef)
             {
                 hasError = true;
+                _errorHandler.AddError(new TypeMismatchException((id.IsRef ? "ref " : "") + actualParams[i],
+                                                                 (function.InputParameters[relativeIndex].IsRef ? "ref " : "") + 
+                                                                 string.Join(", ", formalInputParams[relativeIndex].Types.Select(t => t.Type))),
+                                       node.LineNumber);
             }
             relativeIndex += actualParams[i].Types.Count;
-            formattedInputParams.Add((node.InputParameters[i] is Identifier {IsRef:true} ? "ref " : "") + actualParams[i]);
+            formattedInputParams.Add((node.InputParameters[i] is Identifier {IsRef:true} ? "ref " : "") + 
+                                     string.Join(", ", actualParams[i].Types.Select(t => t.Type)));
         }
         
 
