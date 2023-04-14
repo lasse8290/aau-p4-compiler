@@ -34,6 +34,11 @@ public abstract class ASTNode
             throw new VariableAlreadyExistsException(function.Id);
         }
     }
-    
+
+    public void ShouldBeEquivalentTo(Expression expected, Func<object, object> value)
+    {
+        throw new NotImplementedException();
+    }
+
     public override string ToString() => GetType().Name;
 }

@@ -670,7 +670,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitStringLiteral(YALGrammerParser.StringLiteralContext context)
     {
-        return new StringLiteral(context.STRING().GetText()) { LineNumber = context.Start.Line};
+        return new StringLiteral(context.STRING().GetText().Substring(1, context.STRING().GetText().Length - 2)) { LineNumber = context.Start.Line};
     }
 
     public override object VisitParenthesizedExpression(YALGrammerParser.ParenthesizedExpressionContext context)

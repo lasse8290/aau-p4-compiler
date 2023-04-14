@@ -7,5 +7,5 @@ async test: {
 }*/
 
 test: {
-	float32 k = 0.4;
+	int32[] list = { 5+2, 3+2 };
 }

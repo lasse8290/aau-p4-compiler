@@ -4,6 +4,8 @@ using YALCompiler;
 using YALCompiler.DataTypes;
 using YALCompiler.Helpers;
 using YALCompiler.ErrorHandlers;
+using System.Reflection;
+using FluentAssertions;
 
 namespace Testing;
 
@@ -178,48 +180,135 @@ public class ASTUnitTests
         Assert.IsType(typeof(ForStatement), for_stmt);
     }
 
-    [Theory]
-    [InlineData("i++", typeof(UnaryAssignment))]
-    [InlineData("++i", typeof(UnaryAssignment))]
-    [InlineData("5 * 10", typeof(CompoundExpression))]
-    [InlineData("5 + 10", typeof(CompoundExpression))]
-    [InlineData("5 << 10", typeof(CompoundExpression))]
-    [InlineData("5 >> 10", typeof(CompoundExpression))]
-    [InlineData("5 & 10", typeof(CompoundExpression))]
-    [InlineData("5 ^ 10", typeof(CompoundExpression))]
-    [InlineData("5 | 10", typeof(CompoundExpression))]
-    [InlineData("5 ~ 10", typeof(CompoundExpression))]
-    [InlineData(@"hi = ""whaaat""", typeof(BinaryAssignment))]
-    [InlineData("myCall(param1, param2)", typeof(FunctionCall))]
-    [InlineData("{ 5+2, 3+2 }", typeof(ArrayLiteral))]
-    public void Expression_Type(string input, Type expected)
-    {
-        var expr = Setup(input, nameof(YALGrammerParser.expression));
-
-        Assert.IsType(expected, expr);
-    }
-
-    public static TheoryData<string, object> Expressions =>
+    public static TheoryData<string, Expression> Expressions =>
         new() {
-            /*{ "0.4", new SignedFloat(0.4) },
-            { "-0.4", new SignedFloat(-0.4) },
-            { "5", new SignedNumber(5, isNegative: false) },
-            { "-5", new SignedNumber(5, isNegative: true) },
-            { "5+2", new CompoundExpression {
-                Left = new SignedNumber(5, isNegative: false),
-                Right = new SignedNumber(2, isNegative: false),
-                Operator = Operators.ExpressionOperator.Addition,
-            }},
+            #region PostIncrementDecrement
             { "i++", new UnaryAssignment() {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostIncrement
-            } },*/
+            } },
+            { "i--", new UnaryAssignment() {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostDecrement
+            } },
+            #endregion
+            #region PrefixUnary
+            { "++i", new UnaryAssignment() {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreIncrement
+            } },
+            { "--i", new UnaryAssignment() {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreDecrement
+            } },
+            #endregion
+            #region MultiplicationDivisionModulo
+            { "5 * 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.Multiplication
+            } },
+            { "5 / 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.Division
+            } },
+            { "5 % 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.Modulo
+            } },
+            { "5 % 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.Modulo
+            } },
+            #endregion
+            #region AdditionSubtraction
+            { "5 + 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.Addition
+            } },
+            { "5 - 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.Subtraction
+            } },
+            #endregion
+            #region LeftRightShift
+            { "5 << 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.LeftShift
+            } },
+            { "5 >> 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.RightShift
+            } },
+            #endregion
+            #region Bitwise
+            { "5 & 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.BitwiseAnd
+            } },
+            { "5 ^ 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.BitwiseXor
+            } },
+            { "5 | 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.BitwiseOr
+            } },
+            { "5 ~ 2", new CompoundExpression() {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.BitwiseNot
+            } },
+            #endregion
+            #region VariableAssignment
+            { @"hi = ""whaaat""", new BinaryAssignment {
+                Target = new Identifier("hi"),
+                Operator = Operators.AssignmentOperator.Equals,
+                Value = new StringLiteral("whaaat")
+            }},
+            #endregion
+            #region Variable
+            { @"my_custom_variable", new Identifier("my_custom_variable") },
+            #endregion
+            #region FunctionCallExpression
+            { "myCall(param1, param2)", new FunctionCall("myCall", await: false) {
+                InputParameters = new List<Expression> {
+                    new Identifier("param1"),
+                    new Identifier("param2")
+                }
+            }},
+            #endregion
+            #region FloatLiteral
+            { "0.4", new SignedFloat(0.4) },
+            { "-0.4", new SignedFloat(-0.4) },
+            #endregion
+            #region NumberLiteral
+            { "5", new SignedNumber(5, isNegative: false) },
+            { "-5", new SignedNumber(5, isNegative: true) },
+            #endregion
+            #region StringLiteral
+            { @"""my_string""", new StringLiteral("my_string") },
+            #endregion
+            #region ParenthesizedExpression
+            { "(5)", new SignedNumber(5, isNegative: false) },
+            #endregion
+            #region ArrayLiteral
             { "{ 5+2, 3+2 }", new ArrayLiteral {
                 Values = {
                     new CompoundExpression {
-                    Left = new SignedNumber(5, isNegative: false),
-                    Right = new SignedNumber(2, isNegative: false),
-                    Operator = Operators.ExpressionOperator.Addition,
+                        Left = new SignedNumber(5, isNegative: false),
+                        Right = new SignedNumber(2, isNegative: false),
+                        Operator = Operators.ExpressionOperator.Addition,
                     },
                     new CompoundExpression {
                         Left = new SignedNumber(3, isNegative: false),
@@ -227,7 +316,8 @@ public class ASTUnitTests
                         Operator = Operators.ExpressionOperator.Addition,
                     }
                 }
-            }}
+            }},
+            #endregion
         };
 
     [Theory]
@@ -236,7 +326,6 @@ public class ASTUnitTests
     {
         var expr = Setup(input, nameof(YALGrammerParser.expression), removeLineNumbers: true);
 
-        Assert.IsType(expected.GetType(), expr);
-        Assert.Equivalent(expected, expr);
+        CAssert.Equivalent_Wrapper(expected, expr, options => options.Exclude(k => k.LineNumber));
     }
 }
