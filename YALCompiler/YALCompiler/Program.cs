@@ -64,7 +64,6 @@ public static class Program
 
             File.WriteAllText(filePath, generatedCode);
 
-
             Console.WriteLine("Done");
 
         }

@@ -205,7 +205,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
     internal override object? Visit(SignedNumber node)
     {
-        SingleType? type = node.Negative switch
+        YALType? type = node.Negative switch
         {
             true => node.Value switch
             {
@@ -217,10 +217,10 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             },
             _ => node.Value switch
             {
-                <= byte.MaxValue => new SingleType(Types.ValueType.uint8),
-                <= ushort.MaxValue => new SingleType(Types.ValueType.uint16),
-                <= uint.MaxValue => new SingleType(Types.ValueType.uint32),
-                <= ulong.MaxValue => new SingleType(Types.ValueType.uint64),
+                <= byte.MaxValue => node.Value <= (ulong)sbyte.MaxValue ? new SingleType(Types.ValueType.int8) : new SingleType(Types.ValueType.uint8),
+                <= ushort.MaxValue => node.Value <= (ulong)short.MaxValue ? new SingleType(Types.ValueType.int16) : new SingleType(Types.ValueType.uint16),
+                <= uint.MaxValue => node.Value <= int.MaxValue ? new SingleType(Types.ValueType.int32) : new SingleType(Types.ValueType.uint32),
+                <= ulong.MaxValue => node.Value <= long.MaxValue ? new SingleType(Types.ValueType.int64) : new SingleType(Types.ValueType.uint64),
             }
         };
         

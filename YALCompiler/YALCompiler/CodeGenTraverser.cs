@@ -11,6 +11,10 @@ public class CodeGenTraverser : ASTTraverser
 {
     private readonly Template _template = new("program");
     private readonly StringBuilder _declarationsBuilder = new();
+    private readonly StringBuilder _includeBuilder = new();
+
+    private readonly Dictionary<string, string> _externalNicknames = new();
+    private readonly List<string> _externalLibraries = new();
 
     public CodeGenTraverser(ASTNode node) : base(node)
     {
@@ -19,12 +23,20 @@ public class CodeGenTraverser : ASTTraverser
     public override void BeginTraverse()
     {
         var stringBuilder = new StringBuilder();
-        foreach (var child in _startNode.Children)
+
+        foreach(var child in _startNode.FunctionTable){
+            if(child.Value is ExternalFunction){
+                var x = (string)InvokeVisitor(child.Value);
+            }
+        }
+        foreach (var child in _startNode.Children){
             stringBuilder.AppendLine((string)InvokeVisitor(child));
+        }
 
         _template.SetKeys(new List<Tuple<string, string>>
         {
             new("declarations", _declarationsBuilder.ToString()),
+            new("includes", _includeBuilder.ToString()),
             new("program", stringBuilder.ToString())
         });
     }
@@ -45,6 +57,15 @@ public class CodeGenTraverser : ASTTraverser
         return (boolean.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
+    internal override object? Visit(ExternalFunction externalFunction){
+        if (!_externalLibraries.Contains(externalFunction.LibraryName)) {
+            _externalLibraries.Add(externalFunction.LibraryName);
+            _includeBuilder.AppendLine($"#include <{externalFunction.LibraryName}>");
+        }
+        _externalNicknames[externalFunction.Id] = externalFunction.FunctionName;
+        return "";
+    }
+    
     internal override object? Visit(IfStatement ifStatementNode)
     {
         StringBuilder sb = new();
@@ -150,7 +171,7 @@ public class CodeGenTraverser : ASTTraverser
 
         var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
-            bodyBuilder.Append($"{InvokeVisitor(child) ?? ""};");
+            bodyBuilder.AppendLine($"{InvokeVisitor(child) ?? ""};");
 
         Template template = new Template("function");
         template.SetKeys(new List<Tuple<string, string>>
@@ -364,20 +385,33 @@ public class CodeGenTraverser : ASTTraverser
     internal override object? Visit(FunctionCall functionCall)
     {
         StringBuilder argumentsBuilder = new StringBuilder();
-        foreach (var expression in functionCall.InputParameters)
-            argumentsBuilder.Append($"{(string)InvokeVisitor(expression)},");
+        for (int i = 0; i < functionCall.InputParameters.Count; i++)
+        {
+            Expression? expression = functionCall.InputParameters[i];
+            string potentialComma = (i == functionCall.InputParameters.Count - 1) ? "" : ",";
+            argumentsBuilder.Append($"{(string)InvokeVisitor(expression)}{potentialComma}");
+        }
 
         // Suffix hotfix
         string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Id}" : "";
-
+    
         Template template = new Template("function_call");
-        template.SetKeys(new List<Tuple<string, string>>
+        if (functionCall.Function is ExternalFunction) {
+            template = new Template("function_call_external");
+            template.SetKeys(new List<Tuple<string, string>>
+            {
+                new("function", _externalNicknames[functionCall.Function.Id]),
+                new("arguments", argumentsBuilder.ToString()),
+            });
+        } else {
+            template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", functionCall.Function.Id),
                 new("is_await", functionCall.Await ? "1" : "0"),
                 new("arguments", argumentsBuilder.ToString()),
                 new("suffix", suffix),
             });
+        }
 
         return template.ReplacePlaceholders(true);
     }

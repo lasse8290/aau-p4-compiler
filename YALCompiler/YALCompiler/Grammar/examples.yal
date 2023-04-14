@@ -1,7 +1,7 @@
-expensiveSquareArea: in(int32 width, int32 length) out(int32 area) {
-	area = width * length;
-}
+external  <"stdio.h/Serial.begin"> serialBegin: in(int32 d);
+external  <"stdio.h/Serial.println"> printf: in(int32 d, string format) out(int32 result);
 
 async main: {
-	int32 test = expensiveSquareArea(10, 10);
-}
+	serialBegin(115200);
+	int32 test = printf(1, "test");
+} 
