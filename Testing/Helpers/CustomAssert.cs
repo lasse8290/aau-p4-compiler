@@ -1,21 +1,8 @@
 using System.Collections;
-using System.Reflection;
 using YALCompiler.DataTypes;
 
-
-
-public class Options {
-    public ASTNode Exclude(Func<ASTNode, string> func) {
-        return new SignedFloat(5);
-    }
-}
-
-public class CAssert
+public class CustomAssert
 {
-    public static void Equivalent_Wrapper(object expected, object actual, Func<Options, ASTNode> options) {
-        Equivalent(expected, actual);
-    }
-
     public static void Equivalent(object expected, object actual)
     {
         // If both objects are null or the same instance, they are equal
@@ -48,14 +35,12 @@ public class CAssert
         else {
             CompareProperties(expected, actual);
         }
-
-        return;
     }
 
     private static void ComparePrimitiveOrStringOrEnum(object expected, object actual) {
         if (!expected.Equals(actual))
         {
-            throw new Exception($"Expected: {expected} but got: {actual}");
+            throw new Exception($"{expected} not equal to {actual}");
         }
     }
 
@@ -83,6 +68,7 @@ public class CAssert
 
         foreach (var property in properties)
         {
+            // Ignoring LineNumber and Parent
             if (property.Name == nameof(ASTNode.LineNumber) || property.Name == nameof(ASTNode.Parent)) continue;
 
             var expectedvalue = property.GetValue(expected);
