@@ -34,6 +34,9 @@
       <None Update="Templates\parameter_input_struct.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Templates\function_call_external.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="Templates\parameter_output_struct.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

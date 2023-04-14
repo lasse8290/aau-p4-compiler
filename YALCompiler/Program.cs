@@ -3,15 +3,14 @@ using StringTemplating;
 using Antlr4.Runtime;
 using YALCompiler.ErrorHandlers;
 using System.Reflection;
-using YALCompiler.DataTypes;
 
 namespace YALCompiler;
 public static class Program
 {
-
     public static void Main()
-    {               
+    {
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        Console.WriteLine(path);
         try
         {
 
@@ -39,11 +38,8 @@ public static class Program
             sw.Stop();
             Console.WriteLine("Built AST in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
-
-            Action<ASTNode, ASTNode> ParentsLinker = (parent, child) => child.Parent = parent;
-            LinkerASTTraverser linker = new(node, ParentsLinker);
+            LinkerASTTraverser linker = new(node);
             linker.BeginTraverse();
-
             sw.Stop();
             Console.WriteLine("Linked AST in " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
@@ -56,21 +52,17 @@ public static class Program
             if (errorHandler.Errors.Count > 0)
                 return;
             sw.Restart();
-
-            return;
-
-            CodeGenTraverser cgt = new(node);
-            cgt.BeginTraverse();
-            sw.Stop();
-            Console.WriteLine("Generated code in " + sw.ElapsedMilliseconds + "ms");
-            string generatedCode = cgt.GetGeneratedCode();
-
-            Console.WriteLine(generatedCode);
-
-            string filePath = Path.Combine($"{path}", "GenCode.txt");
-
-            File.WriteAllText(filePath, generatedCode);
-
+            // CodeGenTraverser cgt = new(node);
+            // cgt.BeginTraverse();
+            // sw.Stop();
+            // Console.WriteLine("Generated code in " + sw.ElapsedMilliseconds + "ms");
+            // string generatedCode = cgt.GetGeneratedCode();
+            //
+            // Console.WriteLine(generatedCode);
+            //
+            // string filePath = Path.Combine($"{path}", "GenCode.txt");
+            //
+            // File.WriteAllText(filePath, generatedCode);
 
             Console.WriteLine("Done");
 

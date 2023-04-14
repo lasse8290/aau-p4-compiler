@@ -1,15 +1,13 @@
 namespace YALCompiler.DataTypes;
 
-public class Identifier : Predicate
+public class Identifier : Expression
 {
-    public string Name { get; }
+    public string Name { get; set; }
+    public bool IsRef { get; set; } = false;
     public Identifier(string name)
     {
         Name = name;
     }
 
-    public override string ToString()
-    {
-        return Name;
-    }
+    public override string ToString() => Name;
 }

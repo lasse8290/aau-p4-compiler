@@ -8,7 +8,16 @@ obj/
 
 *.user
 
-bin/ 	# ignore bin directory 
-*.obj 	# ignore any files with .obj postfix 
+**/**/obj/*
 
 YALCompiler/YALParser/gen/
+
+YALCompiler/YALParser/obj/
+
+YALCompiler/YALCompiler/obj/
+
+YALCompiler/YALCompiler/bin/Debug/net7.0/
+
+YALCompiler/YALCompiler/bin/Debug/
+wokwi-hotreload/package-lock.json
+wokwi-hotreload/node_modules

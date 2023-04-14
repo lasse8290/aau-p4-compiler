@@ -1,3 +1,0 @@
-else if (%%predicate%%) {
-        %%body%%
-}
