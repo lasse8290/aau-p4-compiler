@@ -6,7 +6,6 @@ namespace Testing;
 
 public class ASTParsingUnitTests : TestingHelper
 {
-
     public static TheoryData<string, object> FunctionDeclaration =>
         new() {
             { "my_function: {};", new Function {
@@ -128,11 +127,12 @@ public class ASTParsingUnitTests : TestingHelper
 
     [Theory]
     [InlineData("for (int32 i = 5; i < 10; i++) {}")]
+    [InlineData("for (int32 i = 5; i < 10; i++) {}")]
     public void For_Loop(string input)
     {
         var actual = Setup(input, nameof(YALGrammerParser.forStatement));
 
-        actual.Should().BeOfType(typeof(ForStatement));
+        actual.Should().BeOfType<ForStatement>();
     }
 
     public static TheoryData<string, object> Expressions =>

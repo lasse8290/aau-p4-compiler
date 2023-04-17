@@ -6,6 +6,8 @@ obj/
 .vs/
 .antlr/
 
+.DS_Store
+
 *.user
 
 **/**/obj/*
