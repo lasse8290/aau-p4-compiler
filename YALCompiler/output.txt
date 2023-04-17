@@ -52,8 +52,7 @@ void k (void *pvParameters) {
     COMPILER_PARAMETERS_k *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_k*) pvParameters;
     
 
-    String k = hej;
-xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
+    xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
 vTaskDelete(NULL);
 
 return;

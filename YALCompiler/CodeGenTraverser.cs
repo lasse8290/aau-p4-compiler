@@ -42,7 +42,7 @@ public class CodeGenTraverser : ASTTraverser
         });
     }
 
-    public string GetGeneratedCode()
+    public override string ToString()
     {
         return _template.ReplacePlaceholders();
     }

@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
       <ProjectReference Include="..\StringTemplating\StringTemplating.csproj" />
       <PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
     </ItemGroup>

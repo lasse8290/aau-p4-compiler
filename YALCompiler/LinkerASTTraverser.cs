@@ -5,6 +5,7 @@ namespace YALCompiler;
 
 public class LinkerASTTraverser : ASTTraverser
 {
+    /* Linking all nodes to their parents */
     public LinkerASTTraverser(ASTNode node) : base(node) { }
     
     public override void BeginTraverse()

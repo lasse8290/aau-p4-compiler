@@ -16,5 +16,5 @@ public class ErrorHandler
         Errors.Add($"Error occurred at line {lineNumber}: {e.Message}");
     } 
     
-    public string GetAsString() => string.Join(Environment.NewLine, Errors);
+    public override string ToString() => string.Join(Environment.NewLine, Errors);
 }
