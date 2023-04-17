@@ -64,19 +64,22 @@ public class Transpiler
     }
 
     // Sets up the parent-child relationships between nodes in the AST
-    public void AssignParentChildRelations() {
+    public void AssignParentChildRelations()
+    {
         LinkerASTTraverser parentsLinker = new(root);
         parentsLinker.BeginTraverse();
     }
 
     // Ensures types and scopes in the program are valid
-    public void PerformSemanticAnalysis() {
+    public void PerformSemanticAnalysis()
+    {
         TypeAndScopeCheckerTraverser traverser = new(root, errorHandler, warningsHandler);
         traverser.BeginTraverse();
     }
 
     // Printing warnings if any
-    public void PrintWarnings() {
+    public void PrintWarnings()
+    {
         if (warningsHandler.Warnings.Count > 0)
         {
             Console.WriteLine("WARNINGS:");
@@ -85,7 +88,8 @@ public class Transpiler
     }
 
     // Check for errors and printing them
-    public void CheckErrors() {
+    public void CheckErrors()
+    {
         if (errorHandler.Errors.Count > 0)
         {
             throw new Exception(errorHandler.ToString());
@@ -93,7 +97,8 @@ public class Transpiler
     }
 
     // Generate code and returning it
-    public string GenerateCode() {
+    public string GenerateCode()
+    {
         CodeGenTraverser cgt = new(root);
         cgt.BeginTraverse();
 

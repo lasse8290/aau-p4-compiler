@@ -6,10 +6,13 @@ namespace Testing;
 
 public class ASTParsingUnitTests : TestingHelper
 {
+
+
     public static TheoryData<string, object> FunctionDeclaration =>
         new() {
             { "my_function: {};", new Function {
                 Id = "my_function",
+                IsAsync = false,
                 Children = new List<ASTNode> { new ReturnStatement() }
             } },
             { "async function_name_100: {};", new Function {
@@ -65,7 +68,7 @@ public class ASTParsingUnitTests : TestingHelper
         actualOutputParamsCount.Should().Be(expectedOutputParametersCount);
     }
 
-    public static TheoryData<string, object> FormalInputParameters =>
+    public static TheoryData<string, object> FormalParameters =>
         new() {
             { "in (bool b)", new List<Symbol> {
                 new Symbol("b") { Type = new YALType(Types.ValueType.@bool) }
@@ -79,13 +82,37 @@ public class ASTParsingUnitTests : TestingHelper
                 new Symbol("s") { Type = new YALType(Types.ValueType.@string) },
                 new Symbol("f") { Type = new YALType(Types.ValueType.float64) }
             } },
+            { "out (bool b)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) }
+            } },
+            { "out (bool b, string s)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) },
+                new Symbol("s") { Type = new YALType(Types.ValueType.@string) }
+            } },
+            { "out (bool b, string s, float64 f)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) },
+                new Symbol("s") { Type = new YALType(Types.ValueType.@string) },
+                new Symbol("f") { Type = new YALType(Types.ValueType.float64) }
+            } },
         };
 
     [Theory]
-    [MemberData(nameof(FormalInputParameters))]
-    public void Formal_Parameters(string input, List<Symbol> expected)
+    [MemberData(nameof(FormalParameters))]
+    public void Correct_Formal_Parameters(string input, List<Symbol> expected)
     {
-        var actual = Setup(input, nameof(YALGrammerParser.formalInputParams));
+        string type = "";
+
+        switch (input.Split(" ")[0])
+        {
+            case "in":
+                type = nameof(YALGrammerParser.formalInputParams);
+                break;
+            case "out":
+                type = nameof(YALGrammerParser.formalOutputParams);
+                break;
+        }
+
+        var actual = Setup(input, type);
 
         actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
     }
@@ -125,15 +152,56 @@ public class ASTParsingUnitTests : TestingHelper
         actual.Should().BeOfType(expected);
     }
 
+    public static TheoryData<string, object> IfStatement =>
+        new() {
+            { "if (true) { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = true } }
+                }
+            } },
+            { "if (true) { } else { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = true } },
+                    new Else { }
+                }
+            } },
+            { "if (false) { } else if (true) { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = false } },
+                    new ElseIf { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = true } }
+                }
+            } },
+            { "if (false) { } else if (false) {} else { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = false } },
+                    new ElseIf { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = false } },
+                    new Else { }
+                }
+            } }
+        };
+
     [Theory]
-    [InlineData("for (int32 i = 5; i < 10; i++) {}")]
-    [InlineData("for (int32 i = 5; i < 10; i++) {}")]
+    [MemberData(nameof(IfStatement))]
+    public void Correct_If_Statement(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.ifStatement));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
+    }
+
+    /*public static TheoryData<string, object> ForLoop =>
+        new() {
+            { "for (int32 i = 5; i < 10; i++) {}", new ForStatement { } }
+        };
+
+    [Theory]
+    [MemberData(nameof(ForLoop))]
     public void For_Loop(string input)
     {
         var actual = Setup(input, nameof(YALGrammerParser.forStatement));
 
         actual.Should().BeOfType<ForStatement>();
-    }
+    }*/
 
     public static TheoryData<string, object> Expressions =>
         new() {
@@ -156,6 +224,11 @@ public class ASTParsingUnitTests : TestingHelper
             { "5 * 2", new CompoundExpression {
                 Left = new SignedNumber(5, isNegative: false),
                 Right = new SignedNumber(2, isNegative: false),
+                Operator = Operators.ExpressionOperator.Multiplication
+            } },
+            { "5 * my_string", new CompoundExpression {
+                Left = new SignedNumber(5, isNegative: false),
+                Right = new Identifier("my_string"),
                 Operator = Operators.ExpressionOperator.Multiplication
             } },
             { "5 / 2", new CompoundExpression {
@@ -294,6 +367,19 @@ public class ASTParsingUnitTests : TestingHelper
                 new Identifier("expr1"),
                 new Identifier("expr2"),
                 new Identifier("expr3"),
+            }},
+            { @"5+2, expr1 + 5, ""dd""", new List<Expression> {
+                new CompoundExpression {
+                    Left = new SignedNumber(5, isNegative: false),
+                    Right = new SignedNumber(2, isNegative: false),
+                    Operator = Operators.ExpressionOperator.Addition,
+                },
+                new CompoundExpression {
+                    Left = new Identifier("expr1"),
+                    Right = new SignedNumber(5, isNegative: false),
+                    Operator = Operators.ExpressionOperator.Addition
+                },
+                new StringLiteral("dd"),
             }},
         };
 

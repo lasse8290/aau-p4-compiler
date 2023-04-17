@@ -31,7 +31,7 @@
       "BenchmarkDotNet/0.13.5": {
         "dependencies": {
           "BenchmarkDotNet.Annotations": "0.13.5",
-          "CommandLineParser": "2.4.3",
+          "CommandLineParser": "2.9.1",
           "Gee.External.Capstone": "2.3.0",
           "Iced": "1.17.0",
           "Microsoft.CodeAnalysis.CSharp": "3.0.0",
@@ -56,11 +56,11 @@
           }
         }
       },
-      "CommandLineParser/2.4.3": {
+      "CommandLineParser/2.9.1": {
         "runtime": {
           "lib/netstandard2.0/CommandLine.dll": {
-            "assemblyVersion": "2.4.3.0",
-            "fileVersion": "2.4.3.0"
+            "assemblyVersion": "2.9.1.0",
+            "fileVersion": "2.9.1.0"
           }
         }
       },
@@ -1553,6 +1553,7 @@
         "dependencies": {
           "Antlr4.Runtime.Standard": "4.12.0",
           "BenchmarkDotNet": "0.13.5",
+          "CommandLineParser": "2.9.1",
           "StringTemplating": "1.0.0"
         },
         "runtime": {
@@ -1588,12 +1589,12 @@
       "path": "benchmarkdotnet.annotations/0.13.5",
       "hashPath": "benchmarkdotnet.annotations.0.13.5.nupkg.sha512"
     },
-    "CommandLineParser/2.4.3": {
+    "CommandLineParser/2.9.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-U2FC9Y8NyIxxU6MpFFdWWu1xwiqz/61v/Doou7kmVjpeIEMLWyiNNkzNlSE84kyJ0O1LKApuEj5z48Ow0Hi4OQ==",
-      "path": "commandlineparser/2.4.3",
-      "hashPath": "commandlineparser.2.4.3.nupkg.sha512"
+      "sha512": "sha512-OE0sl1/sQ37bjVsPKKtwQlWDgqaxWgtme3xZz7JssWUzg5JpMIyHgCTY9MVMxOg48fJ1AgGT3tgdH5m/kQ5xhA==",
+      "path": "commandlineparser/2.9.1",
+      "hashPath": "commandlineparser.2.9.1.nupkg.sha512"
     },
     "coverlet.collector/3.1.2": {
       "type": "package",

@@ -1,4 +1,4 @@
-public static class FluentAssertionsExtensions
+public static class FluentAssertionsExtension
 {
     public static void BeEquivalentTo(this FluentAssertions.Primitives.ObjectAssertions actual, object expected, string[] excludings)
     {
