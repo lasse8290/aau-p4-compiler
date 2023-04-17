@@ -1,7 +1,6 @@
 using YALCompiler.DataTypes;
 using YALCompiler.Helpers;
 using FluentAssertions;
-using Exludings = System.Linq.Expressions.Expression<System.Func<FluentAssertions.Equivalency.IMemberInfo, bool>>;
 
 namespace Testing;
 
