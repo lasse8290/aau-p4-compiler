@@ -1,8 +1,8 @@
 using Antlr4.Runtime;
 
-public class MyErrorListener : BaseErrorListener {
+public class ParserErrorListener : BaseErrorListener {
     public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
     {
-        throw new Exception("Syntax is wrong");
+        throw new Exception("Parser errors");
     }
 }
