@@ -105,7 +105,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitExternalFunctionDeclaration(YALGrammerParser.ExternalFunctionDeclarationContext context)
     {
-var func = new ExternalFunction
+        var func = new ExternalFunction
         {
             LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").SkipLast(1).ToArray()),
             FunctionName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").Last(),
@@ -965,8 +965,8 @@ var func = new ExternalFunction
             case Expression expression:
                 values.Add(expression);
                 break;
-            case List<Expression> list:
-                values.AddRange(list);
+            case IList iList:
+                values.AddRange(iList.Cast<Expression>());
                 break;
         }
 
@@ -1148,9 +1148,22 @@ var func = new ExternalFunction
         var identifierList = new List<Identifier>();
         foreach (var identifier in context.identifier())
         {
-            var id = Visit(identifier) as Identifier;
-            if (id is null) continue;
-            identifierList.Add(id);
+            var identifierObject = Visit(identifier);
+            switch (identifierObject)
+            {
+                case Identifier id:
+                    identifierList.Add(id);
+                    break;
+                case IList iList:
+                    identifierList.AddRange(iList.Cast<Identifier>());
+                    // foreach (var item in iList)
+                    // {
+                    //     if (item is Identifier id)
+                    //         identifierList.Add(id);
+                    // }
+
+                    break;
+            }
         }
 
         return identifierList;
