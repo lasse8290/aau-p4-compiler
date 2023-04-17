@@ -9,19 +9,18 @@ using FluentAssertions.Equivalency;
 
 namespace Testing;
 
-public class ASTUnitTests
+public class ASTParsingUnitTests
 {
     YALGrammerVisitor visitor = new YALGrammerVisitor(new ErrorHandler(), new WarningsHandler());
 
-    public IParseTree Parse(YALGrammerParser parser, string methodName) => (IParseTree)parser.GetType().GetMethod(methodName).Invoke(parser, null);
+    public IParseTree Parse(YALGrammerParser parser, string methodName)
+    {
+        var method = parser.GetType().GetMethod(methodName);
+        return (IParseTree)(method?.Invoke(parser, null) ?? throw new InvalidOperationException($"Method invocation of {methodName} returned null."));
+    }
 
     System.Linq.Expressions.Expression<Func<IMemberInfo, bool>> lineNumberAndParents = ctx => ctx.Name == "LineNumber" || ctx.Name == "Parent";
-
-    Action<ASTNode, ASTNode> LineNumbersRemover = (node, parent) =>
-    {
-        parent.LineNumber = 0;
-        node.LineNumber = 0;
-    };
+    System.Linq.Expressions.Expression<Func<IMemberInfo, bool>> lineNumberAndParentsAndSymbolTable = ctx => ctx.Name == "LineNumber" || ctx.Name == "Parent" || ctx.Name == "SymbolTable";
 
     private YALGrammerParser Setup(string input)
     {
@@ -33,12 +32,12 @@ public class ASTUnitTests
         return parser;
     }
 
-    private ASTNode Setup(string input, string methodName)
+    private object Setup(string input, string methodName)
     {
         YALGrammerParser parser = Setup(input);
         IParseTree tree = Parse(parser, methodName);
 
-        ASTNode root = (ASTNode)visitor.Visit(tree);
+        var root = visitor.Visit(tree);
 
         return root;
     }
@@ -46,22 +45,34 @@ public class ASTUnitTests
     [Theory]
     [InlineData(@"external <""my_library""> print1: in (string _string);", "print1")]
     [InlineData(@"external <""hej""> print2: in (string _string);", "print2")]
-    public void External_Function_Exists_In_Symbol_Table(string input, string expectedName)
+    public void External_Function_Exists_In_Symbol_Table(string input, string expected)
     {
-        ExternalFunction externalVarDcl = (ExternalFunction)Setup(input, nameof(YALGrammerParser.externalFunctionDeclaration));
+        ExternalFunction actual = (ExternalFunction)Setup(input, nameof(YALGrammerParser.externalFunctionDeclaration));
 
-        Assert.Equal(expectedName, externalVarDcl.Id);
+        actual.Id.Should().Be(expected);
     }
 
-    [Theory]
-    [InlineData("my_function: {}", "my_function")]
-    [InlineData("function_name_100: {}", "function_name_100")]
-    public void Correct_Function_Name(string input, string functionName)
-    {
-        Function func = (Function)Setup(input, nameof(YALGrammerParser.functionDeclaration));
 
-        Assert.IsType<Function>(func);
-        Assert.Equal(functionName, func.Id);
+    public static TheoryData<string, object> FunctionDeclaration =>
+        new() {
+            { "my_function: {};", new Function {
+                Id = "my_function",
+                Children = new List<ASTNode> { new ReturnStatement() }
+            } },
+            { "async function_name_100: {};", new Function {
+                Id = "function_name_100",
+                IsAsync = true,
+                Children = new List<ASTNode> { new ReturnStatement() }
+            } }
+        };
+
+    [Theory]
+    [MemberData(nameof(FunctionDeclaration))]
+    public void Correct_Function_Declaration(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.functionDeclaration));
+
+        actual.Should().BeEquivalentTo(expected, options => options.RespectingRuntimeTypes().Excluding(lineNumberAndParentsAndSymbolTable));
     }
 
     public static TheoryData<string, int> functionsData =>
@@ -76,7 +87,7 @@ public class ASTUnitTests
     [MemberData(nameof(functionsData))]
     public void Should_Create_x_Functions(string input, int expectedFunctionsCount)
     {
-        ASTNode _program = Setup(input, nameof(YALGrammerParser.program));
+        ASTNode _program = (ASTNode)Setup(input, nameof(YALGrammerParser.program));
 
         Assert.Equal(expectedFunctionsCount, _program.Children.Count);
     }
@@ -84,51 +95,56 @@ public class ASTUnitTests
     [Theory]
     [InlineData("", 0, 0)]
     [InlineData("out (string a)", 0, 1)]
-    //[InlineData("in (string a) out ()", 1, 0)]
+    // [InlineData("in (string a) out ()", 1, 0)] We need to discuss if this is it allowed?
     [InlineData("in (int32 a, int32 b)", 2, 0)]
-    [InlineData("in (int32 a, int32 b) out: (int32 c, int32 d)", 2, 2)]
+    [InlineData("in (int32 a, int32 b) out (int32 c, int32 d)", 2, 2)]
     public void Correct_Function_Parameters_Count(string input, int expectedInputParametersCount, int expectedOutputParametersCount)
     {
         Function func = (Function)Setup($"my_function: {input} {{}}", nameof(YALGrammerParser.functionDeclaration));
 
-        Assert.Equal(expectedInputParametersCount, func.InputParameters.Count);
-        Assert.Equal(expectedOutputParametersCount, func.OutputParameters.Count);
+        int actualInputParamsCount = func.InputParameters.Count;
+        int actualOutputParamsCount = func.OutputParameters.Count;
+
+        actualInputParamsCount.Should().Be(expectedInputParametersCount);
+        actualOutputParamsCount.Should().Be(expectedOutputParametersCount);
     }
 
-    public static TheoryData<string, List<Types.ValueType>> InputParametersData =>
+    public static TheoryData<string, object> FormalInputParameters =>
         new() {
-            { "in (int32 a, bool b)", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
-            { "in (float32 c, float64 d)", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
-            { "out (int32 a, bool b)", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
-            { "out (float32 c, float64 d)", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
+            { "in (bool b)", new List<Symbol> {
+                new Symbol("b") {
+                    Type = new YALType(Types.ValueType.@bool)
+                }
+            } },
+            { "in (bool b, string s)", new List<Symbol> {
+                new Symbol("b") {
+                    Type = new YALType(Types.ValueType.@bool)
+                },
+                new Symbol("s") {
+                    Type = new YALType(Types.ValueType.@string)
+                }
+            } },
+            { "in (bool b, string s, float64 f)", new List<Symbol> {
+                new Symbol("b") {
+                    Type = new YALType(Types.ValueType.@bool)
+                },
+                new Symbol("s") {
+                    Type = new YALType(Types.ValueType.@string)
+                },
+                new Symbol("f") {
+                    Type = new YALType(Types.ValueType.float64)
+                }
+            } },
         };
 
-    /*[Theory]
-    [MemberData(nameof(InputParametersData))]
-    public void Formal_Parameters(string parameters, List<Types.ValueType> expected)
+    [Theory]
+    [MemberData(nameof(FormalInputParameters))]
+    public void Formal_Parameters(string input, List<Symbol> expected)
     {
-        IParseTree tree;
-        switch (parameters.Split(" ")[0])
-        {
-            case "in":
-                tree = Setup(parameters).formalInputParams();
-                break;
-            case "out":
-                tree = Setup(parameters).formalOutputParams();
-                break;
-            default:
-                throw new Exception("First lexer must be 'in' or 'out'");
-        }
-        List<Symbol> list = (List<Symbol>)visitor.Visit(tree);
+        var actual = Setup(input, nameof(YALGrammerParser.formalInputParams));
 
-        for (int i = 0; i < expected.Count; i++)
-        {
-            Types.ValueType expectedType = expected[i];
-            Symbol param = (Symbol)list[i];
-
-            Assert.Equal(expectedType, ((SingleType)param.Type!).Type);
-        }
-    }*/
+        actual.Should().BeEquivalentTo(expected, options => options.RespectingRuntimeTypes().Excluding(lineNumberAndParents));
+    }
 
     [Theory]
     [InlineData("my_function: { }", 1)]
@@ -361,21 +377,21 @@ public class ASTUnitTests
                 }
             }},
             #endregion
-            // #region ExpressionList
-            // { "expr1, expr2, expr3", new List<Expression> {
-            //     new Identifier("expr1"),
-            //     new Identifier("expr2"),
-            //     new Identifier("expr3"),
-            // }},
-            // #endregion
+            /*#region ExpressionList
+            { "expr1, expr2, expr3", new List<Expression> {
+                new Identifier("expr1"),
+                new Identifier("expr2"),
+                new Identifier("expr3"),
+            }},
+            #endregion*/
         };
 
     [Theory]
     [MemberData(nameof(Expressions))]
-    public void Expression_Correct_Type_And_Values(string input, Expression expected)
+    public void Expression_Correct_Values(string input, object expected)
     {
-        var expr = Setup(input, nameof(YALGrammerParser.expression));
+        var actual = Setup(input, nameof(YALGrammerParser.expression));
 
-        expected.Should().BeEquivalentTo(expr, options => options.RespectingRuntimeTypes().Excluding(lineNumberAndParents));
+        actual.Should().BeEquivalentTo(expected, options => options.RespectingRuntimeTypes().Excluding(lineNumberAndParents));
     }
 }
