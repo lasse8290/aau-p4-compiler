@@ -377,13 +377,13 @@ public class ASTParsingUnitTests
                 }
             }},
             #endregion
-            /*#region ExpressionList
+            #region ExpressionList
             { "expr1, expr2, expr3", new List<Expression> {
                 new Identifier("expr1"),
                 new Identifier("expr2"),
                 new Identifier("expr3"),
             }},
-            #endregion*/
+            #endregion
         };
 
     [Theory]
