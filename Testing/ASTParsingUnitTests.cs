@@ -6,8 +6,6 @@ namespace Testing;
 
 public class ASTParsingUnitTests : TestingHelper
 {
-
-
     public static TheoryData<string, object> FunctionDeclaration =>
         new() {
             { "my_function: {};", new Function {
