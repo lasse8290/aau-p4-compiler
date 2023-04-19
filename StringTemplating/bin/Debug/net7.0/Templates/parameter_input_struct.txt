@@ -1,3 +1,0 @@
-﻿typedef struct COMPILER_INPUT_STRUCT_%%name%% {
-  %%initialized_parameters%%
-} COMPILER_INPUT_STRUCT_%%name%%;

@@ -1,6 +1,0 @@
-﻿void %%name%%(void *pvParameters);
-struct COMPILER_INPUT_PARAMS_%%name%% {
-    %%input_parameters%%};
-struct COMPILER_OUTPUT_PARAMS_%%name%% {
-    %%output_parameters%%};
-#define COMPILER_PARAMS_%%name%% PARAMETERS<COMPILER_INPUT_PARAMS_%%name%%, COMPILER_OUTPUT_PARAMS_%%name%%>
