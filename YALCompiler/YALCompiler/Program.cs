@@ -10,6 +10,7 @@ public static class Program
     public static void Main()
     {
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("EN-US");
         Console.WriteLine(path);
         try
         {

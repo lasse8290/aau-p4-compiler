@@ -151,14 +151,14 @@ public class CodeGenTraverser : ASTTraverser
         inputTemplate.SetKeys(new List<Tuple<string, string>>
             {
                 new("name", function.Id),
-                new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType()} {symbol.Id};\n")))
+                new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Id};\n")))
             });
 
         Template outputTemplate = new("parameter_output_struct");
         outputTemplate.SetKeys(new List<Tuple<string, string>>
             {
                 new("name", function.Id),
-                new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType()} {symbol.Id};\n"))),
+                new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Id};\n"))),
             });
 
         _declarationsBuilder
@@ -167,10 +167,10 @@ public class CodeGenTraverser : ASTTraverser
         .AppendLine($"#define COMPILER_PARAMETERS_{function.Id} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Id}, COMPILER_OUTPUT_STRUCT_{function.Id}>");
 
         foreach (var symbol in function.InputParameters)
-            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->input->{symbol.Id};");
+            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Id} = _COMPILER_PARAMETERS->input->{symbol.Id};");
 
         foreach (var symbol in function.OutputParameters)
-            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType()} {symbol.Id} = _COMPILER_PARAMETERS->output->{symbol.Id};");
+            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Id} = _COMPILER_PARAMETERS->output->{symbol.Id};");
 
         var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
@@ -251,19 +251,15 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ForStatement forStatement)
     {
-        var declarationAssignment = (string)InvokeVisitor(forStatement.DeclarationAssignment);
-        var runCondition = (string)InvokeVisitor(forStatement.RunCondition);
-        var loopAssignment = (string)InvokeVisitor(forStatement.LoopAssignment);
-        var stringBuilder = new StringBuilder();
+        string condition = "true";        
+        StringBuilder stringBuilder = new();
         foreach (var child in forStatement.Children)
             stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
         var template = new Template("for_statement");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("declaration_assignment", declarationAssignment),
-            new("run_condition", runCondition),
-            new("loop_assignment", loopAssignment),
+            new("condition", condition),
             new("body", stringBuilder.ToString())
         });
 
@@ -273,6 +269,11 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
+        StringBuilder prefixBuilder = new();
+        foreach (var value in binaryAssignment.Values)
+            if (value is FunctionCall functionCall)
+                prefixBuilder.AppendLine($"COMPILER_OUTPUT_STRUCT_{(functionCall.Function.Id)} output;");
+
         var op = binaryAssignment.Operator switch
         {
             Operators.AssignmentOperator.Equals => "=",
@@ -281,18 +282,43 @@ public class CodeGenTraverser : ASTTraverser
             Operators.AssignmentOperator.MultiplicationAssignment => "*=",
             Operators.AssignmentOperator.DivisionAssignment => "/=",
             Operators.AssignmentOperator.ModuloAssignment => "%=",
-            _ => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
         };
+
+        StringBuilder leftBuilder = new();
+        foreach (var target in binaryAssignment.Targets)
+            leftBuilder.Append((string)InvokeVisitor(target));
+
+        StringBuilder rightBuilder = new();
+        foreach (var value in binaryAssignment.Values)
+            rightBuilder.Append($"COMPILER_ASSIGN({(string)InvokeVisitor(value)})");
+
+        StringBuilder assignmentBuilder = new();
+        foreach (var target in binaryAssignment.Targets) {
+            string name = "";
+            switch (target)
+            {
+                case Identifier identifier:
+                    name = identifier.Name;
+                    break;
+                case VariableDeclaration variableDecleration:
+                    name = variableDecleration.Variable.Id;
+                    break;
+            }
+
+            rightBuilder.Append($"COMPILER_ASSIGN(&{name}, 1);");
+        }
+
 
         var template = new Template("binary_assignment");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("left", (string)InvokeVisitor(binaryAssignment.Targets.First())),
-            new("right", (string)InvokeVisitor(binaryAssignment.Values.First())),
-            new("op", op)
+            new("prefix", prefixBuilder.ToString()),
+            new("left", leftBuilder.ToString()),
+            new("operator", op),
+            new("right", rightBuilder.ToString()),
         });
 
-        return template.ReplacePlaceholders();
+        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(VariableDeclaration variableDeclaration)
