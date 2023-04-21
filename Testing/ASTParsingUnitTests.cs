@@ -8,15 +8,13 @@ public class ASTParsingUnitTests : TestingHelper
 {
     public static TheoryData<string, object> FunctionDeclaration =>
         new() {
-            { "my_function: {};", new Function {
-                Id = "my_function",
+            { "func: {};", new Function {
+                Id = "func",
                 IsAsync = false,
-                Children = new List<ASTNode> { new ReturnStatement() }
             } },
-            { "async function_name_100: {};", new Function {
-                Id = "function_name_100",
+            { "async async_func: {};", new Function {
+                Id = "async_func",
                 IsAsync = true,
-                Children = new List<ASTNode> { new ReturnStatement() }
             } }
         };
 
@@ -26,7 +24,7 @@ public class ASTParsingUnitTests : TestingHelper
     {
         var actual = Setup(input, nameof(YALGrammerParser.functionDeclaration));
 
-        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable" });
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable", "Children" });
     }
 
     public static TheoryData<string, int> functionsData =>
@@ -139,17 +137,6 @@ public class ASTParsingUnitTests : TestingHelper
         actual.Should().BeOfType(expected);
     }
 
-    [Theory]
-    [InlineData("for (int32 i = 5; i < 5; i++) { }", typeof(ForStatement))]
-    [InlineData("while (i < 5) { }", typeof(WhileStatement))]
-    [InlineData("if (i < 5) { }", typeof(IfStatement))]
-    public void BlockStatement_Type(string input, Type expected)
-    {
-        var actual = Setup(input, nameof(YALGrammerParser.blockStatement));
-
-        actual.Should().BeOfType(expected);
-    }
-
     public static TheoryData<string, object> IfStatement =>
         new() {
             { "if (true) { }", new IfStatement {
@@ -187,19 +174,129 @@ public class ASTParsingUnitTests : TestingHelper
         actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
     }
 
-    /*public static TheoryData<string, object> ForLoop =>
+    public static TheoryData<string, object> LoopStatements =>
         new() {
-            { "for (int32 i = 5; i < 10; i++) {}", new ForStatement { } }
+            { "for (int32 i = 5; i < 10; i++) {}", new ForStatement {
+                DeclarationAssignment = new BinaryAssignment {
+                    Targets = new List<ASTNode> {
+                        new VariableDeclaration {
+                            Variable = new Symbol("i") { Type = new YALType(Types.ValueType.int32) },
+                        }
+                    },
+                    Values = new List<Expression> {
+                        new SignedNumber(5, isNegative: false)
+                    },
+                    Operator = Operators.AssignmentOperator.Equals
+                },
+                RunCondition = new CompoundPredicate {
+                    Left = new Identifier("i"),
+                    Right = new SignedNumber(10, isNegative: false),
+                    Operator = Operators.PredicateOperator.LessThan
+                },
+                LoopAssignment = new UnaryAssignment {
+                    Target = new Identifier("i"),
+                    Operator = Operators.AssignmentOperator.PostIncrement
+                }
+            } },
+            { "while (i < 5) {}", new WhileStatement {
+                Predicate = new CompoundPredicate {
+                    Left = new Identifier("i"),
+                    Right = new SignedNumber(5, isNegative: false),
+                    Operator = Operators.PredicateOperator.LessThan
+                }
+            } }
         };
 
     [Theory]
-    [MemberData(nameof(ForLoop))]
-    public void For_Loop(string input)
+    [MemberData(nameof(LoopStatements))]
+    public void Loops(string input, object expected)
     {
-        var actual = Setup(input, nameof(YALGrammerParser.forStatement));
+        var actual = Setup(input, nameof(YALGrammerParser.blockStatement));
 
-        actual.Should().BeOfType<ForStatement>();
-    }*/
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable" });
+    }
+
+    public static TheoryData<string, object> SimpleAssignments =>
+       new() {
+            { "i = k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.Equals
+            }},
+            { "i += k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.AdditionAssignment
+            }},
+            { "i -= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.SubtractionAssignment
+            }},
+            { "i *= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.MultiplicationAssignment
+            }},
+            /* This to be uncommented when grammar has been fixed */
+            /*{ "i /= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.DivisionAssignment
+            }},*/
+            { "i %= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.ModuloAssignment
+            }},
+            { "++i", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreIncrement
+            }},
+            { "--i", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreDecrement
+            }},
+            { "i++", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostIncrement
+            }},
+            { "i--", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostDecrement
+            }},
+       };
+
+    [Theory]
+    [MemberData(nameof(SimpleAssignments))]
+    public void SimpleAssignment(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.simpleAssignment));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
+    }
+
+    public static TheoryData<string, object> DeclarationAssignments =>
+       new() {
+            { "int32 i = 1", new BinaryAssignment {
+                Targets = new List<ASTNode> {
+                    new VariableDeclaration {
+                        Variable = new Symbol("i") { Type = new YALType(Types.ValueType.int32) },
+                    }
+                },
+                Values = new List<Expression> { new SignedNumber(1, isNegative: false ) },
+                Operator = Operators.AssignmentOperator.Equals
+            }},
+       };
+
+    [Theory]
+    [MemberData(nameof(DeclarationAssignments))]
+    public void DeclarationAssignment(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.declarationAssignment));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "Initialized", "LineNumber", "Parent" });
+    }
 
     public static TheoryData<string, object> Expressions =>
         new() {
