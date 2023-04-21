@@ -15,7 +15,41 @@ public class ASTParsingUnitTests : TestingHelper
             { "async async_func: {};", new Function {
                 Id = "async_func",
                 IsAsync = true,
-            } }
+            } },
+            { "func: in (string a) {};", new Function {
+                Id = "func",
+                InputParameters = new List<Symbol> {
+                    new Symbol("a") {
+                        Type = new YALType((Types.ValueType.@string, false))
+                    }
+                },
+                IsAsync = false,
+            } },
+            { "func: in (string a, int32 b) {};", new Function {
+                Id = "func",
+                InputParameters = new List<Symbol> {
+                    new Symbol("a") {
+                        Type = new YALType((Types.ValueType.@string, false))
+                    },
+                    new Symbol("b") {
+                        Type = new YALType((Types.ValueType.int32, false))
+                    }
+                },
+                IsAsync = false,
+            } },
+            { "func: out (float64 a, int16 b) {};", new Function {
+                Id = "func",
+                OutputParameters = new List<Symbol> {
+                    new Symbol("a") {
+                        Type = new YALType((Types.ValueType.float64, false))
+                    },
+                    new Symbol("b") {
+                        Type = new YALType((Types.ValueType.int16, false))
+                    }
+                },
+                ReturnType = new YALType((Types.ValueType.float64, false), (Types.ValueType.int16, false)),
+                IsAsync = false,
+            } },
         };
 
     [Theory]
@@ -24,7 +58,7 @@ public class ASTParsingUnitTests : TestingHelper
     {
         var actual = Setup(input, nameof(YALGrammerParser.functionDeclaration));
 
-        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable", "Children" });
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable", "Children", "Initialized" });
     }
 
     public static TheoryData<string, int> functionsData =>
