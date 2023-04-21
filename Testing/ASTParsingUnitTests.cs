@@ -52,11 +52,38 @@ public class ASTParsingUnitTests : TestingHelper
             } },
         };
 
+
     [Theory]
     [MemberData(nameof(FunctionDeclaration))]
     public void Correct_Function_Declaration(string input, object expected)
     {
         var actual = Setup(input, nameof(YALGrammerParser.functionDeclaration));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable", "Children", "Initialized" });
+    }
+    public static TheoryData<string, object> ExternalFunctions =>
+        new() {
+            { @"external <""arduino/digitalWrite""> externalDigitalWrite: in (int64 pin, int64 value)", new ExternalFunction {
+                LibraryName = "arduino",
+                FunctionName = "digitalWrite",
+                Id = "externalDigitalWrite",
+                IsAsync = false,
+                InputParameters = new List<Symbol> {
+                    new Symbol("pin") {
+                        Type = new YALType((Types.ValueType.int64, false))
+                    },
+                    new Symbol("value") {
+                        Type = new YALType((Types.ValueType.int64, false))
+                    }
+                }
+            } }
+        };
+
+    [Theory]
+    [MemberData(nameof(ExternalFunctions))]
+    public void External_Functions(string input, object expected)
+    {
+        ExternalFunction actual = (ExternalFunction)Setup(input, nameof(YALGrammerParser.externalFunctionDeclaration));
 
         actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable", "Children", "Initialized" });
     }
