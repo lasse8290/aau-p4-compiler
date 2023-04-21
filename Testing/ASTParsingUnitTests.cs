@@ -277,6 +277,28 @@ public class ASTParsingUnitTests : TestingHelper
         actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable" });
     }
 
+    public static TheoryData<string, object> Identifiers =>
+        new() {
+            { "identifier[5]", new ArrayElementIdentifier("identifier", new SignedNumber(5, isNegative: false)) },
+            { "identifier", new Identifier("identifier") },
+            { "ref identifier", new Identifier("identifier") { IsRef = true } },
+            { "id1, id2, id3", new List<Identifier> {
+                new Identifier("id1"),
+                new Identifier("id2"),
+                new Identifier("id3"),
+            } },
+            { "(id)", new Identifier("id") },
+        };
+
+    [Theory]
+    [MemberData(nameof(Identifiers))]
+    public void Identifier(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.identifier));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable" });
+    }
+
     public static TheoryData<string, object> SimpleAssignments =>
        new() {
             { "i = k", new BinaryAssignment {
