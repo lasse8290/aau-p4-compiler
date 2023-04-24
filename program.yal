@@ -1,5 +1,5 @@
 async k: {
-	k = 5;
+	int66 a;
 }
 
 /*external  <"stdio.h/Serial.begin"> serial: in(int32 i);

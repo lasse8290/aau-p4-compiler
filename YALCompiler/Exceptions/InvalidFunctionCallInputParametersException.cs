@@ -5,13 +5,13 @@ namespace YALCompiler.Exceptions;
 public class InvalidFunctionCallInputParameters: Exception
 {
     public InvalidFunctionCallInputParameters(List<YALType?> expected, List<YALType?> actual): 
-        base($"Invalid function call: expected {expected?.ToString() ?? "null"} but got {expected?.ToString() ?? "null"}")
+        base($"Invalid function call: expected {expected?.ToString() ?? "null"} but got {actual?.ToString() ?? "null"}")
     {
         
     }
     
     public InvalidFunctionCallInputParameters(YALType? expected, YALType? actual): 
-        base($"Invalid function call: expected {expected?.ToString() ?? "null"} but got {expected?.ToString() ?? "null"}")
+        base($"Invalid function call: expected {expected?.ToString() ?? "null"} but got {actual?.ToString() ?? "null"}")
     {
         
     }

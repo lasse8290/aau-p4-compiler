@@ -52,7 +52,6 @@ public class ASTParsingUnitTests : TestingHelper
             } },
         };
 
-
     [Theory]
     [MemberData(nameof(FunctionDeclaration))]
     public void Correct_Function_Declaration(string input, object expected)
