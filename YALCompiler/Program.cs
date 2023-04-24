@@ -7,7 +7,7 @@ public partial class Program
     {
         CommandLine.Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-                if (!System.IO.File.Exists(o.InputFilePath))
+                if (!File.Exists(o.InputFilePath))
                 {
                     Console.WriteLine("Input file does not exist.");
                     return;
