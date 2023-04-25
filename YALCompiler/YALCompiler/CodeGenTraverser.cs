@@ -249,23 +249,6 @@ public class CodeGenTraverser : ASTTraverser
         return signedFloat.ToString();
     }
 
-    internal override object? Visit(ForStatement forStatement)
-    {
-        string condition = "true";        
-        StringBuilder stringBuilder = new();
-        foreach (var child in forStatement.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
-
-        var template = new Template("for_statement");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("condition", condition),
-            new("body", stringBuilder.ToString())
-        });
-
-
-        return template.ReplacePlaceholders();
-    }
 
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {

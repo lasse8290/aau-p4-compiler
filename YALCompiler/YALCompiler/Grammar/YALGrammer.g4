@@ -13,7 +13,7 @@ statementBlock: '{' ( blockStatement | singleStatement ';'+ )* '}' ;
 
 blockStatement: ifStatement
                 | whileStatement
-                | forStatement
+                //| forStatement
                 ;
                 
 singleStatement: variableDeclaration 
@@ -54,7 +54,6 @@ expression: '!' expression                                      # Not
             | expression operator=('<' | '<=' | '>' | '>=' | '==' | '!=') expression  # Comparison
             | expression '&&' expression                        # And
             | expression '||' expression                        # Or
-            //| REF expression                                    # ReferenceExpression
             | simpleAssignment                                  # VariableAssignment
             | identifier                                        # Variable  
             | functionCall                                      # FunctionCallExpression
@@ -75,7 +74,7 @@ elseStatement:      'else' statementBlock ;
 
 whileStatement:     'while' '(' expression ')' statementBlock;
 
-forStatement:       'for' '(' declarationAssignment ';' expression ';' assignment ')' statementBlock;
+//forStatement:       'for' '(' (variableDeclaration | expression)? ';' expression ';' expression ')' statementBlock;
 
 identifier:  ID '[' expression ']'  # ArrayElementIdentifier
             | ID                    # SimpleIdentifier

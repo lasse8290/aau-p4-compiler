@@ -32,7 +32,7 @@ public abstract class ASTTraverser
     internal virtual object? Visit(If                      node) => node;
     internal virtual object? Visit(Else                    node) => node;
     internal virtual object? Visit(ElseIf                  node) => node;
-    internal virtual object? Visit(ForStatement            node) => node;
+    //internal virtual object? Visit(ForStatement            node) => node;
     internal virtual object? Visit(WhileStatement          node) => node;
     internal virtual object? Visit(ReturnStatement         node) => node;
     internal virtual object? Visit(FunctionCall            node) => node;

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.12.0
+// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -330,12 +330,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitWhileStatement([NotNull] YALGrammerParser.WhileStatementContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="YALGrammerParser.forStatement"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitForStatement([NotNull] YALGrammerParser.ForStatementContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>ReferenceIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
