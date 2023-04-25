@@ -341,8 +341,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (context.whileStatement() != null)
             node = Visit(context.whileStatement()) as ASTNode;
 
-        if (context.forStatement() != null)
-            node = Visit(context.forStatement()) as ASTNode;
+        // if (context.forStatement() != null)
+        //     node = Visit(context.forStatement()) as ASTNode;
 
         if (node is not null)
             node.LineNumber = context.Start.Line;
@@ -504,55 +504,57 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return whileStatement;
     }
 
-    public override object VisitForStatement(YALGrammerParser.ForStatementContext context)
-    {
-        var forStatement = new ForStatement();
-        
-        BinaryAssignment declAssignment = Visit(context.declarationAssignment()) as BinaryAssignment;
-        if (declAssignment is BinaryAssignment)
-        {
-            foreach (var target in declAssignment.Targets)
-            {
-                if (target is VariableDeclaration varDecl)
-                {
-                    forStatement.DeclarationAssignment = declAssignment;
-                    forStatement.AddSymbolOrFunction(varDecl.Variable);    
-                }
-            }
-        }
-
-        if (Visit(context.expression()) is Expression expression)
-        {
-            forStatement.RunCondition = expression;
-        }
-        else
-        {
-            _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
-        }
-
-        forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
-
-        StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
-
-        foreach (ASTNode stmt in statementBlock.Statements)
-        {
-            forStatement.Children.Add(stmt);
-        }
-        
-        foreach (Symbol symbol in statementBlock.LocalVariables)
-        {
-            try
-            {
-                forStatement.SymbolTable.Add(symbol.Id, symbol);
-            }
-            catch (VariableAlreadyExistsException e)
-            {
-                _errorHandler.AddError(e, context);                    
-            }
-        }
-        forStatement.LineNumber = context.Start.Line;
-        return forStatement;
-    }
+    // public override object VisitForStatement(YALGrammerParser.ForStatementContext context)
+    // {
+    //     var forStatement = new ForStatement();
+    //     
+    //     context.
+    //     
+    //     BinaryAssignment declAssignment = Visit(context.declarationAssignment()) as BinaryAssignment;
+    //     if (declAssignment is BinaryAssignment)
+    //     {
+    //         foreach (var target in declAssignment.Targets)
+    //         {
+    //             if (target is VariableDeclaration varDecl)
+    //             {
+    //                 forStatement.DeclarationAssignment = declAssignment;
+    //                 forStatement.AddSymbolOrFunction(varDecl.Variable);    
+    //             }
+    //         }
+    //     }
+    //
+    //     if (Visit(context.expression()) is Expression expression)
+    //     {
+    //         forStatement.RunCondition = expression;
+    //     }
+    //     else
+    //     {
+    //         _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
+    //     }
+    //
+    //     forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
+    //
+    //     StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
+    //
+    //     foreach (ASTNode stmt in statementBlock.Statements)
+    //     {
+    //         forStatement.Children.Add(stmt);
+    //     }
+    //     
+    //     foreach (Symbol symbol in statementBlock.LocalVariables)
+    //     {
+    //         try
+    //         {
+    //             forStatement.SymbolTable.Add(symbol.Id, symbol);
+    //         }
+    //         catch (VariableAlreadyExistsException e)
+    //         {
+    //             _errorHandler.AddError(e, context);                    
+    //         }
+    //     }
+    //     forStatement.LineNumber = context.Start.Line;
+    //     return forStatement;
+    // }
 
     #region PredicateVisitors
 

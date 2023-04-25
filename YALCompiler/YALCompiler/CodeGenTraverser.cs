@@ -249,27 +249,27 @@ public class CodeGenTraverser : ASTTraverser
         return signedFloat.ToString();
     }
 
-    internal override object? Visit(ForStatement forStatement)
-    {
-        var declarationAssignment = (string)InvokeVisitor(forStatement.DeclarationAssignment);
-        var runCondition = (string)InvokeVisitor(forStatement.RunCondition);
-        var loopAssignment = (string)InvokeVisitor(forStatement.LoopAssignment);
-        var stringBuilder = new StringBuilder();
-        foreach (var child in forStatement.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
-
-        var template = new Template("for_statement");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("declaration_assignment", declarationAssignment),
-            new("run_condition", runCondition),
-            new("loop_assignment", loopAssignment),
-            new("body", stringBuilder.ToString())
-        });
-
-
-        return template.ReplacePlaceholders();
-    }
+    // internal override object? Visit(ForStatement forStatement)
+    // {
+    //     var declarationAssignment = (string)InvokeVisitor(forStatement.DeclarationAssignment);
+    //     var runCondition = (string)InvokeVisitor(forStatement.RunCondition);
+    //     var loopAssignment = (string)InvokeVisitor(forStatement.LoopAssignment);
+    //     var stringBuilder = new StringBuilder();
+    //     foreach (var child in forStatement.Children)
+    //         stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+    //
+    //     var template = new Template("for_statement");
+    //     template.SetKeys(new List<Tuple<string, string>>
+    //     {
+    //         new("declaration_assignment", declarationAssignment),
+    //         new("run_condition", runCondition),
+    //         new("loop_assignment", loopAssignment),
+    //         new("body", stringBuilder.ToString())
+    //     });
+    //
+    //
+    //     return template.ReplacePlaceholders();
+    // }
 
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {

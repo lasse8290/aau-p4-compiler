@@ -2,7 +2,7 @@ namespace YALCompiler.DataTypes;
 
 public class ForStatement : ASTNode
 {
-    public BinaryAssignment DeclarationAssignment { get; set; }
-    public Expression RunCondition { get; set; }
-    public Assignment LoopAssignment { get; set; }
+    public List<ASTNode> InitialStatements { get; set; }
+    public List<Expression> TestStatements { get; set; }
+    public List<Expression> UpdateStatements { get; set; }
 }
