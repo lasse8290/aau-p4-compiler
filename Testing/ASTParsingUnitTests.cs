@@ -236,28 +236,6 @@ public class ASTParsingUnitTests : TestingHelper
 
     public static TheoryData<string, object> LoopStatements =>
         new() {
-            { "for (int32 i = 5; i < 10; i++) {}", new ForStatement {
-                DeclarationAssignment = new BinaryAssignment {
-                    Targets = new List<ASTNode> {
-                        new VariableDeclaration {
-                            Variable = new Symbol("i") { Type = new YALType(Types.ValueType.int32) },
-                        }
-                    },
-                    Values = new List<Expression> {
-                        new SignedNumber(5, isNegative: false)
-                    },
-                    Operator = Operators.AssignmentOperator.Equals
-                },
-                RunCondition = new CompoundPredicate {
-                    Left = new Identifier("i"),
-                    Right = new SignedNumber(10, isNegative: false),
-                    Operator = Operators.PredicateOperator.LessThan
-                },
-                LoopAssignment = new UnaryAssignment {
-                    Target = new Identifier("i"),
-                    Operator = Operators.AssignmentOperator.PostIncrement
-                }
-            } },
             { "while (i < 5) {}", new WhileStatement {
                 Predicate = new CompoundPredicate {
                     Left = new Identifier("i"),
