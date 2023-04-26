@@ -12,6 +12,12 @@ struct COMPILER_PARAMETERS {
   O *output;
 };
 
+template <typename T>
+int COMPILER_ASSIGN(void* x, T y) {
+    *(T*)x = y;
+    return 1;
+}
+
 template <typename I>
 void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
     TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
