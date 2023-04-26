@@ -63,13 +63,6 @@
       <FileName>DataTypes\Expression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="YALCompiler.DataTypes.ForStatement">
-    <Position X="31.75" Y="3.75" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAAAAAAEAAAAAAAAAAAAAAAAAAAgA=</HashCode>
-      <FileName>DataTypes\ForStatement.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="YALCompiler.DataTypes.Function">
     <Position X="34" Y="3.75" Width="1.75" />
     <TypeIdentifier>

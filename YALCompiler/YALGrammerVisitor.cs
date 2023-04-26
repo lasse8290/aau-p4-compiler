@@ -8,8 +8,9 @@ using Expression = YALCompiler.DataTypes.Expression;
 
 namespace YALCompiler;
 
-public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
-    
+public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
+{
+
     private readonly ErrorHandler _errorHandler;
     private readonly WarningsHandler _warningsHandler;
 
@@ -18,14 +19,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         _errorHandler = errorHandler;
         _warningsHandler = warningsHandler;
     }
-    
-    public YALGrammerVisitor() {}
+
+    public YALGrammerVisitor() { }
 
     public override object VisitProgram(YALGrammerParser.ProgramContext context)
     {
         DataTypes.Program program = new();
 
-        foreach(var gvd in context.variableDeclaration())
+        foreach (var gvd in context.variableDeclaration())
         {
             if (Visit(gvd) is VariableDeclaration variableDeclaration)
             {
@@ -36,12 +37,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, gvd);                    
+                    _errorHandler.AddError(e, gvd);
                 }
             }
         }
-        
-        foreach(var gvd in context.assignment())
+
+        foreach (var gvd in context.assignment())
         {
             var assignment = Visit(gvd);
             if (assignment is BinaryAssignment binaryAssignment)
@@ -60,14 +61,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                     }
                     catch (VariableAlreadyExistsException e)
                     {
-                        _errorHandler.AddError(e, gvd);                    
+                        _errorHandler.AddError(e, gvd);
                     }
                 }
                 continue;
             }
             _errorHandler.AddError(new InvalidGlobalScopedAssignmentException(), gvd);
         }
-        
+
         foreach (var func in context.externalFunctionDeclaration())
         {
             if (Visit(func) is ExternalFunction f)
@@ -78,7 +79,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, func);                    
+                    _errorHandler.AddError(e, func);
                 }
             }
         }
@@ -88,14 +89,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             if (Visit(func) is Function f)
             {
                 program.Children.Add(f);
-                
+
                 try
                 {
                     program.AddSymbolOrFunction(f);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, func);                    
+                    _errorHandler.AddError(e, func);
                 }
             }
         }
@@ -124,11 +125,11 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, context);                    
+                    _errorHandler.AddError(e, context);
                 }
             }
         }
-        
+
         //handle output params
         if (context.formalOutputParams() != null && Visit(context.formalOutputParams()) is List<Symbol> outSymbols)
         {
@@ -141,7 +142,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, context);                    
+                    _errorHandler.AddError(e, context);
                 }
             }
         }
@@ -149,11 +150,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (func.OutputParameters.Count == 1)
         {
             func.ReturnType = func.OutputParameters[0].Type;
-        } else if (func.OutputParameters.Count > 1)
+        }
+        else if (func.OutputParameters.Count > 1)
         {
             func.ReturnType = new YALType(func.OutputParameters.Select(param => param.Type).ToArray());
         }
-        
+
         return func;
     }
 
@@ -164,7 +166,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             Id = context.ID().GetText(),
             IsAsync = context.ASYNC() != null
         };
-        
+
         //handle input params
         if (context.formalInputParams() != null && Visit(context.formalInputParams()) is List<Symbol> inSymbols)
         {
@@ -178,11 +180,11 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, context);                    
+                    _errorHandler.AddError(e, context);
                 }
             }
         }
-        
+
         //handle output params
         if (context.formalOutputParams() != null && Visit(context.formalOutputParams()) is List<Symbol> outSymbols)
         {
@@ -195,7 +197,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, context);                    
+                    _errorHandler.AddError(e, context);
                 }
             }
         }
@@ -203,7 +205,8 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (func.OutputParameters.Count == 1)
         {
             func.ReturnType = func.OutputParameters[0].Type;
-        } else if (func.OutputParameters.Count > 1)
+        }
+        else if (func.OutputParameters.Count > 1)
         {
             func.ReturnType = new YALType(func.OutputParameters.Select(param => param.Type).ToArray());
         }
@@ -213,7 +216,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             func.Children.Add(stmt);
         }
-        
+
         foreach (Symbol symbol in statementBlock.LocalVariables)
         {
             try
@@ -222,23 +225,23 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
             catch (VariableAlreadyExistsException e)
             {
-                _errorHandler.AddError(e, context);                    
+                _errorHandler.AddError(e, context);
             }
         }
-        
+
         if (func.Children.LastOrDefault() is not ReturnStatement)
             func.Children.Add(new ReturnStatement());
 
         func.LineNumber = context.Start.Line;
         return func;
     }
-    
+
     public override object VisitFormalInputParams(YALGrammerParser.FormalInputParamsContext context)
     {
         var declaredVars = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
         return declaredVars.Select(varDecl => varDecl.Variable).ToList();
     }
-    
+
     public override object VisitFormalOutputParams(YALGrammerParser.FormalOutputParamsContext context)
     {
         var declaredVars = Visit(context.variableDeclaration()) as List<VariableDeclaration>;
@@ -255,11 +258,11 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return varDecls;
     }
 
-    
+
     public override object VisitArrayDeclaration(YALGrammerParser.ArrayDeclarationContext context)
     {
         var symbol = new Symbol(context.ID().GetText());
-        
+
         try
         {
             symbol.Type = new YALType(context.TYPE().GetText(), true);
@@ -274,7 +277,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             symbol.ArraySize = size;
         }
 
-        return new VariableDeclaration {Variable = symbol, LineNumber = context.Start.Line};
+        return new VariableDeclaration { Variable = symbol, LineNumber = context.Start.Line };
     }
 
     public override object VisitReferenceVariableDeclaration(YALGrammerParser.ReferenceVariableDeclarationContext context)
@@ -283,11 +286,11 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         if (variable is not null) variable.Variable.IsRef = true;
         return variable;
     }
-    
+
     public override object VisitSimpleVariableDeclaration(YALGrammerParser.SimpleVariableDeclarationContext context)
     {
         var symbol = new Symbol(context.ID().GetText());
-        
+
         try
         {
             symbol.Type = new YALType(context.TYPE().GetText());
@@ -297,7 +300,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _errorHandler.AddError(e, context);
         }
 
-        return new VariableDeclaration {Variable = symbol, LineNumber = context.Start.Line};
+        return new VariableDeclaration { Variable = symbol, LineNumber = context.Start.Line };
     }
 
     public override object VisitStatementBlock(YALGrammerParser.StatementBlockContext context)
@@ -306,7 +309,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         foreach (var statement in context.children)
         {
             var stmt = Visit(statement);
-            
+
             if (stmt is ASTNode node)
                 statementBlock.Statements.Add(node);
 
@@ -337,16 +340,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         ASTNode node = null;
         if (context.ifStatement() != null)
             node = Visit(context.ifStatement()) as ASTNode;
-            
+
         if (context.whileStatement() != null)
             node = Visit(context.whileStatement()) as ASTNode;
 
-        // if (context.forStatement() != null)
-        //     node = Visit(context.forStatement()) as ASTNode;
-
         if (node is not null)
             node.LineNumber = context.Start.Line;
-        
+
         return node;
     }
 
@@ -355,7 +355,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         ASTNode? node = null;
         if (context.variableDeclaration() != null)
             return Visit(context.variableDeclaration()) as List<VariableDeclaration>;
-        
+
         if (context.assignment() != null)
             node = Visit(context.assignment()) as ASTNode;
 
@@ -364,32 +364,33 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
         if (context.RETURN() != null)
             node = new ReturnStatement();
-        
+
         if (node is not null)
             node.LineNumber = context.Start.Line;
-        
+
         return node;
     }
 
     public override object VisitIfStatement(YALGrammerParser.IfStatementContext context)
     {
-        var ifStatement = new IfStatement() { LineNumber = context.Start.Line};
+        var ifStatement = new IfStatement() { LineNumber = context.Start.Line };
         var ifPath = new If();
 
-         if (Visit(context.expression()) is Expression expression) {
+        if (Visit(context.expression()) is Expression expression)
+        {
             ifPath.Predicate = expression;
         }
         else
         {
             _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
-        
+
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
         foreach (ASTNode stmt in statementBlock.Statements)
         {
             ifPath.Children.Add(stmt);
         }
-        
+
         foreach (Symbol symbol in statementBlock.LocalVariables)
         {
             try
@@ -398,32 +399,33 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
             catch (VariableAlreadyExistsException e)
             {
-                _errorHandler.AddError(e, context);                    
+                _errorHandler.AddError(e, context);
             }
         }
         ifPath.LineNumber = context.Start.Line;
         ifStatement.Children.Add(ifPath);
-        
+
         if (context.elseIfStatement() != null)
         {
             foreach (var elseIf in context.elseIfStatement())
             {
                 var elseIfPath = new ElseIf();
 
-                if (Visit(elseIf.expression()) is Expression elseIfExpression){
+                if (Visit(elseIf.expression()) is Expression elseIfExpression)
+                {
                     elseIfPath.Predicate = elseIfExpression;
                 }
                 else
                 {
                     _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), elseIf);
                 }
-                
+
                 StatementBlock elseIfStatementBlock = Visit(elseIf.statementBlock()) as StatementBlock;
                 foreach (ASTNode stmt in elseIfStatementBlock.Statements)
                 {
                     elseIfPath.Children.Add(stmt);
                 }
-        
+
                 foreach (Symbol symbol in elseIfStatementBlock.LocalVariables)
                 {
                     try
@@ -432,14 +434,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                     }
                     catch (VariableAlreadyExistsException e)
                     {
-                        _errorHandler.AddError(e, context);                    
+                        _errorHandler.AddError(e, context);
                     }
                 }
                 elseIfPath.LineNumber = elseIf.Start.Line;
                 ifStatement.Children.Add(elseIfPath);
             }
         }
-        
+
         if (context.elseStatement() != null)
         {
             var elsePath = new Else();
@@ -450,7 +452,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 elsePath.Children.Add(stmt);
             }
-        
+
             foreach (Symbol symbol in elseStatementBlock.LocalVariables)
             {
                 try
@@ -459,13 +461,13 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 }
                 catch (VariableAlreadyExistsException e)
                 {
-                    _errorHandler.AddError(e, context);                    
+                    _errorHandler.AddError(e, context);
                 }
             }
             elsePath.LineNumber = context.elseStatement().Start.Line;
             ifStatement.Children.Add(elsePath);
         }
-        
+
         return ifStatement;
     }
 
@@ -481,14 +483,14 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
         }
-        
+
         StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
 
         foreach (ASTNode stmt in statementBlock.Statements)
         {
             whileStatement.Children.Add(stmt);
         }
-        
+
         foreach (Symbol symbol in statementBlock.LocalVariables)
         {
             try
@@ -497,64 +499,12 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             }
             catch (VariableAlreadyExistsException e)
             {
-                _errorHandler.AddError(e, context);                    
+                _errorHandler.AddError(e, context);
             }
         }
         whileStatement.LineNumber = context.Start.Line;
         return whileStatement;
     }
-
-    // public override object VisitForStatement(YALGrammerParser.ForStatementContext context)
-    // {
-    //     var forStatement = new ForStatement();
-    //     
-    //     context.
-    //     
-    //     BinaryAssignment declAssignment = Visit(context.declarationAssignment()) as BinaryAssignment;
-    //     if (declAssignment is BinaryAssignment)
-    //     {
-    //         foreach (var target in declAssignment.Targets)
-    //         {
-    //             if (target is VariableDeclaration varDecl)
-    //             {
-    //                 forStatement.DeclarationAssignment = declAssignment;
-    //                 forStatement.AddSymbolOrFunction(varDecl.Variable);    
-    //             }
-    //         }
-    //     }
-    //
-    //     if (Visit(context.expression()) is Expression expression)
-    //     {
-    //         forStatement.RunCondition = expression;
-    //     }
-    //     else
-    //     {
-    //         _errorHandler.AddError(new InvalidPredicateException(context.expression().GetText()), context);
-    //     }
-    //
-    //     forStatement.LoopAssignment = Visit(context.assignment()) as Assignment;
-    //
-    //     StatementBlock statementBlock = Visit(context.statementBlock()) as StatementBlock;
-    //
-    //     foreach (ASTNode stmt in statementBlock.Statements)
-    //     {
-    //         forStatement.Children.Add(stmt);
-    //     }
-    //     
-    //     foreach (Symbol symbol in statementBlock.LocalVariables)
-    //     {
-    //         try
-    //         {
-    //             forStatement.SymbolTable.Add(symbol.Id, symbol);
-    //         }
-    //         catch (VariableAlreadyExistsException e)
-    //         {
-    //             _errorHandler.AddError(e, context);                    
-    //         }
-    //     }
-    //     forStatement.LineNumber = context.Start.Line;
-    //     return forStatement;
-    // }
 
     #region PredicateVisitors
 
@@ -577,7 +527,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         compoundPredicate.LineNumber = context.Start.Line;
         return compoundPredicate;
     }
-    
+
     public override object VisitOr(YALGrammerParser.OrContext context)
     {
         var compoundPredicate = new CompoundPredicate
@@ -607,7 +557,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 break;
             case YALGrammerLexer.GREATER_THAN:
                 compoundPredicate.Operator = Operators.PredicateOperator.GreaterThan;
-                break; 
+                break;
             case YALGrammerLexer.GREATER_THAN_OR_EQUAL:
                 compoundPredicate.Operator = Operators.PredicateOperator.GreaterThanOrEqual;
                 break;
@@ -635,11 +585,11 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         boolean.LineNumber = context.Start.Line;
         return boolean;
     }
-    
+
     #endregion
-    
+
     #region ExpressionVisitors
-   
+
     public override object VisitVariable(YALGrammerParser.VariableContext context)
     {
         return Visit(context.identifier());
@@ -648,20 +598,20 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
     {
         if (UInt64.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
-            return new SignedNumber(number, context.MINUS() != null) { LineNumber = context.Start.Line};
+            return new SignedNumber(number, context.MINUS() != null) { LineNumber = context.Start.Line };
         return null;
     }
-    
+
     public override object VisitFloatLiteral(YALGrammerParser.FloatLiteralContext context)
     {
         if (double.TryParse(context.MINUS() == null ? context.FLOAT().GetText() : "-" + context.FLOAT().GetText(), CultureInfo.InvariantCulture, out var number))
-            return new SignedFloat(number) { LineNumber = context.Start.Line};
+            return new SignedFloat(number) { LineNumber = context.Start.Line };
         return null;
     }
 
     public override object VisitStringLiteral(YALGrammerParser.StringLiteralContext context)
     {
-        return new StringLiteral(context.STRING().GetText().Substring(1, context.STRING().GetText().Length - 2)) { LineNumber = context.Start.Line};
+        return new StringLiteral(context.STRING().GetText().Substring(1, context.STRING().GetText().Length - 2)) { LineNumber = context.Start.Line };
     }
 
     public override object VisitParenthesizedExpression(YALGrammerParser.ParenthesizedExpressionContext context)
@@ -853,7 +803,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return compoundExpression;
     }
 
-    
+
     public override object VisitBitwiseNot(YALGrammerParser.BitwiseNotContext context)
     {
         var expression = Visit(context.expression()) as Expression;
@@ -885,7 +835,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         compoundExpression.LineNumber = context.Start.Line;
         return compoundExpression;
     }
-    
+
     public override object VisitPrefixUnary(YALGrammerParser.PrefixUnaryContext context)
     {
         var compoundExpression = new UnaryAssignment()
@@ -928,7 +878,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             foreach (var inputParameter in functionCall.InputParameters)
             {
                 inputParameter.Parent = functionCall;
-            }    
+            }
         }
         functionCall.LineNumber = context.Start.Line;
         return functionCall;
@@ -939,9 +889,9 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     public override object VisitIdAssignment(YALGrammerParser.IdAssignmentContext context)
     {
         var assignment = new BinaryAssignment();
-        
+
         var targets = new List<Identifier>();
-        
+
         var identifiers = Visit(context.identifier());
         switch (identifiers)
         {
@@ -952,7 +902,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 targets.AddRange(list);
                 break;
         }
-        
+
         foreach (var target in targets)
         {
             target.Parent = assignment;
@@ -1026,7 +976,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         assignment.LineNumber = context.Start.Line;
         return assignment;
     }
-    
+
     public override object VisitIdPreIncrementDecrementAssignment(YALGrammerParser.IdPreIncrementDecrementAssignmentContext context)
     {
         var target = Visit(context.identifier());
@@ -1089,10 +1039,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             foreach (var target in targets)
             {
                 target.Parent = assignment;
-                assignment.Targets.Add(target);                
+                assignment.Targets.Add(target);
             }
         }
-        
+
         List<Expression> values = new();
         var expressions = Visit(context.expression());
         switch (expressions)
@@ -1109,7 +1059,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             foreach (var value in values)
             {
                 value.Parent = assignment;
-                assignment.Values.Add(value);                
+                assignment.Values.Add(value);
             }
         }
 
@@ -1119,9 +1069,9 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitSimpleIdentifier(YALGrammerParser.SimpleIdentifierContext context)
     {
-        return new Identifier(context.ID().GetText()) {LineNumber = context.Start.Line};
+        return new Identifier(context.ID().GetText()) { LineNumber = context.Start.Line };
     }
-    
+
     public override object VisitReferenceIdentifier(YALGrammerParser.ReferenceIdentifierContext context)
     {
         var identifier = Visit(context.identifier());
@@ -1133,7 +1083,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
         return identifier;
     }
-    
+
     public override object VisitParenthesizedIdentifier(YALGrammerParser.ParenthesizedIdentifierContext context)
     {
         return Visit(context.identifier());
@@ -1141,7 +1091,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
 
     public override object VisitArrayElementIdentifier(YALGrammerParser.ArrayElementIdentifierContext context)
     {
-        return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression)  {LineNumber = context.Start.Line};
+        return new ArrayElementIdentifier(context.ID().GetText(), Visit(context.expression()) as Expression) { LineNumber = context.Start.Line };
     }
 
     public override object VisitIdentifierList(YALGrammerParser.IdentifierListContext context)
@@ -1190,4 +1140,4 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         arrayLiteral.LineNumber = context.Start.Line;
         return arrayLiteral;
     }
-} 
+}
