@@ -13,7 +13,6 @@ statementBlock: '{' ( blockStatement | singleStatement ';'+ )* '}' ;
 
 blockStatement: ifStatement
                 | whileStatement
-                | forStatement
                 ;
                 
 singleStatement: variableDeclaration 
@@ -34,7 +33,7 @@ assignment: simpleAssignment
             ;
 
 
-simpleAssignment: identifier operator=('=' | '+=' | '-=' | '*=' | '\\=' | '%=') expression      # IdAssignment
+simpleAssignment: identifier operator=('=' | '+=' | '-=' | '*=' | '=/' | '%=') expression      # IdAssignment
                 | operator=('++' | '--') identifier                                             # IdPreIncrementDecrementAssignment
                 | identifier operator=('++' | '--')                                             # IdPostIncrementDecrementAssignment
                 ;
@@ -54,7 +53,6 @@ expression: '!' expression                                      # Not
             | expression operator=('<' | '<=' | '>' | '>=' | '==' | '!=') expression  # Comparison
             | expression '&&' expression                        # And
             | expression '||' expression                        # Or
-            //| REF expression                                    # ReferenceExpression
             | simpleAssignment                                  # VariableAssignment
             | identifier                                        # Variable  
             | functionCall                                      # FunctionCallExpression
@@ -74,8 +72,6 @@ elseIfStatement:    'else if' '(' expression ')' statementBlock ;
 elseStatement:      'else' statementBlock ;
 
 whileStatement:     'while' '(' expression ')' statementBlock;
-
-forStatement:       'for' '(' declarationAssignment ';' expression ';' assignment ')' statementBlock;
 
 identifier:  ID '[' expression ']'  # ArrayElementIdentifier
             | ID                    # SimpleIdentifier
@@ -140,7 +136,7 @@ EQUAL:                  '=' ;
 PLUS_EQUAL:             '+=' ;
 MINUS_EQUAL:            '-=' ;
 MULTIPLY_EQUAL:         '*=' ;
-DIVIDE_EQUAL:           '\\=' ;
+DIVIDE_EQUAL:           '/=' ;
 MODULO_EQUAL:           '%=' ;
 BITWISE_NOT:            '~' ;
 

@@ -437,16 +437,16 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return null;
     }
     
-    internal override object? Visit(ForStatement node)
-    {
-        YALType? type = Visit(node.RunCondition) as YALType;
-        if (type != new YALType(Types.ValueType.@bool))
-        {
-            _errorHandler.AddError(new InvalidPredicateException(node.RunCondition.ToString(), type.ToString()), node.LineNumber);
-        }
-
-        return null;
-    }
+    // internal override object? Visit(ForStatement node)
+    // {
+    //     YALType? type = Visit(node.RunCondition) as YALType;
+    //     if (type != new YALType(Types.ValueType.@bool))
+    //     {
+    //         _errorHandler.AddError(new InvalidPredicateException(node.RunCondition.ToString(), type.ToString()), node.LineNumber);
+    //     }
+    //
+    //     return null;
+    // }
 
     internal override object? Visit(ReturnStatement node)
     {
