@@ -96,7 +96,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 break;
         }
 
-        return valueType;
+        return targetType;
 
     }
 
