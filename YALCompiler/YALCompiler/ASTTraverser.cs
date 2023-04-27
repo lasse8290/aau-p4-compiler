@@ -18,7 +18,8 @@ public abstract class ASTTraverser
 
     internal virtual object? Visit(Boolean                 node) => node;
     internal virtual object? Visit(SignedFloat             node) => node;
-    internal virtual object? Visit(SignedNumber            node) => node;
+    internal virtual object? Visit(Integer                 node) => node;
+    internal virtual object? Visit(UnsignedInteger         node) => node;
     internal virtual object? Visit(Identifier              node) => node;
     internal virtual object? Visit(CompoundPredicate       node) => node;
     internal virtual object? Visit(Predicate               node) => node;
@@ -32,7 +33,6 @@ public abstract class ASTTraverser
     internal virtual object? Visit(If                      node) => node;
     internal virtual object? Visit(Else                    node) => node;
     internal virtual object? Visit(ElseIf                  node) => node;
-    //internal virtual object? Visit(ForStatement            node) => node;
     internal virtual object? Visit(WhileStatement          node) => node;
     internal virtual object? Visit(ReturnStatement         node) => node;
     internal virtual object? Visit(FunctionCall            node) => node;
