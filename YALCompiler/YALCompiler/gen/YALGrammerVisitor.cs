@@ -147,6 +147,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitParenthesizedExpression([NotNull] YALGrammerParser.ParenthesizedExpressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>UintLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUintLiteral([NotNull] YALGrammerParser.UintLiteralContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>Variable</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -273,6 +280,13 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPostIncrementDecrement([NotNull] YALGrammerParser.PostIncrementDecrementContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>IntLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIntLiteral([NotNull] YALGrammerParser.IntLiteralContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>BitwiseNot</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -293,13 +307,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitExpressionList([NotNull] YALGrammerParser.ExpressionListContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="YALGrammerParser.functionCall"/>.
 	/// </summary>

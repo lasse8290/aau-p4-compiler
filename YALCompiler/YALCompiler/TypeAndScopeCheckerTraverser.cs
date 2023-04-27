@@ -33,11 +33,24 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                         {
                             idType.Types[0] = idType.Types[0] with {IsArray = false};
                             if (symbol.ArraySize is not null && 
-                                arrayElementIdentifier.Index is SignedNumber index && 
-                                index.Value > symbol.ArraySize!)
+                                (arrayElementIdentifier.Index is Integer index && 
+                                index.Value > (long)symbol.ArraySize ||
+                                arrayElementIdentifier.Index is UnsignedInteger uIndex && 
+                                uIndex.Value > (ulong)symbol.ArraySize))
                             {
-                                _errorHandler.AddError(new ArrayIndexOutOfBoundsException(
-                                    index.Value, symbol.ArraySize.Value), node.LineNumber);
+                                switch (arrayElementIdentifier.Index)
+                                {
+                                    case Integer i:
+                                        if (i.Value > (long)symbol.ArraySize)
+                                            _errorHandler.AddError(new ArrayIndexOutOfBoundsException(
+                                                i.Value, symbol.ArraySize.Value), node.LineNumber);
+                                        break;
+                                    case UnsignedInteger ui:
+                                        if (ui.Value > (ulong)symbol.ArraySize)
+                                            _errorHandler.AddError(new ArrayIndexOutOfBoundsException(
+                                                ui.Value, symbol.ArraySize.Value), node.LineNumber);
+                                        break;
+                                }
                             }
                         }
                         targetTypes.Add(symbol.Type);
@@ -96,7 +109,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 break;
         }
 
-        return valueType;
+        return targetType;
 
     }
 
@@ -232,47 +245,35 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         return function.ReturnType;
     }
 
-    internal override object? Visit(SignedNumber node)
+    internal override object? Visit(Integer node)
     {
-        YALType? type = node.Negative switch
+        return node.Value switch
         {
-            true => node.Value switch
-            {
-                <= sbyte.MaxValue + 1 => new YALType(Types.ValueType.int8),
-                <= short.MaxValue + 1 => new YALType(Types.ValueType.int16),
-                <= (ulong)int.MaxValue + 1 => new YALType(Types.ValueType.int32),
-                <= (ulong)long.MaxValue + 1 => new YALType(Types.ValueType.int64),
-                _ => null,
-            },
-            _ => node.Value switch
-            {
-                <= byte.MaxValue => node.Value <= (ulong)sbyte.MaxValue ? new YALType(Types.ValueType.int8) : new YALType(Types.ValueType.uint8),
-                <= ushort.MaxValue => node.Value <= (ulong)short.MaxValue ? new YALType(Types.ValueType.int16) : new YALType(Types.ValueType.uint16),
-                <= uint.MaxValue => node.Value <= int.MaxValue ? new YALType(Types.ValueType.int32) : new YALType(Types.ValueType.uint32),
-                <= ulong.MaxValue => node.Value <= long.MaxValue ? new YALType(Types.ValueType.int64) : new YALType(Types.ValueType.uint64),
-            }
+            <= sbyte.MaxValue and >= sbyte.MinValue => new YALType(Types.ValueType.int8),
+            <= short.MaxValue and >= short.MinValue => new YALType(Types.ValueType.int16),
+            <= int.MaxValue and >= int.MinValue => new YALType(Types.ValueType.int32),
+            <= long.MaxValue and >= long.MinValue => new YALType(Types.ValueType.int64)
         };
-        
-        if (type is null)
-            _errorHandler.AddError(new SignedLongOutOfRangeException(node.Value), node.LineNumber);
-        
-        return type;
     }
     
+    internal override object? Visit(UnsignedInteger node)
+    {
+        return node.Value switch
+        {
+            <= byte.MaxValue and >= byte.MinValue => new YALType(Types.ValueType.uint8),
+            <= ushort.MaxValue and >= ushort.MinValue => new YALType(Types.ValueType.uint16),
+            <= uint.MaxValue and >= uint.MinValue => new YALType(Types.ValueType.uint32),
+            <= ulong.MaxValue and >= ulong.MinValue => new YALType(Types.ValueType.uint64)
+        };
+    }
+
     internal override object? Visit(SignedFloat node)
     {
-        YALType type;
-        
-        if (node.Value <= float.MaxValue && node.Value >= float.MinValue)
+        return node.Value switch
         {
-            type = new YALType(Types.ValueType.float32);
-        }
-        else
-        {
-            type = new YALType(Types.ValueType.float64);
-        }
-        
-        return type;
+            <= float.MaxValue and >= float.MinValue => new YALType(Types.ValueType.float32),
+            <= double.MaxValue and >= double.MinValue => new YALType(Types.ValueType.float64)
+        };
     }
     
     internal override object? Visit(Expression node)

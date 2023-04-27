@@ -269,7 +269,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             _errorHandler.AddError(e, context);
         }
 
-        if (context.POSITIVE_NUMBER() != null && ulong.TryParse(context.POSITIVE_NUMBER().GetText(), out ulong size))
+        if (context.POSITIVE_INT() != null && ulong.TryParse(context.POSITIVE_INT().GetText(), out ulong size))
         {
             symbol.ArraySize = size;
         }
@@ -645,10 +645,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         return Visit(context.identifier());
     }
 
-    public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
+    public override object VisitIntLiteral(YALGrammerParser.IntLiteralContext context)
     {
-        if (UInt64.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
-            return new SignedNumber(number, context.MINUS() != null) { LineNumber = context.Start.Line};
+        if (Int64.TryParse(context.POSITIVE_INT().GetText(), out var number))
+            return new Integer(context.MINUS() == null ? number : -number) { LineNumber = context.Start.Line};
+        return null;
+    }
+    
+    public override object VisitUintLiteral(YALGrammerParser.UintLiteralContext context)
+    {
+        if (UInt64.TryParse(context.POSITIVE_UINT().GetText().Replace("u", "", StringComparison.OrdinalIgnoreCase), out var number))
+            return new UnsignedInteger(number) { LineNumber = context.Start.Line};
         return null;
     }
     

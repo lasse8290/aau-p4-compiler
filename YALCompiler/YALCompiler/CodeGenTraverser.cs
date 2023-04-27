@@ -217,16 +217,18 @@ public class CodeGenTraverser : ASTTraverser
         return (compoundPredicate.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
-    internal override object? Visit(SignedNumber signedNumber)
-    {
-        var template = new Template("signed_number");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("signed_number", (signedNumber.Negative ? "-" : "") + signedNumber.Value)
-        });
-
-        return template.ReplacePlaceholders();
-    }
+    // fix this to have 2 visitors: Integer and UnsignedInteger
+    
+    // internal override object? Visit(SignedNumber signedNumber)
+    // {
+    //     var template = new Template("signed_number");
+    //     template.SetKeys(new List<Tuple<string, string>>
+    //     {
+    //         new("signed_number", (signedNumber.Negative ? "-" : "") + signedNumber.Value)
+    //     });
+    //
+    //     return template.ReplacePlaceholders();
+    // }
 
     internal override object? Visit(WhileStatement whileLoop)
     {
