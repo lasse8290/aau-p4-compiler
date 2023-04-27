@@ -44,7 +44,7 @@ public class ASTUnitTests
         Function func = (Function)node.Children[0];
 
         Assert.IsType<Function>(node.Children[0]);
-        Assert.Equal(functionName, func.Id);
+        Assert.Equal(functionName, func.Name);
     }
 
     public static TheoryData<string, int> functionsData =>

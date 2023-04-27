@@ -31,7 +31,7 @@ public class CodeGenTraverser : ASTTraverser
         }
 
         foreach (var child in _startNode.Children){
-            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+            stringBuilder.AppendLine((string)InvokeVisitor(child));
         }
 
         _template.SetKeys(new List<Tuple<string, string>>
@@ -44,7 +44,7 @@ public class CodeGenTraverser : ASTTraverser
 
     public string GetGeneratedCode()
     {
-        return _template.ReplacePlaceholders();
+        return _template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(Boolean boolean)
@@ -63,7 +63,7 @@ public class CodeGenTraverser : ASTTraverser
             _externalLibraries.Add(externalFunction.LibraryName);
             _includeBuilder.AppendLine($"#include <{externalFunction.LibraryName}>");
         }
-        _externalNicknames[externalFunction.Id] = externalFunction.FunctionName;
+        _externalNicknames[externalFunction.Name] = externalFunction.FunctionName;
         return "";
     }
     
@@ -71,78 +71,36 @@ public class CodeGenTraverser : ASTTraverser
     {
         StringBuilder sb = new();
 
-        foreach (ASTNode node in ifStatementNode.Children) {
+        foreach (ASTNode node in ifStatementNode.Children)
             sb.Append((string)InvokeVisitor(node));
-        }
 
         return sb.ToString();
     }
 
     internal override object? Visit(If ifNode)
     {
-        // Visit the predicate of the if statement
-        var predicateCode = (string)InvokeVisitor(ifNode.Predicate);
-
-        // Visit the children of the if statement
-        var childrenBuilder = new StringBuilder();
-        foreach (var child in ifNode.Children)
-            childrenBuilder.AppendLine((string)InvokeVisitor(child) + ";");
-
-        // Generate the if statement code using a template
-        var template = new Template("if");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("predicate", predicateCode),
-            new("body", childrenBuilder.ToString())
-        });
-
-        return template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(ElseIf elseIfNode)
     {
-        // Visit the Predicate of the ElseIf node
-        var predicateCode = (string)InvokeVisitor(elseIfNode.Predicate);
-
-        // Visit the children of the ElseIf node
-        StringBuilder body = new();
-        foreach (var child in elseIfNode.Children) body.AppendLine((string)InvokeVisitor(child));
-
-
-        var template = new Template("else_if");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("predicate", predicateCode),
-            new("body", body.ToString())
-        });
-
-        return template.ReplacePlaceholders();
-
+        return "";
     }
 
     internal override object? Visit(Else elseNode)
     {
-        StringBuilder body = new();
-        foreach (var child in elseNode.Children) body.AppendLine((string)InvokeVisitor(child));
-
-        var template = new Template("else");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("body", body.ToString())
-        });
-
-        return template.ReplacePlaceholders();
+        return "";
     }
 
-    internal override object? Visit(Function function)
+   internal override object? Visit(Function function)
     {
         StringBuilder initializedParametersBuilder = new();
         string inputArguments = "void *pvParameters";
-        string ugabuga = "COMPILER_PARAMETERS_" + function.Id + " *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_" + function.Id + "*) pvParameters;";
+        string ugabuga = "COMPILER_PARAMETERS_" + function.Name + " *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_" + function.Name + "*) pvParameters;";
 
-        if (function.Id == "main")
+        if (function.Name == "main")
         {
-            function.Id = "setup";
+            function.Name = "setup";
             inputArguments = "";
             ugabuga = "";
         }
@@ -150,36 +108,36 @@ public class CodeGenTraverser : ASTTraverser
         Template inputTemplate = new("parameter_input_struct");
         inputTemplate.SetKeys(new List<Tuple<string, string>>
             {
-                new("name", function.Id),
-                new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Id};\n")))
+                new("name", function.Name),
+                new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n")))
             });
 
         Template outputTemplate = new("parameter_output_struct");
         outputTemplate.SetKeys(new List<Tuple<string, string>>
             {
-                new("name", function.Id),
-                new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Id};\n"))),
+                new("name", function.Name),
+                new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n"))),
             });
 
         _declarationsBuilder
         .AppendLine(inputTemplate.ReplacePlaceholders())
         .AppendLine(outputTemplate.ReplacePlaceholders())
-        .AppendLine($"#define COMPILER_PARAMETERS_{function.Id} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Id}, COMPILER_OUTPUT_STRUCT_{function.Id}>");
+        .AppendLine($"#define COMPILER_PARAMETERS_{function.Name} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Name}, COMPILER_OUTPUT_STRUCT_{function.Name}>");
 
         foreach (var symbol in function.InputParameters)
-            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Id} = _COMPILER_PARAMETERS->input->{symbol.Id};");
+            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Name} = _COMPILER_PARAMETERS->input->{symbol.Name};");
 
         foreach (var symbol in function.OutputParameters)
-            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Id} = _COMPILER_PARAMETERS->output->{symbol.Id};");
+            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Name} = _COMPILER_PARAMETERS->output->{symbol.Name};");
 
         var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
-            bodyBuilder.AppendLine($"{InvokeVisitor(child) ?? ""};");
+            bodyBuilder.AppendLine(InvokeVisitor(child) as string);
 
         Template template = new Template("function");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("name", function.Id),
+            new("name", function.Name),
             new("ugabuga", ugabuga),
             new("input_arguments", inputArguments),
             new("initialized_parameters", initializedParametersBuilder.ToString()),
@@ -232,18 +190,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(WhileStatement whileLoop)
     {
-        var stringBuilder = new StringBuilder();
-        foreach (var child in whileLoop.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
-
-        var template = new Template("while");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("predicate", (string)InvokeVisitor(whileLoop.Predicate)),
-            new("body", stringBuilder.ToString())
-        });
-
-        return template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(SignedFloat signedFloat)
@@ -251,81 +198,33 @@ public class CodeGenTraverser : ASTTraverser
         return signedFloat.ToString();
     }
 
-
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
-        StringBuilder prefixBuilder = new();
-        foreach (var value in binaryAssignment.Values)
-            if (value is FunctionCall functionCall)
-                prefixBuilder.AppendLine($"COMPILER_OUTPUT_STRUCT_{(functionCall.Function.Id)} output;");
-
-        var op = binaryAssignment.Operator switch
-        {
-            Operators.AssignmentOperator.Equals => "=",
-            Operators.AssignmentOperator.AdditionAssignment => "+=",
-            Operators.AssignmentOperator.SubtractionAssignment => "-=",
-            Operators.AssignmentOperator.MultiplicationAssignment => "*=",
-            Operators.AssignmentOperator.DivisionAssignment => "/=",
-            Operators.AssignmentOperator.ModuloAssignment => "%=",
-        };
-
-        StringBuilder leftBuilder = new();
-        foreach (var target in binaryAssignment.Targets)
-            leftBuilder.Append((string)InvokeVisitor(target));
-
-        StringBuilder rightBuilder = new();
-        foreach (var value in binaryAssignment.Values)
-            rightBuilder.Append($"COMPILER_ASSIGN({(string)InvokeVisitor(value)})");
-
-        StringBuilder assignmentBuilder = new();
+        StringBuilder targetsBuilder = new(); 
         foreach (var target in binaryAssignment.Targets) {
-            string name = "";
-            switch (target)
+            var targetName = target switch
             {
-                case Identifier identifier:
-                    name = identifier.Name;
-                    break;
-                case VariableDeclaration variableDecleration:
-                    name = variableDecleration.Variable.Id;
-                    break;
-            }
-
-            rightBuilder.Append($"COMPILER_ASSIGN(&{name}, 1);");
+                VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
+                Identifier identifier => identifier.Name,
+            };
+            
+            targetsBuilder.AppendLine($"COMPILER_ASSIGN(&{targetName});");
         }
+        
+        foreach(var value in binaryAssignment.Values)
+            targetsBuilder.AppendLine((string)InvokeVisitor(value));
 
-
-        var template = new Template("binary_assignment");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("prefix", prefixBuilder.ToString()),
-            new("left", leftBuilder.ToString()),
-            new("operator", op),
-            new("right", rightBuilder.ToString()),
-        });
-
-        return template.ReplacePlaceholders(true);
+        return targetsBuilder.ToString();
     }
 
     internal override object? Visit(VariableDeclaration variableDeclaration)
     {
-        var template = new Template("variable_declaration");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("type", variableDeclaration.Variable.Type.ToCPPType().First()),
-            new("identifier", variableDeclaration.Variable.Id)
-        });
-        return template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(Identifier identifier)
     {
-        var template = new Template("identifier");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("name", identifier.Name)
-        });
-
-        return (identifier.Negated ? "!" : "") + template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(UnaryAssignment unaryAssignment)
@@ -358,126 +257,31 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ArrayLiteral arrayLiteral)
     {
-        var elementsBuilder = new StringBuilder();
-        for (var i = 0; i < arrayLiteral.Values.Count; i++)
-        {
-            elementsBuilder.Append((string)InvokeVisitor(arrayLiteral.Values[i]));
-            if (i < arrayLiteral.Values.Count - 1) elementsBuilder.Append(", ");
-        }
-
-        var template = new Template("array_literal");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("elements", elementsBuilder.ToString())
-        });
-
-        return template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(ArrayElementIdentifier arrayElementIdentifier)
     {
-        var template = new Template("array_element_identifier");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("array_name", arrayElementIdentifier.Name),
-            new("index", (string)InvokeVisitor(arrayElementIdentifier.Index))
-        });
-
-        return (arrayElementIdentifier.Negated ? "!" : "") + template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(FunctionCall functionCall)
     {
-        StringBuilder argumentsBuilder = new StringBuilder();
-        for (int i = 0; i < functionCall.InputParameters.Count; i++)
-        {
-            Expression? expression = functionCall.InputParameters[i];
-            string potentialComma = (i == functionCall.InputParameters.Count - 1) ? "" : ",";
-            argumentsBuilder.Append($"{(string)InvokeVisitor(expression)}{potentialComma}");
-        }
-
-        // Suffix hotfix
-        string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Id}" : "";
-    
-        Template template = new Template("function_call");
-        if (functionCall.Function is ExternalFunction) {
-            template = new Template("function_call_external");
-            template.SetKeys(new List<Tuple<string, string>>
-            {
-                new("function", _externalNicknames[functionCall.Function.Id]),
-                new("arguments", argumentsBuilder.ToString()),
-            });
-        } else {
-            template.SetKeys(new List<Tuple<string, string>>
-            {
-                new("function", functionCall.Function.Id),
-                new("is_async", functionCall.Function.IsAsync ? "1" : "0"),
-                new("is_await", functionCall.Await ? "1" : "0"),
-                new("arguments", argumentsBuilder.ToString()),
-                new("suffix", suffix),
-            });
-        }
-
-        return template.ReplacePlaceholders(true);
+        return $"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} struct;";
     }
 
     internal override object? Visit(CompoundExpression compoundExpression)
     {
-        var left = (string)InvokeVisitor(compoundExpression.Left);
-        var right = (string)InvokeVisitor(compoundExpression.Right);
-
-        var op = compoundExpression.Operator switch
-        {
-            Operators.ExpressionOperator.Addition => "+",
-            Operators.ExpressionOperator.Subtraction => "-",
-            Operators.ExpressionOperator.Multiplication => "*",
-            Operators.ExpressionOperator.Division => "/",
-            Operators.ExpressionOperator.Modulo => "%",
-            _ => throw new InvalidOperationException($"Unknown compound expression operator: {compoundExpression.Operator}")
-        };
-
-        var template = new Template("compound_expression");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("left", left),
-            new("operator", op),
-            new("right", right)
-        });
-
-        return template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(StringLiteral stringLiteral)
     {
-        var template = new Template("string_literal");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("string_value", stringLiteral.Value)
-        });
-
-        return template.ReplacePlaceholders();
+        return "";
     }
 
     internal override object? Visit(ReturnStatement returnStatement)
     {
-        var template = new Template("return_statement");
-
-        if (returnStatement.function.Id != "setup")
-        {
-            StringBuilder outputParametersBuilder = new();
-            foreach (var symbol in returnStatement.function.OutputParameters)
-                outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Id} = {symbol.Id};");
-
-            if (returnStatement.function.IsAsync)
-                outputParametersBuilder
-                .AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);")
-                .AppendLine("vTaskDelete(NULL);");
-
-            template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("output_parameters", outputParametersBuilder.ToString())
-        });
-        }
-        return template.ReplacePlaceholders(true);
+        return "";
     }
 }

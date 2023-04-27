@@ -467,7 +467,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             foreach (Symbol outParam in parentFunction.OutputParameters)
             {
                 if (!outParam.Initialized)
-                    _errorHandler.AddError(new UninitializedVariableException(outParam.Id), node.LineNumber);
+                    _errorHandler.AddError(new UninitializedVariableException(outParam.Name), node.LineNumber);
             }
         }
 

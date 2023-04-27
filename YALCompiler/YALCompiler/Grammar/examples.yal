@@ -2,22 +2,13 @@ external  <"stdio.h/Serial.begin"> serial: in(int32 i);
 external  <"stdio.h/Serial.println"> print: in(string s);
 external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-int32 _INPUT = 1;
-int32 _OUTPUT = 3;
-int32 _LED_BUILTIN = 2;
 
-func: out(int32 x, int32 y) {
-	x = 1;
-	y = 2;
-
+func: out(int32 b, int32 c) {
+	b = 1;
+	c = 2; 
 	return;
 }
 
 async main: {
-	//int32 x, int32 y;
-	//struct str = func();
-	//x = str.x;
-	//y = str.y;
-
-	int32 x, int32 y = func();
+	int32 b, int32 c = func();
 }

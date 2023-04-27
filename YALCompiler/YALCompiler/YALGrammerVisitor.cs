@@ -108,7 +108,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").SkipLast(1).ToArray()),
             FunctionName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").Last(),
-            Id = context.ID().GetText(),
+            Name = context.ID().GetText(),
         };
 
         //handle input params
@@ -161,7 +161,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
     {
         var func = new Function
         {
-            Id = context.ID().GetText(),
+            Name = context.ID().GetText(),
             IsAsync = context.ASYNC() != null
         };
         
@@ -394,7 +394,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                ifPath.SymbolTable.Add(symbol.Id, symbol);
+                ifPath.SymbolTable.Add(symbol.Name, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -428,7 +428,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 {
                     try
                     {
-                        elseIfPath.SymbolTable.Add(symbol.Id, symbol);
+                        elseIfPath.SymbolTable.Add(symbol.Name, symbol);
                     }
                     catch (VariableAlreadyExistsException e)
                     {
@@ -455,7 +455,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
-                    elsePath.SymbolTable.Add(symbol.Id, symbol);
+                    elsePath.SymbolTable.Add(symbol.Name, symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
@@ -493,7 +493,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                whileStatement.SymbolTable.Add(symbol.Id, symbol);
+                whileStatement.SymbolTable.Add(symbol.Name, symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
