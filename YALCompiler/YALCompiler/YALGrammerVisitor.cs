@@ -394,7 +394,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                ifPath.SymbolTable.Add(symbol.Name, symbol);
+                ifPath.AddSymbolOrFunction(symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -428,7 +428,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
                 {
                     try
                     {
-                        elseIfPath.SymbolTable.Add(symbol.Name, symbol);
+                        elseIfPath.AddSymbolOrFunction(symbol);
                     }
                     catch (VariableAlreadyExistsException e)
                     {
@@ -455,7 +455,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
             {
                 try
                 {
-                    elsePath.SymbolTable.Add(symbol.Name, symbol);
+                    elsePath.AddSymbolOrFunction(symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
@@ -493,7 +493,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object> {
         {
             try
             {
-                whileStatement.SymbolTable.Add(symbol.Name, symbol);
+                whileStatement.AddSymbolOrFunction(symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
