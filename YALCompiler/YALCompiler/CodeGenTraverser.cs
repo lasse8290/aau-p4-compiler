@@ -25,13 +25,16 @@ public class CodeGenTraverser : ASTTraverser
     {
         var stringBuilder = new StringBuilder();
 
-        foreach(var child in _startNode.FunctionTable){
-            if(child.Value is ExternalFunction){
+        foreach (var child in _startNode.FunctionTable)
+        {
+            if (child.Value is ExternalFunction)
+            {
                 var x = (string)InvokeVisitor(child.Value);
             }
         }
 
-        foreach (var child in _startNode.Children){
+        foreach (var child in _startNode.Children)
+        {
             stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
         }
 
@@ -59,20 +62,23 @@ public class CodeGenTraverser : ASTTraverser
         return (boolean.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
-    internal override object? Visit(ExternalFunction externalFunction){
-        if (!_externalLibraries.Contains(externalFunction.LibraryName)) {
+    internal override object? Visit(ExternalFunction externalFunction)
+    {
+        if (!_externalLibraries.Contains(externalFunction.LibraryName))
+        {
             _externalLibraries.Add(externalFunction.LibraryName);
             _includeBuilder.AppendLine($"#include <{externalFunction.LibraryName}>");
         }
         _externalNicknames[externalFunction.Name] = externalFunction.FunctionName;
         return "";
     }
-    
+
     internal override object? Visit(IfStatement ifStatementNode)
     {
         StringBuilder sb = new();
 
-        foreach (ASTNode node in ifStatementNode.Children) {
+        foreach (ASTNode node in ifStatementNode.Children)
+        {
             sb.Append((string)InvokeVisitor(node));
         }
 
@@ -222,7 +228,7 @@ public class CodeGenTraverser : ASTTraverser
     {
         return uInt.ToString();
     }
-    
+
     internal override object? Visit(Integer integer)
     {
         return integer.ToString();
@@ -248,7 +254,7 @@ public class CodeGenTraverser : ASTTraverser
     {
         return signedFloat.ToString();
     }
-    
+
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
         var op = binaryAssignment.Operator switch
@@ -264,15 +270,24 @@ public class CodeGenTraverser : ASTTraverser
 
         var template = new Template("binary_assignment");
 
-        string right = "";
-        if(op == "=")
+        string right;
+        if (op == "=")
         {
-            //    auto [y, z] = [&]() {"SPAM FUNCTION CALLS HER, HUSK ;"; return std::make_tuple("VÆRDIER HER"); }();
-
+            foreach (var target in binaryAssignment.Targets)
+            {
+                string name = target switch
+                {
+                    Identifier identifier => identifier.Name,
+                    VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
+                    _ => "Da hell, how this possible! 🤷‍♂️"
+                };
+                Console.WriteLine(name);
+            }
+            right = "[&]() {tie() = make_tuple(10, 50); }();";
         }
         else
             right = (string)InvokeVisitor(binaryAssignment.Values.First());
-        
+
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("left", (string)InvokeVisitor(binaryAssignment.Targets.First())),
@@ -285,6 +300,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(VariableDeclaration variableDeclaration)
     {
+        /*
         if (variableDeclaration.Parent is BinaryAssignment)
         {
             StringBuilder autoBuilder = new();
@@ -302,8 +318,8 @@ public class CodeGenTraverser : ASTTraverser
             
             return autoBuilder.ToString();
 
-        }
-        
+        }*/
+
         var template = new Template("variable_declaration");
         template.SetKeys(new List<Tuple<string, string>>
         {
@@ -393,16 +409,19 @@ public class CodeGenTraverser : ASTTraverser
         }
 
         // Suffix hotfix
-        string   suffix   = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Name}" : "";
+        string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Name}" : "";
         Template template = new Template("function_call");
-        if (functionCall.Function is ExternalFunction) {
+        if (functionCall.Function is ExternalFunction)
+        {
             template = new Template("function_call_external");
             template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", _externalNicknames[functionCall.Function.Name]),
                 new("arguments", argumentsBuilder.ToString()),
             });
-        } else {
+        }
+        else
+        {
             template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", functionCall.Function.Name),
@@ -447,7 +466,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("string_literal");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("string_value", stringLiteral.Value)
+            new("string_value", '"' + stringLiteral.Value + '"')
         });
 
         return template.ReplacePlaceholders();

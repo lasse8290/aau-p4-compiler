@@ -1,8 +1,6 @@
 
-func: out(int32 b, int32 c) {
-	b = 1;
-	c = 2;
-	return;
+func: out(string s) {
+	s = "a";
 }
 
 async main: {
