@@ -1,8 +1,23 @@
+external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
+external  <"stdio.h/Serial.println"> print: in(int32 s);
+
+external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
+external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
+external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
+external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
 func: out(string s) {
 	s = "a";
+	return;
+}
+
+funcRetInt: out(int32 x){
+	x = 1;
+	return;
 }
 
 async main: {
-	int32 b, int32 x;
+	int32 y = funcRetInt();
+	serialBegin(115200);
+	print(y);
 }

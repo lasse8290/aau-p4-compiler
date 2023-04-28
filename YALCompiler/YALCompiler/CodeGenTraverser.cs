@@ -268,58 +268,64 @@ public class CodeGenTraverser : ASTTraverser
             _ => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
         };
 
-        var template = new Template("binary_assignment");
-
-        string right;
         if (op == "=")
         {
-            foreach (var target in binaryAssignment.Targets)
+            StringBuilder assignmentBuilder = new();
+            foreach(var target in binaryAssignment.Targets.Where(target => target is VariableDeclaration))
+                assignmentBuilder.AppendLine((string)InvokeVisitor(target));
+                
+            string targets = string.Join(", ", binaryAssignment.Targets.Select(target => target switch
             {
-                string name = target switch
-                {
-                    Identifier identifier => identifier.Name,
-                    VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
-                    _ => "Da hell, how this possible! 🤷‍♂️"
-                };
-                Console.WriteLine(name);
+                Identifier identifier => identifier.Name,
+                VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
+                _ => "Da hell, how this possible! 🤷‍♂️"
+            }));
+
+            StringBuilder valuesBuilder = new();
+            StringBuilder functionCallsBuilder = new();
+            for (int i = 0; i < binaryAssignment.Values.Count; i++) {
+                Expression value = binaryAssignment.Values[i];
+
+                int valuesCounter = 0;
+                if (value is FunctionCall functionCall) {
+                    functionCallsBuilder.Append($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} a = {(string)InvokeVisitor(value)};");
+                    foreach (var outputParameter in functionCall.Function.OutputParameters){
+                        valuesBuilder.Append($"a.{outputParameter.Name}{(binaryAssignment.Targets.Count - 1 ==  valuesCounter ? "" : ",")}");
+                        valuesCounter++;
+                    }
+                } else {
+                    valuesBuilder.Append($"{(string)InvokeVisitor(value)}{(binaryAssignment.Targets.Count - 1 == valuesCounter ? "" : ",")}");
+                    valuesCounter++;
+                }
             }
-            right = "[&]() {tie() = make_tuple(10, 50); }();";
+
+            var template = new Template("binary_assignment_literal");
+            template.SetKeys(new List<Tuple<string, string>>
+            {
+                new("functionCalls", functionCallsBuilder.ToString()),
+                new("targets", targets),
+                new("values", valuesBuilder.ToString()),
+            });
+
+            assignmentBuilder.AppendLine(template.ReplacePlaceholders(true));
+            return assignmentBuilder.ToString();
         }
         else
-            right = (string)InvokeVisitor(binaryAssignment.Values.First());
-
-        template.SetKeys(new List<Tuple<string, string>>
         {
-            new("left", (string)InvokeVisitor(binaryAssignment.Targets.First())),
-            new("right", right),
-            new("operator", op)
-        });
+            var template = new Template("binary_assignment");
+            template.SetKeys(new List<Tuple<string, string>>
+            {
+                new("left", (string)InvokeVisitor(binaryAssignment.Targets.First())),
+                new("right", "A"),
+                new("operator", op)
+            });
 
-        return template.ReplacePlaceholders();
+            return template.ReplacePlaceholders();
+        }
     }
 
     internal override object? Visit(VariableDeclaration variableDeclaration)
     {
-        /*
-        if (variableDeclaration.Parent is BinaryAssignment)
-        {
-            StringBuilder autoBuilder = new();
-            autoBuilder.Append("auto[");
-            
-            var targets = ((BinaryAssignment)variableDeclaration.Parent).Targets;
-            for (int i = 0; i < targets.Count; i++)
-            {
-                var target         = targets[i];
-                
-                autoBuilder.Append($"{((VariableDeclaration)target).Variable.Name}{(i == targets.Count - 1 ? "" : ",")}");
-            }
-
-            autoBuilder.Append("]");
-            
-            return autoBuilder.ToString();
-
-        }*/
-
         var template = new Template("variable_declaration");
         template.SetKeys(new List<Tuple<string, string>>
         {
@@ -408,31 +414,29 @@ public class CodeGenTraverser : ASTTraverser
             argumentsBuilder.Append($"{(string)InvokeVisitor(expression)}{potentialComma}");
         }
 
-        // Suffix hotfix
-        string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Name}" : "";
-        Template template = new Template("function_call");
         if (functionCall.Function is ExternalFunction)
         {
-            template = new Template("function_call_external");
+            Template template = new Template("function_call_external");
             template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", _externalNicknames[functionCall.Function.Name]),
                 new("arguments", argumentsBuilder.ToString()),
             });
+            return template.ReplacePlaceholders(true); 
         }
         else
         {
+            Template template = new Template("function_call");
             template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", functionCall.Function.Name),
                 new("is_async", functionCall.Function.IsAsync ? "1" : "0"),
                 new("is_await", functionCall.Await ? "1" : "0"),
                 new("arguments", argumentsBuilder.ToString()),
-                new("suffix", suffix),
             });
+            return template.ReplacePlaceholders(true); 
         }
 
-        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(CompoundExpression compoundExpression)
@@ -466,7 +470,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("string_literal");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("string_value", '"' + stringLiteral.Value + '"')
+            new("string_value", stringLiteral.Value)
         });
 
         return template.ReplacePlaceholders();

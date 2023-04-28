@@ -1,0 +1,1 @@
+[&]() {%%functionCalls%%;std::tie(%%targets%%) = std::make_tuple(%%values%%); }();
