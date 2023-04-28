@@ -6,5 +6,5 @@ func: out(int32 b, int32 c) {
 }
 
 async main: {
-	int32 b, int32 x = func();
+	int32 b, int32 x;
 }

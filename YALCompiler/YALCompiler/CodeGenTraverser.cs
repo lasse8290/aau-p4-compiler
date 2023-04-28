@@ -294,9 +294,8 @@ public class CodeGenTraverser : ASTTraverser
             for (int i = 0; i < targets.Count; i++)
             {
                 var target         = targets[i];
-                var commaSeperator = i == targets.Count - 1 ? "" : ",";
                 
-                autoBuilder.Append($"{((VariableDeclaration)target).Variable.Name}{commaSeperator}");
+                autoBuilder.Append($"{((VariableDeclaration)target).Variable.Name}{(i == targets.Count - 1 ? "" : ",")}");
             }
 
             autoBuilder.Append("]");
