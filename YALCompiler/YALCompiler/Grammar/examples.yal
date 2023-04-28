@@ -1,14 +1,10 @@
-external  <"stdio.h/Serial.begin"> serial: in(int32 i);
-external  <"stdio.h/Serial.println"> print: in(string s);
-external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
-
 
 func: out(int32 b, int32 c) {
 	b = 1;
-	c = 2; 
+	c = 2;
 	return;
 }
 
 async main: {
-	int32 b, int32 c = func();
+	int32 b, int32 x = func();
 }

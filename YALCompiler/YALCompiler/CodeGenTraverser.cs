@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using Microsoft.Diagnostics.Tracing.Parsers.ClrPrivate;
 using StringTemplating;
 using YALCompiler.DataTypes;
 using YALCompiler.Helpers;
@@ -31,7 +32,7 @@ public class CodeGenTraverser : ASTTraverser
         }
 
         foreach (var child in _startNode.Children){
-            stringBuilder.AppendLine((string)InvokeVisitor(child));
+            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
         }
 
         _template.SetKeys(new List<Tuple<string, string>>
@@ -44,7 +45,7 @@ public class CodeGenTraverser : ASTTraverser
 
     public string GetGeneratedCode()
     {
-        return _template.ReplacePlaceholders(true);
+        return _template.ReplacePlaceholders();
     }
 
     internal override object? Visit(Boolean boolean)
@@ -71,28 +72,70 @@ public class CodeGenTraverser : ASTTraverser
     {
         StringBuilder sb = new();
 
-        foreach (ASTNode node in ifStatementNode.Children)
+        foreach (ASTNode node in ifStatementNode.Children) {
             sb.Append((string)InvokeVisitor(node));
+        }
 
         return sb.ToString();
     }
 
     internal override object? Visit(If ifNode)
     {
-        return "";
+        // Visit the predicate of the if statement
+        var predicateCode = (string)InvokeVisitor(ifNode.Predicate);
+
+        // Visit the children of the if statement
+        var childrenBuilder = new StringBuilder();
+        foreach (var child in ifNode.Children)
+            childrenBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+
+        // Generate the if statement code using a template
+        var template = new Template("if");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("predicate", predicateCode),
+            new("body", childrenBuilder.ToString())
+        });
+
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(ElseIf elseIfNode)
     {
-        return "";
+        // Visit the Predicate of the ElseIf node
+        var predicateCode = (string)InvokeVisitor(elseIfNode.Predicate);
+
+        // Visit the children of the ElseIf node
+        StringBuilder body = new();
+        foreach (var child in elseIfNode.Children) body.AppendLine((string)InvokeVisitor(child));
+
+
+        var template = new Template("else_if");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("predicate", predicateCode),
+            new("body", body.ToString())
+        });
+
+        return template.ReplacePlaceholders();
+
     }
 
     internal override object? Visit(Else elseNode)
     {
-        return "";
+        StringBuilder body = new();
+        foreach (var child in elseNode.Children) body.AppendLine((string)InvokeVisitor(child));
+
+        var template = new Template("else");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("body", body.ToString())
+        });
+
+        return template.ReplacePlaceholders();
     }
 
-   internal override object? Visit(Function function)
+    internal override object? Visit(Function function)
     {
         StringBuilder initializedParametersBuilder = new();
         string inputArguments = "void *pvParameters";
@@ -132,7 +175,7 @@ public class CodeGenTraverser : ASTTraverser
 
         var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
-            bodyBuilder.AppendLine(InvokeVisitor(child) as string);
+            bodyBuilder.AppendLine($"{InvokeVisitor(child) ?? ""};");
 
         Template template = new Template("function");
         template.SetKeys(new List<Tuple<string, string>>
@@ -175,56 +218,111 @@ public class CodeGenTraverser : ASTTraverser
         return (compoundPredicate.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
-    // fix this to have 2 visitors: Integer and UnsignedInteger
+    internal override object? Visit(UnsignedInteger uInt)
+    {
+        return uInt.ToString();
+    }
     
-    // internal override object? Visit(SignedNumber signedNumber)
-    // {
-    //     var template = new Template("signed_number");
-    //     template.SetKeys(new List<Tuple<string, string>>
-    //     {
-    //         new("signed_number", (signedNumber.Negative ? "-" : "") + signedNumber.Value)
-    //     });
-    //
-    //     return template.ReplacePlaceholders();
-    // }
+    internal override object? Visit(Integer integer)
+    {
+        return integer.ToString();
+    }
 
     internal override object? Visit(WhileStatement whileLoop)
     {
-        return "";
+        var stringBuilder = new StringBuilder();
+        foreach (var child in whileLoop.Children)
+            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+
+        var template = new Template("while");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("predicate", (string)InvokeVisitor(whileLoop.Predicate)),
+            new("body", stringBuilder.ToString())
+        });
+
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(SignedFloat signedFloat)
     {
         return signedFloat.ToString();
     }
-
+    
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
-        StringBuilder targetsBuilder = new(); 
-        foreach (var target in binaryAssignment.Targets) {
-            var targetName = target switch
-            {
-                VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
-                Identifier identifier => identifier.Name,
-            };
-            
-            targetsBuilder.AppendLine($"COMPILER_ASSIGN(&{targetName});");
-        }
-        
-        foreach(var value in binaryAssignment.Values)
-            targetsBuilder.AppendLine((string)InvokeVisitor(value));
+        var op = binaryAssignment.Operator switch
+        {
+            Operators.AssignmentOperator.Equals => "=",
+            Operators.AssignmentOperator.AdditionAssignment => "+=",
+            Operators.AssignmentOperator.SubtractionAssignment => "-=",
+            Operators.AssignmentOperator.MultiplicationAssignment => "*=",
+            Operators.AssignmentOperator.DivisionAssignment => "/=",
+            Operators.AssignmentOperator.ModuloAssignment => "%=",
+            _ => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
+        };
 
-        return targetsBuilder.ToString();
+        var template = new Template("binary_assignment");
+
+        string right = "";
+        if(op == "=")
+        {
+            //    auto [y, z] = [&]() {"SPAM FUNCTION CALLS HER, HUSK ;"; return std::make_tuple("VÆRDIER HER"); }();
+
+        }
+        else
+            right = (string)InvokeVisitor(binaryAssignment.Values.First());
+        
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("left", (string)InvokeVisitor(binaryAssignment.Targets.First())),
+            new("right", right),
+            new("operator", op)
+        });
+
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(VariableDeclaration variableDeclaration)
     {
-        return "";
+        if (variableDeclaration.Parent is BinaryAssignment)
+        {
+            StringBuilder autoBuilder = new();
+            autoBuilder.Append("auto[");
+            
+            var targets = ((BinaryAssignment)variableDeclaration.Parent).Targets;
+            for (int i = 0; i < targets.Count; i++)
+            {
+                var target         = targets[i];
+                var commaSeperator = i == targets.Count - 1 ? "" : ",";
+                
+                autoBuilder.Append($"{((VariableDeclaration)target).Variable.Name}{commaSeperator}");
+            }
+
+            autoBuilder.Append("]");
+            
+            return autoBuilder.ToString();
+
+        }
+        
+        var template = new Template("variable_declaration");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("type", variableDeclaration.Variable.Type.ToCPPType().First()),
+            new("identifier", variableDeclaration.Variable.Name)
+        });
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(Identifier identifier)
     {
-        return "";
+        var template = new Template("identifier");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("name", identifier.Name)
+        });
+
+        return (identifier.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
     internal override object? Visit(UnaryAssignment unaryAssignment)
@@ -257,31 +355,125 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ArrayLiteral arrayLiteral)
     {
-        return "";
+        var elementsBuilder = new StringBuilder();
+        for (var i = 0; i < arrayLiteral.Values.Count; i++)
+        {
+            elementsBuilder.Append((string)InvokeVisitor(arrayLiteral.Values[i]));
+            if (i < arrayLiteral.Values.Count - 1) elementsBuilder.Append(", ");
+        }
+
+        var template = new Template("array_literal");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("elements", elementsBuilder.ToString())
+        });
+
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(ArrayElementIdentifier arrayElementIdentifier)
     {
-        return "";
+        var template = new Template("array_element_identifier");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("array_name", arrayElementIdentifier.Name),
+            new("index", (string)InvokeVisitor(arrayElementIdentifier.Index))
+        });
+
+        return (arrayElementIdentifier.Negated ? "!" : "") + template.ReplacePlaceholders();
     }
 
     internal override object? Visit(FunctionCall functionCall)
     {
-        return $"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} struct;";
+        StringBuilder argumentsBuilder = new StringBuilder();
+        for (int i = 0; i < functionCall.InputParameters.Count; i++)
+        {
+            Expression? expression = functionCall.InputParameters[i];
+            string potentialComma = (i == functionCall.InputParameters.Count - 1) ? "" : ",";
+            argumentsBuilder.Append($"{(string)InvokeVisitor(expression)}{potentialComma}");
+        }
+
+        // Suffix hotfix
+        string   suffix   = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Name}" : "";
+        Template template = new Template("function_call");
+        if (functionCall.Function is ExternalFunction) {
+            template = new Template("function_call_external");
+            template.SetKeys(new List<Tuple<string, string>>
+            {
+                new("function", _externalNicknames[functionCall.Function.Name]),
+                new("arguments", argumentsBuilder.ToString()),
+            });
+        } else {
+            template.SetKeys(new List<Tuple<string, string>>
+            {
+                new("function", functionCall.Function.Name),
+                new("is_async", functionCall.Function.IsAsync ? "1" : "0"),
+                new("is_await", functionCall.Await ? "1" : "0"),
+                new("arguments", argumentsBuilder.ToString()),
+                new("suffix", suffix),
+            });
+        }
+
+        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(CompoundExpression compoundExpression)
     {
-        return "";
+        var left = (string)InvokeVisitor(compoundExpression.Left);
+        var right = (string)InvokeVisitor(compoundExpression.Right);
+
+        var op = compoundExpression.Operator switch
+        {
+            Operators.ExpressionOperator.Addition => "+",
+            Operators.ExpressionOperator.Subtraction => "-",
+            Operators.ExpressionOperator.Multiplication => "*",
+            Operators.ExpressionOperator.Division => "/",
+            Operators.ExpressionOperator.Modulo => "%",
+            _ => throw new InvalidOperationException($"Unknown compound expression operator: {compoundExpression.Operator}")
+        };
+
+        var template = new Template("compound_expression");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("left", left),
+            new("operator", op),
+            new("right", right)
+        });
+
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(StringLiteral stringLiteral)
     {
-        return "";
+        var template = new Template("string_literal");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("string_value", stringLiteral.Value)
+        });
+
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(ReturnStatement returnStatement)
     {
-        return "";
+        var template = new Template("return_statement");
+
+        if (returnStatement.function.Name != "setup")
+        {
+            StringBuilder outputParametersBuilder = new();
+            foreach (var symbol in returnStatement.function.OutputParameters)
+                outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Name} = {symbol.Name};");
+
+            if (returnStatement.function.IsAsync)
+                outputParametersBuilder
+                .AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);")
+                .AppendLine("vTaskDelete(NULL);");
+
+            template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("output_parameters", outputParametersBuilder.ToString())
+        });
+        }
+        return template.ReplacePlaceholders(true);
     }
 }
