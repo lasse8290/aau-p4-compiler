@@ -1,6 +1,7 @@
 #include <string>
 #include <stdint.h>
 #include <stdbool.h>
+#include <Arduino.h>
 
 
 typedef void (*Func)(void*);
@@ -11,6 +12,12 @@ struct COMPILER_PARAMETERS {
   I *input;
   O *output;
 };
+
+template <typename T>
+int COMPILER_ASSIGN(void* x, T y) {
+    *(T*)x = y;
+    return 1;
+}
 
 template <typename I>
 void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
@@ -39,20 +46,43 @@ void loop() {
   delay(10);
 }
 
-typedef struct COMPILER_INPUT_STRUCT_k {
+typedef struct COMPILER_INPUT_STRUCT_setup {
   
-} COMPILER_INPUT_STRUCT_k;
-typedef struct COMPILER_OUTPUT_STRUCT_k {
+} COMPILER_INPUT_STRUCT_setup;
+typedef struct COMPILER_OUTPUT_STRUCT_setup {
   
-} COMPILER_OUTPUT_STRUCT_k;
-#define COMPILER_PARAMETERS_k COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_k, COMPILER_OUTPUT_STRUCT_k>
+} COMPILER_OUTPUT_STRUCT_setup;
+#define COMPILER_PARAMETERS_setup COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_setup, COMPILER_OUTPUT_STRUCT_setup>
+typedef struct COMPILER_INPUT_STRUCT_test {
+  
+} COMPILER_INPUT_STRUCT_test;
+typedef struct COMPILER_OUTPUT_STRUCT_test {
+  
+} COMPILER_OUTPUT_STRUCT_test;
+#define COMPILER_PARAMETERS_test COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_test, COMPILER_OUTPUT_STRUCT_test>
 
 
-void k (void *pvParameters) {
-    COMPILER_PARAMETERS_k *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_k*) pvParameters;
+void setup () {
+    
     
 
-    int64_t a;
+    Serial.begin(115200);
+int32_t b;
+int32_t x;
+Serial.println("before test");
+(*((COMPILER_OUTPUT_STRUCT_test*) COMPILER_INVOKE(COMPILER_INPUT_STRUCT_test {  }, test, 1, 1)));
+Serial.println("after test");
+
+return;
+
+    
+};
+void test (void *pvParameters) {
+    COMPILER_PARAMETERS_test *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_test*) pvParameters;
+    
+
+    Serial.println("test");
+vTaskDelay(1000);
 xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
 vTaskDelete(NULL);
 

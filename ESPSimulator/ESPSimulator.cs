@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using PuppeteerSharp;
-using static System.Console;
+﻿using PuppeteerSharp;
+using TextCopy;
+using System.Diagnostics;
 
 public class ESPSimulator
 {
@@ -19,7 +17,6 @@ public class ESPSimulator
         using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = false,
-            ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
             Product = Product.Chrome
         });
 
@@ -28,33 +25,35 @@ public class ESPSimulator
 
         page.Console += async (sender, eventArgs) =>
         {
-            WriteLine(eventArgs.Message.Text);
+            Console.WriteLine(eventArgs.Message.Text);
         };
         page.PageError += (sender, eventArgs) =>
         {
-            WriteLine(eventArgs.Message);
+            Console.WriteLine(eventArgs.Message);
         };
 
         await page.WaitForSelectorAsync("div[class='react-draggable']");
-        // await Clipboard.WriteTextAsync(code);
+        await ClipboardService.SetTextAsync(Code);
 
-        // Hold down Ctrl and press the "a" key
         await page.Keyboard.DownAsync("Control");
         await page.Keyboard.PressAsync("a");
         await page.Keyboard.UpAsync("Control");
 
-        // Press the "Backspace" key
         await page.Keyboard.PressAsync("Backspace");
 
-        // Paste from clipboard
         await page.Keyboard.DownAsync("Control");
         await page.Keyboard.PressAsync("v");
         await page.Keyboard.UpAsync("Control");
+
+        await page.ScreenshotAsync("screenshot1.png");
 
         var buttonSelector = "button[aria-label='Start the simulation']";
         await page.WaitForSelectorAsync(buttonSelector);
         await page.ClickAsync(buttonSelector);
 
-        await page.WaitForTimeoutAsync(7000);
+        await page.ScreenshotAsync("screenshot2.png");
+
+        await page.WaitForTimeoutAsync(15000);
+        await page.ScreenshotAsync("screenshot3.png");
     }
 }

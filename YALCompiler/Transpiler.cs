@@ -12,6 +12,7 @@ public class Transpiler
     public string OutputFilePath { get; set; }
     string TemplatesPath = Directory.GetParent(Directory.GetCurrentDirectory()) + "/StringTemplating/Templates";
     string SourceCode;
+    public string CompiledCode { get; private set; }
     ASTNode root = default!;
 
     public Transpiler(string InputFilePath, string OutputFilePath)
@@ -38,9 +39,9 @@ public class Transpiler
 
             CheckErrors();
 
-            string code = GenerateCode();
+            GenerateCode();
 
-            File.WriteAllText(OutputFilePath, code);
+            File.WriteAllText(OutputFilePath, CompiledCode);
         }
         catch (Exception e)
         {
@@ -97,11 +98,11 @@ public class Transpiler
     }
 
     // Generate code and returning it
-    public string GenerateCode()
+    public void GenerateCode()
     {
         CodeGenTraverser cgt = new(root);
         cgt.BeginTraverse();
 
-        return cgt.ToString();
+        CompiledCode = cgt.ToString();
     }
 }
