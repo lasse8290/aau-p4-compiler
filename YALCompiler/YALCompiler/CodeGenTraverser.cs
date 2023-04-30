@@ -21,6 +21,37 @@ public class CodeGenTraverser : ASTTraverser
     {
     }
 
+    // Helper function to get the variable name from an ASTNode
+    string GetVariableName(ASTNode node)
+    {
+        string localName = node switch
+        {
+            Identifier identifier                   => identifier.Name,
+            VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
+            _                                       => "Da hell, how is this possible! 🤷‍♂️"
+        };
+            
+        ASTNode testNode = node;
+        while (testNode.Parent != null)
+        {
+            if (testNode.Parent.SymbolTable is not null && testNode.Parent.SymbolTable.ContainsKey(localName))
+            {
+                if (testNode.Parent is Function function)
+                {
+                    if(function.InputParameters.Any(x => x.Name == localName))
+                        return $"_COMPILER_PARAMETERS->input->{localName}";
+                    if(function.OutputParameters.Any(x => x.Name == localName))
+                        return $"_COMPILER_PARAMETERS->output->{localName}";
+                }
+                break;
+            }
+
+            testNode = testNode.Parent;
+        }
+
+        return localName;
+    }
+    
     public override void BeginTraverse()
     {
         var stringBuilder = new StringBuilder();
@@ -143,7 +174,6 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(Function function)
     {
-        StringBuilder initializedParametersBuilder = new();
         string inputArguments = "void *pvParameters";
         string ugabuga = "COMPILER_PARAMETERS_" + function.Name + " *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_" + function.Name + "*) pvParameters;";
 
@@ -156,28 +186,24 @@ public class CodeGenTraverser : ASTTraverser
 
         Template inputTemplate = new("parameter_input_struct");
         inputTemplate.SetKeys(new List<Tuple<string, string>>
-            {
-                new("name", function.Name),
-                new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n")))
-            });
+        {
+            new("name", function.Name),
+            new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n")))
+        });
 
         Template outputTemplate = new("parameter_output_struct");
         outputTemplate.SetKeys(new List<Tuple<string, string>>
-            {
-                new("name", function.Name),
-                new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n"))),
-            });
+        {
+            new("name", function.Name),
+            new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n"))),
+        });
 
         _declarationsBuilder
-        .AppendLine(inputTemplate.ReplacePlaceholders())
-        .AppendLine(outputTemplate.ReplacePlaceholders())
+        .AppendLine(inputTemplate.ReplacePlaceholders(true))
+        .AppendLine(outputTemplate.ReplacePlaceholders(true))
         .AppendLine($"#define COMPILER_PARAMETERS_{function.Name} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Name}, COMPILER_OUTPUT_STRUCT_{function.Name}>");
 
-        foreach (var symbol in function.InputParameters)
-            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Name} = _COMPILER_PARAMETERS->input->{symbol.Name};");
 
-        foreach (var symbol in function.OutputParameters)
-            initializedParametersBuilder.AppendLine($"{symbol.Type.ToCPPType().First()} {symbol.Name} = _COMPILER_PARAMETERS->output->{symbol.Name};");
 
         var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
@@ -189,7 +215,6 @@ public class CodeGenTraverser : ASTTraverser
             new("name", function.Name),
             new("ugabuga", ugabuga),
             new("input_arguments", inputArguments),
-            new("initialized_parameters", initializedParametersBuilder.ToString()),
             new("body", bodyBuilder.ToString()),
         });
 
@@ -257,73 +282,75 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
-        var op = binaryAssignment.Operator switch
-        {
-            Operators.AssignmentOperator.Equals => "=",
-            Operators.AssignmentOperator.AdditionAssignment => "+=",
-            Operators.AssignmentOperator.SubtractionAssignment => "-=",
-            Operators.AssignmentOperator.MultiplicationAssignment => "*=",
-            Operators.AssignmentOperator.DivisionAssignment => "/=",
-            Operators.AssignmentOperator.ModuloAssignment => "%=",
-            _ => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
-        };
+        
 
-        if (op == "=")
-        {
-            StringBuilder assignmentBuilder = new();
-            foreach(var target in binaryAssignment.Targets.Where(target => target is VariableDeclaration))
-                assignmentBuilder.AppendLine((string)InvokeVisitor(target));
-                
-            string targets = string.Join(", ", binaryAssignment.Targets.Select(target => target switch
-            {
-                Identifier identifier => identifier.Name,
-                VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
-                _ => "Da hell, how this possible! 🤷‍♂️"
-            }));
-
-            StringBuilder valuesBuilder = new();
-            StringBuilder functionCallsBuilder = new();
-            for (int i = 0; i < binaryAssignment.Values.Count; i++) {
-                Expression value = binaryAssignment.Values[i];
-
-                int valuesCounter = 0;
-                if (value is FunctionCall functionCall) {
-                    functionCallsBuilder.Append($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} a = {(string)InvokeVisitor(value)};");
-                    foreach (var outputParameter in functionCall.Function.OutputParameters){
-                        valuesBuilder.Append($"a.{outputParameter.Name}{(binaryAssignment.Targets.Count - 1 ==  valuesCounter ? "" : ",")}");
-                        valuesCounter++;
-                    }
-                } else {
-                    valuesBuilder.Append($"{(string)InvokeVisitor(value)}{(binaryAssignment.Targets.Count - 1 == valuesCounter ? "" : ",")}");
-                    valuesCounter++;
-                }
-            }
-
-            var template = new Template("binary_assignment_literal");
-            template.SetKeys(new List<Tuple<string, string>>
-            {
-                new("functionCalls", functionCallsBuilder.ToString()),
-                new("targets", targets),
-                new("values", valuesBuilder.ToString()),
-            });
-
-            assignmentBuilder.AppendLine(template.ReplacePlaceholders(true));
-            return assignmentBuilder.ToString();
-        }
-        else
+        // Helper function to generate simple binary assignments
+        string GetSimpleBinaryAssignment(string Target, string Value, string Operator)
         {
             var template = new Template("binary_assignment");
             template.SetKeys(new List<Tuple<string, string>>
             {
-                new("left", (string)InvokeVisitor(binaryAssignment.Targets.First())),
-                new("right", "A"),
-                new("operator", op)
+                new("left", Target),
+                new("right", Value),
+                new("operator", Operator)
             });
-
-            return template.ReplacePlaceholders();
+            return template.ReplacePlaceholders(true);
         }
-    }
+        
+        var op = binaryAssignment.Operator switch
+        {
+            Operators.AssignmentOperator.Equals                   => "=",
+            Operators.AssignmentOperator.AdditionAssignment       => "+=",
+            Operators.AssignmentOperator.SubtractionAssignment    => "-=",
+            Operators.AssignmentOperator.MultiplicationAssignment => "*=",
+            Operators.AssignmentOperator.DivisionAssignment       => "/=",
+            Operators.AssignmentOperator.ModuloAssignment         => "%=",
+            _                                                     => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
+        };
+        
+        var declarationBuilder   = new StringBuilder();
+        var functionCallsBuilder = new StringBuilder();
+        var assignmentsBuilder   = new StringBuilder();
 
+        int assignmentCount = 0;
+        for (int i = 0; i < binaryAssignment.Values.Count; i++)
+        {
+            var target = binaryAssignment.Targets[assignmentCount];
+            var value  = binaryAssignment.Values[i];
+            
+            //If the target is a variable declaration, we need to declare the variable before assigning it.
+            if (target is VariableDeclaration variableDeclaration)
+                declarationBuilder.AppendLine((string)InvokeVisitor(variableDeclaration));
+            
+            //If the value is a function call, we need to build the function call and assign the output parameters to the targets
+            if (value is FunctionCall functionCall)  {
+                functionCallsBuilder.Append($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} struct_{i} = {(string)InvokeVisitor(value)};");
+                foreach (var outputParameter in functionCall.Function.OutputParameters){
+                    string targetName = GetVariableName(binaryAssignment.Targets[assignmentCount]);
+                    assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"struct_{i}.{outputParameter.Name}", op));
+                    assignmentCount++;
+                }
+            }
+            else //If the value is not a function call, we can just assign it to the target
+            {
+                string targetName = GetVariableName(binaryAssignment.Targets[assignmentCount]);
+                assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}", op));
+                assignmentCount++;
+            }
+        }
+        
+        // Set up and populate the template with the generated code
+        var template = new Template("binary_assignment_literal");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("functionCalls", functionCallsBuilder.ToString()),
+            new("assignments", assignmentsBuilder.ToString()),
+            new("declarations", declarationBuilder.ToString())
+        });
+
+        return template.ReplacePlaceholders(true);
+    }
+    
     internal override object? Visit(VariableDeclaration variableDeclaration)
     {
         var template = new Template("variable_declaration");
@@ -340,7 +367,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("identifier");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("name", identifier.Name)
+            new("name", GetVariableName(identifier))
         });
 
         return (identifier.Negated ? "!" : "") + template.ReplacePlaceholders();
@@ -483,9 +510,6 @@ public class CodeGenTraverser : ASTTraverser
         if (returnStatement.function.Name != "setup")
         {
             StringBuilder outputParametersBuilder = new();
-            foreach (var symbol in returnStatement.function.OutputParameters)
-                outputParametersBuilder.AppendLine($"_COMPILER_PARAMETERS->output->{symbol.Name} = {symbol.Name};");
-
             if (returnStatement.function.IsAsync)
                 outputParametersBuilder
                 .AppendLine("xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);")
