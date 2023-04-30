@@ -19,6 +19,7 @@ public class ESPSimulator
         using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = false,
+            ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
             Product = Product.Chrome
         });
 
@@ -50,6 +51,10 @@ public class ESPSimulator
         await page.Keyboard.PressAsync("v");
         await page.Keyboard.UpAsync("Control");
 
-        await page.ClickAsync("button[aria-label='Start the simulation']");
+        var buttonSelector = "button[aria-label='Start the simulation']";
+        await page.WaitForSelectorAsync(buttonSelector);
+        await page.ClickAsync(buttonSelector);
+
+        await page.WaitForTimeoutAsync(7000);
     }
 }
