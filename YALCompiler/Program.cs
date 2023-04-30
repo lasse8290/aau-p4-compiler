@@ -1,11 +1,16 @@
 using CommandLine;
+using System.Threading.Tasks;
 
 namespace YALCompiler;
 public partial class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        CommandLine.Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
+        ESPSimulator s = new("");
+
+        await s.Run();
+
+        /*CommandLine.Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
                 if (!File.Exists(o.InputFilePath))
                 {
@@ -15,6 +20,6 @@ public partial class Program
                 
                 Transpiler transpiler = new(o.InputFilePath, o.OutputFilePath);
                 transpiler.Transpile();
-            });
+            });*/
     }
 }
