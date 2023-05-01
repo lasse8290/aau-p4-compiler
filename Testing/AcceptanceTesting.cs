@@ -17,6 +17,6 @@ public class AcceptanceTesting
         string code = transpiler.CompiledCode;
         ESPSimulation s = new(code, timeout);
         await s.Run();
-        s.Output.Should().BeEquivalentTo(expectedOutput);
+        s.Output.Should().BeEquivalentTo(expectedOutput, options => options.WithStrictOrdering());
     }
 }
