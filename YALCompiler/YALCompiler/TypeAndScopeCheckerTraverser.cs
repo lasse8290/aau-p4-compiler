@@ -88,26 +88,9 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             _errorHandler.AddError(new TypeMismatchException(valueType?.ToString() ?? "null",
                 targetType?.ToString() ?? "null"), node.LineNumber);
         }
-
-        switch (targetType.Types.Count)
-        {
-            case 0:
-                // some error happened before and no target type was resolved,
-                // no need to throw an unrelated error
-                break;
-            case 1:
-                if (!Operators.CheckOperationIsValid(targetType, node.Operator))
-                {
-                    _errorHandler.AddError(new InvalidOperatorException(node.Operator, targetType.Types[0].Type), node.LineNumber);
-                }
-                break;
-            default:
-                if (node.Operator != Operators.AssignmentOperator.Equals)
-                {
-                    _errorHandler.AddError(new InvalidOperatorException(node.Operator, targetType), node.LineNumber);
-                }
-                break;
-        }
+        
+        if (!Operators.CheckOperationIsValid(targetType, node.Operator))
+            _errorHandler.AddError(new InvalidOperatorException(node.Operator, targetType), node.LineNumber);
 
         return targetType;
 
