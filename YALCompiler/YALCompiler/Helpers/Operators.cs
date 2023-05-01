@@ -84,8 +84,8 @@ public static class Operators
     {
         foreach (var valueTypeAndArrayFlag in type.Types)
         {
-            if (valueTypeAndArrayFlag.IsArray && @operator != AssignmentOperator.Equals ||
-                ((int)valueTypeAndArrayFlag.Type & (int)@operator) == 0)
+            if ((valueTypeAndArrayFlag.IsArray && @operator != AssignmentOperator.Equals) ||
+                ((int)TypeMaskMatching[valueTypeAndArrayFlag.Type] & (int)@operator) == 0)
             {
                 return false;
             }

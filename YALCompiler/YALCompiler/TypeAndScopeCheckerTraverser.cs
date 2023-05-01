@@ -280,7 +280,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         if (CompilerUtilities.FindSymbol(node.Name, node) is Symbol symbol)
         {
             if (!symbol.Initialized && 
-                !(node.Parent is BinaryAssignment binaryAssignment && binaryAssignment.Targets.Contains(node)) && 
+                !(node.Parent is BinaryAssignment binaryAssignment && binaryAssignment.Targets.Contains(node) && binaryAssignment.Operator == Operators.AssignmentOperator.Equals) && 
                 !node.IsRef)
                 _errorHandler.AddError(new UninitializedVariableException(node.Name), node.LineNumber);
                 
