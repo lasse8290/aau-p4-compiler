@@ -3,27 +3,31 @@ using Antlr4.Runtime;
 using YALCompiler.ErrorHandlers;
 using YALCompiler.DataTypes;
 using YALCompiler;
+using System.Reflection;
 
 public class Transpiler
 {
     ErrorHandler errorHandler = new ErrorHandler();
     WarningsHandler warningsHandler = new WarningsHandler();
     public string InputFilePath { get; set; }
-    public string OutputFilePath { get; set; }
-    string TemplatesPath = Directory.GetParent(Directory.GetCurrentDirectory()) + "/StringTemplating/Templates";
+    public string? OutputFilePath { get; set; }
+    string TemplatesPath = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}/Templates";
     string SourceCode;
     public string CompiledCode { get; private set; }
     ASTNode root = default!;
 
-    public Transpiler(string InputFilePath, string OutputFilePath)
+    public Transpiler(string InputFilePath)
     {
         this.InputFilePath = InputFilePath;
-        this.OutputFilePath = OutputFilePath;
 
         Template.LoadTemplates(TemplatesPath, "txt");
         SourceCode = File.ReadAllText(InputFilePath);
     }
 
+    public Transpiler(string InputFilePath, string OutputFilePath) : this(InputFilePath)
+    {
+        this.OutputFilePath = OutputFilePath;
+    }
 
     public void Transpile()
     {
@@ -41,7 +45,10 @@ public class Transpiler
 
             GenerateCode();
 
-            File.WriteAllText(OutputFilePath, CompiledCode);
+            if (OutputFilePath != null)
+            {
+                File.WriteAllText(OutputFilePath, CompiledCode);
+            }
         }
         catch (Exception e)
         {

@@ -1,13 +1,10 @@
 using CommandLine;
-using System.Threading.Tasks;
 
 namespace YALCompiler;
 public partial class Program
 {
-    static async Task Main(string[] args)
+    static void Main(string[] args)
     {
-        string code = "";
-
         CommandLine.Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
                 if (!File.Exists(o.InputFilePath))
@@ -19,12 +16,19 @@ public partial class Program
                 Transpiler transpiler = new(o.InputFilePath, o.OutputFilePath);
                 transpiler.Transpile();
 
-                code = transpiler.CompiledCode;
+                if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Timeout, o.WokwiURL);
             });
+    }
 
-        ESPSimulator s = new(code);
+    static void RunSimulator(string code, int timeout, string? wokwiURL = null)
+    {
+        ESPSimulation s;
 
-        Console.WriteLine("Running puppeteer");
-        await s.Run();
+        if (wokwiURL != null)
+            s = new(code, timeout, wokwiURL);
+        else
+            s = new(code, timeout);
+
+        s.Run().Wait();
     }
 }
