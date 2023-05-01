@@ -1,25 +1,24 @@
 external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
 external  <"stdio.h/Serial.println"> print: in(int32 s);
 
-
 external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
 external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
 external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
 external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-y: {}
-
-funcRetInt: in(int32 y) out(int32 x){
-	x = y;
-	y = 10101010;
-	return;
+func: in(int32 z) out(int32 x, int32 y){
+    z = 57;
+    x = z;
+    y = 2;
+    return;
 }
 
-async main: {
-    int32 WAT = 901;
-    y();
-	int32 y = funcRetInt(WAT);
-	serialBegin(115200);
-	print(y);
-	print(WAT);
+main: {
+    serialBegin(115200);
+    int32 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = 100;
+    int32 x = 5;
+    int32 y = 1;
+    x, y *= func(110);
+    
+    print(x);
 }

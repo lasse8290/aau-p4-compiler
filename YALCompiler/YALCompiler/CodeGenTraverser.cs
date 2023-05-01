@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using Microsoft.Diagnostics.Tracing.Parsers.ClrPrivate;
 using StringTemplating;
 using YALCompiler.DataTypes;
 using YALCompiler.Helpers;
@@ -16,6 +14,7 @@ public class CodeGenTraverser : ASTTraverser
 
     private readonly Dictionary<string, string> _externalNicknames = new();
     private readonly List<string> _externalLibraries = new();
+    private StringBuilder _scopeBuilder = new();
 
     public CodeGenTraverser(ASTNode node) : base(node)
     {
@@ -39,9 +38,11 @@ public class CodeGenTraverser : ASTTraverser
                 if (testNode.Parent is Function function)
                 {
                     if(function.InputParameters.Any(x => x.Name == localName))
-                        return $"_COMPILER_PARAMETERS->input->{localName}";
+                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input->{localName}";
                     if(function.OutputParameters.Any(x => x.Name == localName))
-                        return $"_COMPILER_PARAMETERS->output->{localName}";
+                        return $" ((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{localName}";
+
+
                 }
                 break;
             }
@@ -118,6 +119,9 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(If ifNode)
     {
+        StringBuilder scopeBuilder = new();
+        _scopeBuilder = scopeBuilder;
+
         // Visit the predicate of the if statement
         var predicateCode = (string)InvokeVisitor(ifNode.Predicate);
 
@@ -134,11 +138,14 @@ public class CodeGenTraverser : ASTTraverser
             new("body", childrenBuilder.ToString())
         });
 
-        return template.ReplacePlaceholders();
+        return $"{scopeBuilder.ToString()} {template.ReplacePlaceholders(true)}";
     }
 
     internal override object? Visit(ElseIf elseIfNode)
     {
+        StringBuilder scopeBuilder = new();
+        _scopeBuilder = scopeBuilder;
+
         // Visit the Predicate of the ElseIf node
         var predicateCode = (string)InvokeVisitor(elseIfNode.Predicate);
 
@@ -154,34 +161,37 @@ public class CodeGenTraverser : ASTTraverser
             new("body", body.ToString())
         });
 
-        return template.ReplacePlaceholders();
-
+        return $"{scopeBuilder.ToString()} {template.ReplacePlaceholders(true)}";
     }
 
     internal override object? Visit(Else elseNode)
     {
-        StringBuilder body = new();
-        foreach (var child in elseNode.Children) body.AppendLine((string)InvokeVisitor(child));
+        StringBuilder scopeBuilder = new();
+        _scopeBuilder = scopeBuilder;
+
+        StringBuilder bodyBuilder = new();
+        foreach (var child in elseNode.Children) bodyBuilder.AppendLine((string)InvokeVisitor(child));
 
         var template = new Template("else");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("body", body.ToString())
+            new("body", bodyBuilder.ToString())
         });
 
-        return template.ReplacePlaceholders();
+        return $"{scopeBuilder.ToString()} {template.ReplacePlaceholders(true)}";
     }
 
     internal override object? Visit(Function function)
     {
+        StringBuilder scopeBuilder = new();
+        _scopeBuilder = scopeBuilder;
+
         string inputArguments = "void *pvParameters";
-        string ugabuga = "COMPILER_PARAMETERS_" + function.Name + " *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_" + function.Name + "*) pvParameters;";
 
         if (function.Name == "main")
         {
             function.Name = "setup";
             inputArguments = "";
-            ugabuga = "";
         }
 
         Template inputTemplate = new("parameter_input_struct");
@@ -203,8 +213,6 @@ public class CodeGenTraverser : ASTTraverser
         .AppendLine(outputTemplate.ReplacePlaceholders(true))
         .AppendLine($"#define COMPILER_PARAMETERS_{function.Name} COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_{function.Name}, COMPILER_OUTPUT_STRUCT_{function.Name}>");
 
-
-
         var bodyBuilder = new StringBuilder();
         foreach (var child in function.Children)
             bodyBuilder.AppendLine($"{InvokeVisitor(child) ?? ""};");
@@ -213,12 +221,11 @@ public class CodeGenTraverser : ASTTraverser
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Name),
-            new("ugabuga", ugabuga),
             new("input_arguments", inputArguments),
             new("body", bodyBuilder.ToString()),
         });
 
-        return template.ReplacePlaceholders(true);
+        return $"{scopeBuilder.ToString()} {template.ReplacePlaceholders(true)}";
     }
 
     internal override object? Visit(CompoundPredicate compoundPredicate)
@@ -261,6 +268,9 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(WhileStatement whileLoop)
     {
+        StringBuilder scopeBuilder = new();
+        _scopeBuilder = scopeBuilder;
+
         var stringBuilder = new StringBuilder();
         foreach (var child in whileLoop.Children)
             stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
@@ -272,7 +282,7 @@ public class CodeGenTraverser : ASTTraverser
             new("body", stringBuilder.ToString())
         });
 
-        return template.ReplacePlaceholders();
+        return $"{scopeBuilder.ToString()} {template.ReplacePlaceholders(true)}";
     }
 
     internal override object? Visit(SignedFloat signedFloat)
@@ -282,8 +292,6 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(BinaryAssignment binaryAssignment)
     {
-        
-
         // Helper function to generate simple binary assignments
         string GetSimpleBinaryAssignment(string Target, string Value, string Operator)
         {
@@ -308,7 +316,6 @@ public class CodeGenTraverser : ASTTraverser
             _                                                     => throw new InvalidOperationException($"Unknown assignment operator: {binaryAssignment.Operator}")
         };
         
-        var declarationBuilder   = new StringBuilder();
         var functionCallsBuilder = new StringBuilder();
         var assignmentsBuilder   = new StringBuilder();
 
@@ -317,13 +324,10 @@ public class CodeGenTraverser : ASTTraverser
         {
             var target = binaryAssignment.Targets[assignmentCount];
             var value  = binaryAssignment.Values[i];
-            
-            //If the target is a variable declaration, we need to declare the variable before assigning it.
-            if (target is VariableDeclaration variableDeclaration)
-                declarationBuilder.AppendLine((string)InvokeVisitor(variableDeclaration));
+            Console.WriteLine(op);
             
             //If the value is a function call, we need to build the function call and assign the output parameters to the targets
-            if (value is FunctionCall functionCall)  {
+            if (value is FunctionCall functionCall && functionCall.Function.OutputParameters.Count > 1)  {
                 functionCallsBuilder.Append($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} struct_{i} = {(string)InvokeVisitor(value)};");
                 foreach (var outputParameter in functionCall.Function.OutputParameters){
                     string targetName = GetVariableName(binaryAssignment.Targets[assignmentCount]);
@@ -333,7 +337,7 @@ public class CodeGenTraverser : ASTTraverser
             }
             else //If the value is not a function call, we can just assign it to the target
             {
-                string targetName = GetVariableName(binaryAssignment.Targets[assignmentCount]);
+                string targetName = (string)InvokeVisitor(target);
                 assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}", op));
                 assignmentCount++;
             }
@@ -344,9 +348,8 @@ public class CodeGenTraverser : ASTTraverser
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("functionCalls", functionCallsBuilder.ToString()),
-            new("assignments", assignmentsBuilder.ToString()),
-            new("declarations", declarationBuilder.ToString())
-        });
+            new("assignments", assignmentsBuilder.ToString())
+            });
 
         return template.ReplacePlaceholders(true);
     }
@@ -439,7 +442,7 @@ public class CodeGenTraverser : ASTTraverser
             Expression? expression = functionCall.InputParameters[i];
             string potentialComma = (i == functionCall.InputParameters.Count - 1) ? "" : ",";
             argumentsBuilder.Append($"{(string)InvokeVisitor(expression)}{potentialComma}");
-        }
+        }        
 
         if (functionCall.Function is ExternalFunction)
         {

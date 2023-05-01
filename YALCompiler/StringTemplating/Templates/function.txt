@@ -1,5 +1,3 @@
 void %%name%% (%%input_arguments%%) {
-    %%ugabuga%%
-
     %%body%%
 }

@@ -305,7 +305,6 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         {
             _errorHandler.AddError(new TypeMismatchException(leftType.ToString(), rightType.ToString()), node.LineNumber);
         }
-
         if (!Operators.CheckOperationIsValid(leftType, node.Operator))
         {
             _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftType), node.LineNumber);
