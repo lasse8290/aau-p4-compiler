@@ -28,7 +28,14 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                     if (CompilerUtilities.FindSymbol(identifier.Name, node) is Symbol symbol)
                     {
                         var idType = symbol.Type;
-                        symbol.Initialized = true;
+                        if (node.Operator == Operators.AssignmentOperator.Equals)
+                        {
+                            symbol.Initialized = true;
+                        }
+                        else if (!symbol.Initialized)
+                        {
+                            _errorHandler.AddError(new UninitializedVariableException(identifier.Name), node.LineNumber);
+                        }
                         if (identifier is ArrayElementIdentifier arrayElementIdentifier)
                         {
                             idType.Types[0] = idType.Types[0] with {IsArray = false};
