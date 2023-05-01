@@ -82,12 +82,16 @@ public static class Operators
 
     public static bool CheckOperationIsValid(YALType type, AssignmentOperator @operator)
     {
-        if (type.Types.Count > 1 || type.Types[0].IsArray)
+        foreach (var valueTypeAndArrayFlag in type.Types)
         {
-            return @operator == AssignmentOperator.Equals;
+            if (valueTypeAndArrayFlag.IsArray && @operator != AssignmentOperator.Equals ||
+                ((int)valueTypeAndArrayFlag.Type & (int)@operator) == 0)
+            {
+                return false;
+            }
         }
 
-        return ((int)TypeMaskMatching[type.Types[0].Type] & (int)@operator) != 0;
+        return true;
     }
 
     public static bool CheckOperationIsValid(YALType type, PredicateOperator @operator)
