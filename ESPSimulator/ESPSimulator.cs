@@ -1,59 +1,53 @@
 ﻿using PuppeteerSharp;
-using TextCopy;
-using System.Diagnostics;
 
-public class ESPSimulator
+public class ESPSimulation
 {
     string Code;
+    string WokwiURL = "https://wokwi.com/projects/new/esp32";
+    int SimulationDuration;
+    public List<string> Output = new List<string>();
 
-    public ESPSimulator(string code)
+    public ESPSimulation(string code, int timeout)
     {
         this.Code = code;
+        this.SimulationDuration = timeout;
+    }
+
+    public ESPSimulation(string code, int timeout, string wokwiURL) : this(code, timeout)
+    {
+        this.WokwiURL = wokwiURL;
     }
 
     public async Task Run()
     {
-        await new BrowserFetcher(Product.Chrome).DownloadAsync();
-        using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+        await new BrowserFetcher(Product.Firefox).DownloadAsync();
+        using IBrowser? browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = false,
-            Product = Product.Chrome
+            Product = Product.Firefox,
         });
 
-        var page = await browser.NewPageAsync();
-        await page.GoToAsync("https://wokwi.com/projects/new/esp32");
+        IPage page = await browser.NewPageAsync();
+        await page.GoToAsync(WokwiURL);
 
-        page.Console += async (sender, eventArgs) =>
+        page.Console += (sender, eventArgs) =>
         {
-            Console.WriteLine(eventArgs.Message.Text);
-        };
-        page.PageError += (sender, eventArgs) =>
-        {
-            Console.WriteLine(eventArgs.Message);
+            if (eventArgs.Message.Type != ConsoleType.Log) return;
+
+            string output = eventArgs.Message.Text.Substring(10).Trim();
+            Console.WriteLine(output);
+            Output.Add(output);
         };
 
         await page.WaitForSelectorAsync("div[class='react-draggable']");
-        await ClipboardService.SetTextAsync(Code);
 
-        await page.Keyboard.DownAsync("Control");
-        await page.Keyboard.PressAsync("a");
-        await page.Keyboard.UpAsync("Control");
+        await page.SelectAllText();
+        await page.Paste(Code);
 
-        await page.Keyboard.PressAsync("Backspace");
-
-        await page.Keyboard.DownAsync("Control");
-        await page.Keyboard.PressAsync("v");
-        await page.Keyboard.UpAsync("Control");
-
-        await page.ScreenshotAsync("screenshot1.png");
-
-        var buttonSelector = "button[aria-label='Start the simulation']";
+        string buttonSelector = "button[aria-label='Start the simulation']";
         await page.WaitForSelectorAsync(buttonSelector);
         await page.ClickAsync(buttonSelector);
 
-        await page.ScreenshotAsync("screenshot2.png");
-
-        await page.WaitForTimeoutAsync(15000);
-        await page.ScreenshotAsync("screenshot3.png");
+        await page.WaitForTimeoutAsync(SimulationDuration);
     }
 }

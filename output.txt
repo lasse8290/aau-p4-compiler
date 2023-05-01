@@ -82,7 +82,7 @@ void test (void *pvParameters) {
     
 
     Serial.println("test");
-vTaskDelay(1000);
+vTaskDelay(5000);
 xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
 vTaskDelete(NULL);
 

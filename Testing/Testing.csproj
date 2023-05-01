@@ -28,4 +28,10 @@
       <ProjectReference Include="..\YALCompiler\YALCompiler.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="src\*.*">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
