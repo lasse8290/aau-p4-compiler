@@ -28,15 +28,22 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                     if (CompilerUtilities.FindSymbol(identifier.Name, node) is Symbol symbol)
                     {
                         var idType = symbol.Type;
-                        symbol.Initialized = true;
+                        if (node.Operator == Operators.AssignmentOperator.Equals)
+                        {
+                            symbol.Initialized = true;
+                        }
+                        else if (!symbol.Initialized)
+                        {
+                            _errorHandler.AddError(new UninitializedVariableException(identifier.Name), node.LineNumber);
+                        }
                         if (identifier is ArrayElementIdentifier arrayElementIdentifier)
                         {
                             idType.Types[0] = idType.Types[0] with {IsArray = false};
                             if (symbol.ArraySize is not null && 
                                 (arrayElementIdentifier.Index is Integer index && 
-                                index.Value > (long)symbol.ArraySize ||
+                                index.Value >= (long)symbol.ArraySize ||
                                 arrayElementIdentifier.Index is UnsignedInteger uIndex && 
-                                uIndex.Value > (ulong)symbol.ArraySize))
+                                uIndex.Value >= (ulong)symbol.ArraySize))
                             {
                                 switch (arrayElementIdentifier.Index)
                                 {
@@ -285,9 +292,61 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                 _errorHandler.AddError(new UninitializedVariableException(node.Name), node.LineNumber);
                 
             return symbol.Type;
-        } else if (CompilerUtilities.FindFunction(node.Name, node) is Function function)
+        }
+        else
         {
-            return function.ReturnType;
+            _errorHandler.AddError(new IdentifierNotFoundException(node.Name), node.LineNumber);
+            return null;
+        }
+    }
+    
+    internal override object? Visit(ArrayElementIdentifier node)
+    {
+        if (CompilerUtilities.FindSymbol(node.Name, node) is Symbol symbol)
+        {
+            if (!symbol.Initialized &&
+                !(node.Parent is BinaryAssignment binaryAssignment && binaryAssignment.Targets.Contains(node) &&
+                  binaryAssignment.Operator == Operators.AssignmentOperator.Equals) &&
+                !node.IsRef)
+            {
+                _errorHandler.AddError(new UninitializedVariableException(node.Name), node.LineNumber);
+                return null;
+            }
+
+            
+            
+            YALType? _indexType = (YALType)Visit(node.Index);
+            if (_indexType is YALType indexType)
+            {
+                if (!Types.CheckTypesAreAssignable(new YALType(Types.ValueType.int64, false), indexType) &&
+                    !Types.CheckTypesAreAssignable(new YALType(Types.ValueType.uint64, false), indexType))
+                {
+                    _errorHandler.AddError(new TypeMismatchException("int64", indexType.ToString()), node.LineNumber);
+                }
+
+                switch (node.Index)
+                {
+                    case Integer integer:
+                        if (integer.Value < 0)
+                            _errorHandler.AddError(new ArrayIndexOutOfBoundsException(integer.Value, symbol.ArraySize ?? 0), node.LineNumber);
+                        else if (symbol.ArraySize is ulong arrSize && (ulong)integer.Value >= arrSize)
+                            _errorHandler.AddError(new ArrayIndexOutOfBoundsException(integer.Value, arrSize), node.LineNumber);
+                        break;
+                    case UnsignedInteger unsignedInteger:
+                        if (symbol.ArraySize is ulong _arrSize && unsignedInteger.Value >= _arrSize)
+                            _errorHandler.AddError(new ArrayIndexOutOfBoundsException(unsignedInteger.Value, _arrSize), node.LineNumber);
+                        break;
+                }
+            }
+            else
+            {
+                return null;
+            }
+            
+            YALType type = symbol.Type;
+            type.Types[0] = type.Types[0] with { IsArray = false };
+            
+            return symbol.Type;
         }
         else
         {
@@ -347,11 +406,6 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             return null;
         }
 
-        // if (!Types.CheckCompoundExpressionTypesAreValid(leftType, rightType))
-        // {
-        //     _errorHandler.AddError(new TypeMismatchException(leftType?.ToString() ?? "null", rightType?.ToString() ?? "null"), node.LineNumber);
-        // }
-
         if (!Operators.CheckOperationIsValid(leftType, node.Operator))
         {
             _errorHandler.AddError(new InvalidOperatorException(node.Operator, leftType), node.LineNumber);
@@ -374,15 +428,15 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         {
             return null;
         }
-        YALType leastAssignableType = (YALType)Visit(node.Values[0]);
-        for (int i = 1; i < node.Values.Count; i++)
+        List<YALType> types = new();
+        foreach (var value in node.Values)
         {
-            YALType type = (YALType)Visit(node.Values[i]);
-            leastAssignableType = Types.GetLeastAssignableType(leastAssignableType, type);
+            YALType? type = Visit(value) as YALType;
+            types.Add(type);
         }
 
-        if (leastAssignableType is null) return null;
-        
+        YALType? leastAssignableType = Types.GetLeastAssignableType(types.ToArray());
+        if (leastAssignableType is null || leastAssignableType.Types.Count == 0) return null;
         leastAssignableType.Types[0] = leastAssignableType.Types[0] with { IsArray = true };
         return leastAssignableType;
     }
@@ -419,17 +473,6 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
         return null;
     }
-    
-    // internal override object? Visit(ForStatement node)
-    // {
-    //     YALType? type = Visit(node.RunCondition) as YALType;
-    //     if (type != new YALType(Types.ValueType.@bool))
-    //     {
-    //         _errorHandler.AddError(new InvalidPredicateException(node.RunCondition.ToString(), type.ToString()), node.LineNumber);
-    //     }
-    //
-    //     return null;
-    // }
 
     internal override object? Visit(ReturnStatement node)
     {
@@ -459,5 +502,13 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     internal override object? Visit(Function node)
     {
         return node.ReturnType;
+    }
+
+    internal override object? Visit(VariableDeclaration node)
+    {
+        if (node.Variable.ArraySize is not null)
+            node.Variable.Initialized = true;
+
+        return node.Variable.Type;
     }
 }
