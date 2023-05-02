@@ -382,15 +382,15 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         {
             return null;
         }
-        YALType leastAssignableType = (YALType)Visit(node.Values[0]);
-        for (int i = 1; i < node.Values.Count; i++)
+        List<YALType> types = new();
+        foreach (var value in node.Values)
         {
-            YALType type = (YALType)Visit(node.Values[i]);
-            leastAssignableType = Types.GetLeastAssignableType(leastAssignableType, type);
+            YALType? type = Visit(value) as YALType;
+            types.Add(type);
         }
 
-        if (leastAssignableType is null) return null;
-        
+        YALType? leastAssignableType = Types.GetLeastAssignableType(types.ToArray());
+        if (leastAssignableType is null || leastAssignableType.Types.Count == 0) return null;
         leastAssignableType.Types[0] = leastAssignableType.Types[0] with { IsArray = true };
         return leastAssignableType;
     }
