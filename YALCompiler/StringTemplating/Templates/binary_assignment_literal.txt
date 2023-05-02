@@ -1,2 +1,2 @@
-%%functionCalls%%;
-%%assignments%%;
+%%functionCalls%%
+%%assignments%%

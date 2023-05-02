@@ -6,19 +6,13 @@ external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
 external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
 external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-func: in(int32 z) out(int32 x, int32 y){
-    z = 57;
-    x = z;
+
+retInt: out(int32 x, int32 y){
+    x = 1;
     y = 2;
     return;
 }
-
 main: {
     serialBegin(115200);
-    int32 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = 100;
-    int32 x = 5;
-    int32 y = 1;
-    x, y *= func(110);
-    
-    print(x);
+    int32[2] a = {retInt()};
 }
