@@ -8,15 +8,15 @@ public class ASTParsingUnitTests : TestingHelper
 {
     public static TheoryData<string, object> FunctionDeclaration =>
         new() {
-            { "func: {};", new Function {
+            { "func: {}", new Function {
                 Id = "func",
                 IsAsync = false,
             } },
-            { "async async_func: {};", new Function {
+            { "async async_func: {}", new Function {
                 Id = "async_func",
                 IsAsync = true,
             } },
-            { "func: in (string a) {};", new Function {
+            { "func: in (string a) {}", new Function {
                 Id = "func",
                 InputParameters = new List<Symbol> {
                     new Symbol("a") {
@@ -25,7 +25,7 @@ public class ASTParsingUnitTests : TestingHelper
                 },
                 IsAsync = false,
             } },
-            { "func: in (string a, int32 b) {};", new Function {
+            { "func: in (string a, int32 b) {}", new Function {
                 Id = "func",
                 InputParameters = new List<Symbol> {
                     new Symbol("a") {
@@ -37,7 +37,7 @@ public class ASTParsingUnitTests : TestingHelper
                 },
                 IsAsync = false,
             } },
-            { "func: out (float64 a, int16 b) {};", new Function {
+            { "func: out (float64 a, int16 b) {}", new Function {
                 Id = "func",
                 OutputParameters = new List<Symbol> {
                     new Symbol("a") {

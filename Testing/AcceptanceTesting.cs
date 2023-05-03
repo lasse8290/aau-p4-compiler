@@ -4,7 +4,7 @@ public class AcceptanceTesting
 {
     public static TheoryData<string, List<string>, int> AcceptanceTestsData =>
        new() {
-            { "test1.yal", new List<string> { "before", "between", "after" }, 1500 },
+            { "test.yal", new List<string> { "before", "between", "after" }, 1500 },
         };
 
     [Theory]
@@ -14,9 +14,10 @@ public class AcceptanceTesting
         Transpiler transpiler = new(Path.Combine(Environment.CurrentDirectory, $"src/{filename}"));
         transpiler.Transpile();
 
-        string code = transpiler.CompiledCode;
-        ESPSimulation s = new(code, timeout);
+        string CompiledCode = transpiler.CompiledCode;
+        ESPSimulation s = new(CompiledCode, timeout);
         await s.Run();
+
         s.Output.Should().BeEquivalentTo(expectedOutput, options => options.WithStrictOrdering());
     }
 }

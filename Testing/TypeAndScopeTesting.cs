@@ -32,7 +32,7 @@ public class TypeAndScopeTesting : TestingHelper
             { "main: { char a = 1; }", new TypeMismatchException("int8", "char") },
             { @"main: { char a = ""dd""; }", new TypeMismatchException("string", "char") },
             { "main: { char a = false; }", new TypeMismatchException("bool", "char") },
-            
+
             { "main: { float64 a = false; }", new TypeMismatchException("bool", "float64") },
             { @"main: { float64 a = ""a""; }", new TypeMismatchException("string", "float64") },
 

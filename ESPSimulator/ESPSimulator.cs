@@ -39,15 +39,30 @@ public class ESPSimulation
             Output.Add(output);
         };
 
+        page.Dialog += async (sender, e) =>
+        {
+            await e.Dialog.Accept();
+        };
+
         await page.WaitForSelectorAsync("div[class='react-draggable']");
 
         await page.SelectAllText();
         await page.Paste(Code);
 
-        string buttonSelector = "button[aria-label='Start the simulation']";
-        await page.WaitForSelectorAsync(buttonSelector);
-        await page.ClickAsync(buttonSelector);
+        string startButtonSelector = "button[aria-label='Start the simulation']";
+        await page.WaitForSelectorAsync(startButtonSelector);
+        await page.ClickAsync(startButtonSelector);
 
         await page.WaitForTimeoutAsync(SimulationDuration);
+
+        string stopButtonSelector = "button[aria-label='Stop the simulation']";
+        await page.WaitForSelectorAsync(stopButtonSelector);
+        await page.ClickAsync(stopButtonSelector);
+
+        await page.Keyboard.DownAsync("Meta");
+        await page.Keyboard.PressAsync("z");
+        await page.Keyboard.UpAsync("Meta");
+
+        await page.CloseAsync();
     }
 }

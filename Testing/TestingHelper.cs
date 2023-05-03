@@ -3,9 +3,11 @@ using Antlr4.Runtime.Tree;
 using YALCompiler;
 using YALCompiler.ErrorHandlers;
 
-public abstract class TestingHelper {
+public abstract class TestingHelper
+{
+
     YALGrammerVisitor visitor = new YALGrammerVisitor(new ErrorHandler(), new WarningsHandler());
-    
+
     public YALGrammerParser Setup(string input)
     {
         AntlrInputStream inputStream = new AntlrInputStream(input);
