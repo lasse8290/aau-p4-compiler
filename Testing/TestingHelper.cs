@@ -5,7 +5,6 @@ using YALCompiler.ErrorHandlers;
 
 public abstract class TestingHelper
 {
-
     YALGrammerVisitor visitor = new YALGrammerVisitor(new ErrorHandler(), new WarningsHandler());
 
     public YALGrammerParser Setup(string input)

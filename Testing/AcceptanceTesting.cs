@@ -1,3 +1,4 @@
+using ESPSimulation;
 using FluentAssertions;
 
 public class AcceptanceTesting
@@ -15,7 +16,7 @@ public class AcceptanceTesting
         transpiler.Transpile();
 
         string CompiledCode = transpiler.CompiledCode;
-        ESPSimulation s = new(CompiledCode, timeout);
+        ESPSimulator s = new(CompiledCode, timeout);
         await s.Run();
 
         s.Output.Should().BeEquivalentTo(expectedOutput, options => options.WithStrictOrdering());

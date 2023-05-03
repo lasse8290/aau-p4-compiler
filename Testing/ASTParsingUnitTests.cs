@@ -360,6 +360,14 @@ public class ASTParsingUnitTests : TestingHelper
 
     public static TheoryData<string, object> Expressions =>
         new() {
+            /*{ "!true", new YALCompiler.DataTypes.Boolean {
+                Negated = true,
+                LiteralValue = true,
+            } },
+            { "!false", new YALCompiler.DataTypes.Boolean {
+                Negated = true,
+                LiteralValue = false,
+            } },*/
             { "i++", new UnaryAssignment {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostIncrement
@@ -375,6 +383,14 @@ public class ASTParsingUnitTests : TestingHelper
             { "--i", new UnaryAssignment {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PreDecrement
+            } },
+            { "1++;", new UnaryAssignment {
+                Target = new SignedNumber(1, isNegative: false),
+                Operator = Operators.AssignmentOperator.PostIncrement
+            } },
+            { "1--;", new UnaryAssignment {
+                Target = new SignedNumber(1, isNegative: false),
+                Operator = Operators.AssignmentOperator.PostDecrement
             } },
             { "5 * 2", new CompoundExpression {
                 Left = new SignedNumber(5, isNegative: false),
