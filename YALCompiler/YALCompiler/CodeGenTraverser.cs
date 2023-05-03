@@ -29,18 +29,25 @@ public class CodeGenTraverser : ASTTraverser
             VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
             _                                       => "Da hell, how is this possible! 🤷‍♂️"
         };
+        
             
         ASTNode testNode = node;
+
         while (testNode.Parent != null)
         {
             if (testNode.Parent.SymbolTable is not null && testNode.Parent.SymbolTable.ContainsKey(localName))
             {
                 if (testNode.Parent is Function function)
                 {
-                    if(function.InputParameters.Any(x => x.Name == localName))
-                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input->{localName}";
-                    if(function.OutputParameters.Any(x => x.Name == localName))
-                        return $" ((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{localName}";
+                    var symbol = function.InputParameters.FirstOrDefault(x => x.Name == localName);
+                    if (symbol != null) {
+                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input->{localName})";
+                    }
+
+                    symbol = function.OutputParameters.FirstOrDefault(x => x.Name == localName);
+                    if (symbol != null) {
+                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{localName}";
+                    }
                 }
                 break;
             }
@@ -196,14 +203,14 @@ public class CodeGenTraverser : ASTTraverser
         inputTemplate.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Name),
-            new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n")))
+            new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name};\n")))
         });
 
         Template outputTemplate = new("parameter_output_struct");
         outputTemplate.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Name),
-            new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()} {symbol.Name};\n"))),
+            new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name};\n"))),
         });
 
         _declarationsBuilder
@@ -376,7 +383,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("identifier");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("name", GetVariableName(identifier))
+            new("name", $"{(identifier.IsRef ? "&" : "")}{GetVariableName(identifier)}")
         });
 
         return (identifier.Negated ? "!" : "") + template.ReplacePlaceholders();
@@ -442,7 +449,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(FunctionCall functionCall)
     {
-        string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Name}" : "";
+        //string suffix = (functionCall.Function.OutputParameters.Count == 1) ? $".{functionCall.Function.OutputParameters[0].Name}" : "";
 
         StringBuilder argumentsBuilder = new StringBuilder();
         for (int i = 0; i < functionCall.InputParameters.Count; i++)
@@ -459,7 +466,6 @@ public class CodeGenTraverser : ASTTraverser
             {
                 new("function", _externalNicknames[functionCall.Function.Name]),
                 new("arguments", argumentsBuilder.ToString()),
-                new("suffix", suffix),
             });
             return template.ReplacePlaceholders(true); 
         }
@@ -477,7 +483,6 @@ public class CodeGenTraverser : ASTTraverser
                 new("is_async", functionCall.Function.IsAsync ? "1" : "0"),
                 new("is_await", functionCall.Await ? "1" : "0"),
                 new("arguments", argumentsBuilder.ToString()),
-                new("suffix", suffix),
             });
             return template.ReplacePlaceholders(true); 
         }
