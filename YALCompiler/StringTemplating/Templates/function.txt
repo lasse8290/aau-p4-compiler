@@ -1,0 +1,7 @@
+void %%name%% (%%input_arguments%%) {
+    %%ugabuga%%
+    %%initialized_parameters%%
+
+    %%body%%
+    %%output_parameters%%
+}

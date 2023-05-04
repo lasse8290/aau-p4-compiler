@@ -1,4 +1,5 @@
 using CommandLine;
+using ESPSimulation;
 
 namespace YALCompiler;
 public partial class Program
@@ -22,7 +23,7 @@ public partial class Program
 
     static void RunSimulator(string code, int timeout, string? wokwiURL = null)
     {
-        ESPSimulation s;
+        ESPSimulator s;
 
         if (wokwiURL != null)
             s = new(code, timeout, wokwiURL);
