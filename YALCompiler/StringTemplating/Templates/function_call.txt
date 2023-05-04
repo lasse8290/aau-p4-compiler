@@ -1,1 +1,1 @@
-COMPILER_INVOKE(COMPILER_INPUT_STRUCT_%%function%% { %%arguments%% }, %%output%%, %%function%%, %%is_async%%, %%is_await%%)8
+COMPILER_INVOKE(COMPILER_INPUT_STRUCT_%%function%% { %%arguments%% }, %%output%%, %%function%%, %%is_async%%, %%is_await%%)
