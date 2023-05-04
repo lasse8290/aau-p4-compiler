@@ -15,7 +15,7 @@ public partial class Program
         public bool UseSimulator { get; set; } = default!;
 
         [Option('t', "timeout", Required = false, HelpText = "Timeout for the simulation in milliseconds.")]
-        public int Timeout { get; set; } = default!;
+        public int Timeout { get; set; } = 999999999;
 
         [Option('w', "wokwi", Required = false, HelpText = "URL to Wokwi project to be used")]
         public string WokwiURL { get; set; } = default!;
