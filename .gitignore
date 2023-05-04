@@ -12,3 +12,6 @@ packages
 
 package-lock.json
 node_modules
+
+coverageresults
+TestResults

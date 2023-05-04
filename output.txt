@@ -56,7 +56,7 @@ void setup () {
 int32_t b;
 int32_t x;
 Serial.println("before");
-COMPILER_INVOKE(COMPILER_INPUT_STRUCT_between {  }, &_55530882, between, 1, 1)8;
+COMPILER_INVOKE(COMPILER_INPUT_STRUCT_between {  }, &_55530882, between, 1, 1);
 Serial.println("after");
 
 return;
@@ -65,7 +65,7 @@ return;
 void between (void *pvParameters) {
      Serial.println("between");
 vTaskDelay(500);
-xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
+xTaskNotify(((COMPILER_PARAMETERS_between*) pvParameters)->taskhandle, 0, eNoAction);
 vTaskDelete(NULL);
 
 return;
