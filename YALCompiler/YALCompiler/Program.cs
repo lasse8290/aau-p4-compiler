@@ -17,7 +17,7 @@ public partial class Program
                 Transpiler transpiler = new(o.InputFilePath, o.OutputFilePath);
                 transpiler.Transpile();
 
-                if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Timeout, o.WokwiURL);
+                if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Timeout * 1000, o.WokwiURL);
             });
     }
 
@@ -32,6 +32,6 @@ public partial class Program
 
         Console.WriteLine("Running code...");
         s.Run().Wait();
-        Console.WriteLine("Excited...");
+        Console.WriteLine("Exited...");
     }
 }

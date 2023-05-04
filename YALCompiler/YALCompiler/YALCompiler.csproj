@@ -22,4 +22,15 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\program.yal">
+        <Link>program.yal</Link>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ClCompile Include="bin\Debug\net7.0\output.cpp" />
+    </ItemGroup>
 </Project>
