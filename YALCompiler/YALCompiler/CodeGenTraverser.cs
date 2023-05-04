@@ -483,10 +483,11 @@ public class CodeGenTraverser : ASTTraverser
             template.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", functionCall.Function.Name),
+                new("arguments", argumentsBuilder.ToString()),
                 new("output", $"&_{functionCall.GetHashCode().ToString()}"),
                 new("is_async", functionCall.Function.IsAsync ? "1" : "0"),
                 new("is_await", functionCall.Await ? "1" : "0"),
-                new("arguments", argumentsBuilder.ToString()),
+
             });
             return template.ReplacePlaceholders(true);
         }
@@ -539,8 +540,8 @@ public class CodeGenTraverser : ASTTraverser
             if (returnStatement.function.IsAsync)
                 outputParametersBuilder
                 .AppendLine($"xTaskNotify(((COMPILER_PARAMETERS_{returnStatement.function.Name}*) pvParameters)->taskhandle, 0, eNoAction);")
-                .AppendLine("vTaskDelete(NULL);");
-
+                .AppendLine("vTaskDelete(NULL);")
+                .AppendLine("delete pvParameters;");
 
             template.SetKeys(new List<Tuple<string, string>>
         {
