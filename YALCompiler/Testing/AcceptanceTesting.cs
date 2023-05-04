@@ -12,7 +12,7 @@ public class AcceptanceTesting
     [MemberData(nameof(AcceptanceTestsData))]
     public async Task AcceptanceTests(string filename, List<string> expectedOutput, int timeout)
     {
-        Transpiler transpiler = new(Path.Combine(Environment.CurrentDirectory, $"src/{filename}"));
+        Transpiler transpiler = new(Path.Combine(Environment.CurrentDirectory, $"tests/{filename}"));
         transpiler.Transpile();
 
         string CompiledCode = transpiler.CompiledCode;
