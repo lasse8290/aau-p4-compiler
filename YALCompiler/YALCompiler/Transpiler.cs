@@ -13,7 +13,7 @@ public class Transpiler
     public string? OutputFilePath { get; set; }
     string TemplatesPath = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}/Templates";
     string SourceCode;
-    public string CompiledCode { get; private set; }
+    public string CompiledCode { get; private set; } = "";
     ASTNode root = default!;
 
     public Transpiler(string InputFilePath)
@@ -24,7 +24,7 @@ public class Transpiler
         SourceCode = File.ReadAllText(InputFilePath);
     }
 
-    public Transpiler(string InputFilePath, string OutputFilePath) : this(InputFilePath)
+    public Transpiler(string InputFilePath, string? OutputFilePath) : this(InputFilePath)
     {
         this.OutputFilePath = OutputFilePath;
     }

@@ -17,21 +17,21 @@ public partial class Program
                 Transpiler transpiler = new(o.InputFilePath, o.OutputFilePath);
                 transpiler.Transpile();
 
-                if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Timeout, o.WokwiURL);
+                if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Duration, o.WokwiURL);
             });
     }
 
-    static void RunSimulator(string code, int timeout, string? wokwiURL = null)
+    static void RunSimulator(string code, int? duration, string? wokwiURL = null)
     {
         ESPSimulator s;
 
         if (wokwiURL != null)
-            s = new(code, timeout, wokwiURL);
+            s = new(code, duration, wokwiURL);
         else
-            s = new(code, timeout);
+            s = new(code, duration);
 
         Console.WriteLine("Running code...");
         s.Run().Wait();
-        Console.WriteLine("Excited...");
+        Console.WriteLine("Exited...");
     }
 }
