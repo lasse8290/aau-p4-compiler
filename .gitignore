@@ -1,21 +1,17 @@
-**/.vscode/
 *.cache
-*.user
-obj/
-.idea/
-.vs/
-.antlr/
+.idea
+.vs
+.antlr
+
+.DS_Store
 
 *.user
+bin
+obj
+packages
 
-**/**/obj/*
+package-lock.json
+node_modules
 
-YALCompiler/YALParser/gen/
-
-YALCompiler/YALParser/obj/
-
-YALCompiler/YALCompiler/obj/
-
-YALCompiler/YALCompiler/bin/Debug/net7.0/
-
-YALCompiler/YALCompiler/bin/Debug/
+coverageresults
+TestResults

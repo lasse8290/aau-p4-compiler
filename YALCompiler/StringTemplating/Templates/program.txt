@@ -1,14 +1,42 @@
-#include <Arduino.h>
-#include <pt.h>
-%%include%%
+#include <string>
+#include <stdint.h>
+#include <stdbool.h>
+%%includes%%
 
-%%globalVariables%%
-%%globalFunctions%%
-    
-void setup() {
-    %%setup_body%%
+typedef void (*Func)(void*);
+template <typename I, typename O>
+struct COMPILER_PARAMETERS {
+  TaskHandle_t taskhandle; 
+  I input;
+  O *output;
+};
+
+template <typename I, typename O>
+void* COMPILER_INVOKE(I inputParameters, O *outputParameters, Func func, int isAsync, int isAwait) {
+    TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
+
+    auto parameters = new COMPILER_PARAMETERS<I, O> {
+      taskhandle,
+      inputParameters,
+      outputParameters,
+    };
+
+    if (isAsync) {
+      xTaskCreate(func, NULL, 4096, parameters, 10, &taskhandle);
+      if (isAwait) {
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+      }
+    } else {
+      func(parameters);
+    }
+
+    return outputParameters;
 }
 
+%%declarations%%
+
+%%program%%
+
 void loop() {
-    %%loop_body%%
+  delay(10);
 }

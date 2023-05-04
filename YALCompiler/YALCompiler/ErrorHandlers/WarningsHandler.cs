@@ -10,6 +10,11 @@ public class WarningsHandler
         Warnings.Add($"Warning at line {context.Start.Line}: {e.Message}");
     } 
     
-    public string GetAsString() => string.Join(Environment.NewLine, Warnings);
+    public void AddWarning(Exception e, int lineNumber)
+    {
+        Warnings.Add($"Warning at line {lineNumber}: {e.Message}");
+    } 
+    
+    public override string ToString() => string.Join(Environment.NewLine, Warnings);
 
 }

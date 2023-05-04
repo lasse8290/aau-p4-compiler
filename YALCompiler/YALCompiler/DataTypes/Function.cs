@@ -2,11 +2,11 @@
 
 namespace YALCompiler.DataTypes;
 
-public class Function : ASTNode
+public class Function : ASTNode, ISymbol
 {
     public bool IsAsync { get; set; }
-    public string Id { get; set; }
-    public Dictionary<string, string> InputParameters { get; } = new();
-    public Dictionary<string, string> OutputParameters { get; } = new();
-    public List<YALType> ReturnType { get; set; }
+    public string Name { get; set; }
+    public List<Symbol> InputParameters { get; set; } = new();
+    public List<Symbol> OutputParameters { get; set; } = new();
+    public YALType ReturnType { get; set; } = new();
 }

@@ -2,5 +2,5 @@
 
 public class If: ASTNode
 {
-    public string Predicate { get; set; }
+    public Expression Predicate { get; set; }
 }

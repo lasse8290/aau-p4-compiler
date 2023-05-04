@@ -5,11 +5,15 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
       <ProjectReference Include="..\StringTemplating\StringTemplating.csproj" />
-      <ProjectReference Include="..\YALParser\YALParser.csproj" />
+      <ProjectReference Include="..\ESPSimulator\ESPSimulator.csproj" />
       <PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
     </ItemGroup>
 
@@ -19,4 +23,14 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="..\..\program.yal">
+        <Link>program.yal</Link>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ClCompile Include="bin\Debug\net7.0\output.cpp" />
+    </ItemGroup>
 </Project>

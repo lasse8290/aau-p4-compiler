@@ -178,7 +178,7 @@ public partial class Template {
 
         for (int index = 0; index < matches.Count; index++) {
             Match match = matches[index];
-            replacementKeys.Add(match.Groups[1].Value, null);
+            replacementKeys.TryAdd(match.Groups[1].Value, null);
         }
 
         return replacementKeys;

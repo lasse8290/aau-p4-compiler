@@ -1,55 +1,28 @@
-﻿main: {
+external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
+external  <"stdio.h/Serial.println"> print: in(int32 s);
 
-    // This is a line comment
-    /* This is a block comment
-       which can span across multiple lines */
-    
-    int8 f;
-    f = 1;
-    
-    functionWithNoParams();
-    
-    functionWithInputParams(1, "hello");
-    
-    int32 i = functionWithOneOutputParam();
-    
-    (int32 ii, string ss) = functionWithInputAndOutputParams(i);
-    
-    if (i < 0) {
-        i = 0;
-    } else if (i > 0) {
-        i = 1;
-    } else {
-        i = 2;
-    }
-    
-    while (i < 10) {
-        i = i + 1;
-    }
-    
-    for (int32 h = 0; h < 10; h++) {
-        functionWithInputAndOutputParams(h);
-    }
+external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
+external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
+external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
+external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
+
+initialize_values: in(int32 a, int32 b) out(int32 c, int32 d) {
+    c = a;
+    d = b;
 }
 
-functionWithNoParams: {
-    return;
+x: in(int32 y){
+
 }
 
-functionWithInputParams: in (int32 i, string args) {
-    return;
+print_abcd: in(int32 a, int32 b, int32 c, int32 d) {
+    print(a);
+    print(b);
+    print(c);
+    print(d);
 }
 
-functionWithOneOutputParam: out (int32 o) {
-    return;
-}
-
-functionWithInputAndOutputParams: in (int32 i) out (int32 o, string s) {
-    return;
-}
-
-async functionEx: out (int32 o) {
-    longFunctionDontWait();
-    o = await longFunction();
-    return;
+main: {
+    serialBegin(115200);
+    print_abcd(1,2,3,4);
 }
