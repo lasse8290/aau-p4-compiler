@@ -1,148 +1,565 @@
-using Antlr4.Runtime.Tree;
-using Antlr4.Runtime;
-using YALCompiler;
 using YALCompiler.DataTypes;
 using YALCompiler.Helpers;
+using FluentAssertions;
 
 namespace Testing;
 
-public class ASTUnitTests
+public class ASTParsingUnitTests : TestingHelper
 {
-    private static ASTNode Setup(string _string)
-    {
-        AntlrInputStream inputStream = new AntlrInputStream(_string);
-        YALGrammerLexer speakLexer = new YALGrammerLexer(inputStream);
-        CommonTokenStream commonTokenStream = new CommonTokenStream(speakLexer);
-        YALGrammerParser speakParser = new YALGrammerParser(commonTokenStream);
-        IParseTree tree = speakParser.program();
-        YALGrammerVisitor visitor = new YALGrammerVisitor();
-        ASTNode node = (ASTNode)visitor.Visit(tree);
-
-        return node;
-    }
+    public static TheoryData<string, object> FunctionDeclaration =>
+        new() {
+            { "func: {}", new Function {
+                Name = "func",
+                IsAsync = false,
+            } },
+            { "async async_func: {}", new Function {
+                Name = "async_func",
+                IsAsync = true,
+            } },
+            { "func: in (string a) {}", new Function {
+                Name = "func",
+                InputParameters = new List<Symbol> {
+                    new Symbol("a") {
+                        Type = new YALType((Types.ValueType.@string, false))
+                    }
+                },
+                IsAsync = false,
+            } },
+            { "func: in (string a, int32 b) {}", new Function {
+                Name = "func",
+                InputParameters = new List<Symbol> {
+                    new Symbol("a") {
+                        Type = new YALType((Types.ValueType.@string, false))
+                    },
+                    new Symbol("b") {
+                        Type = new YALType((Types.ValueType.int32, false))
+                    }
+                },
+                IsAsync = false,
+            } },
+            { "func: out (float64 a, int16 b) {}", new Function {
+                Name = "func",
+                OutputParameters = new List<Symbol> {
+                    new Symbol("a") {
+                        Type = new YALType((Types.ValueType.float64, false))
+                    },
+                    new Symbol("b") {
+                        Type = new YALType((Types.ValueType.int16, false))
+                    }
+                },
+                ReturnType = new YALType((Types.ValueType.float64, false), (Types.ValueType.int16, false)),
+                IsAsync = false,
+            } },
+        };
 
     [Theory]
-    [InlineData(@"external <""my_library""> print1: in (string _string);external <""my_library""> print2: in (string _string);", new string[] { "print1", "print2" })]
-    [InlineData(@"external <""my_library2""> printhello1: in (string _string);external <""my_library3""> printhello2: in (string _string);", new string[] { "printhello1", "printhello2" })]
-    public void Assert_External_Function_Declaration_Exists_In_Symbol_Table(string code, string[] expectedNames) {
-        ASTNode node = Setup(code);
-
-        foreach (string expectedName in expectedNames) {
-            bool exists = node.FunctionTable.ContainsKey(expectedName);
-
-            Assert.True(exists);
-        }
-
-    }
-    
-    [Theory]
-    [InlineData("my_function: {}", "my_function")]
-    public void Assert_Correct_Function_Name(string code, string functionName)
+    [MemberData(nameof(FunctionDeclaration))]
+    public void Correct_Function_Declaration(string input, object expected)
     {
-        ASTNode node = Setup(code);
-        
-        Function func = (Function)node.Children[0];
+        var actual = Setup(input, nameof(YALGrammerParser.functionDeclaration));
 
-        Assert.IsType<Function>(node.Children[0]);
-        Assert.Equal(functionName, func.Id);
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable", "Children", "Initialized" });
+    }
+    public static TheoryData<string, object> ExternalFunctions =>
+        new() {
+            { @"external <""arduino/digitalWrite""> externalDigitalWrite: in (int64 pin, int64 value)", new ExternalFunction {
+                LibraryName = "arduino",
+                FunctionName = "digitalWrite",
+                Name = "externalDigitalWrite",
+                IsAsync = false,
+                InputParameters = new List<Symbol> {
+                    new Symbol("pin") {
+                        Type = new YALType((Types.ValueType.int64, false))
+                    },
+                    new Symbol("value") {
+                        Type = new YALType((Types.ValueType.int64, false))
+                    }
+                }
+            } }
+        };
+
+    [Theory]
+    [MemberData(nameof(ExternalFunctions))]
+    public void External_Functions(string input, object expected)
+    {
+        ExternalFunction actual = (ExternalFunction)Setup(input, nameof(YALGrammerParser.externalFunctionDeclaration));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable", "Children", "Initialized" });
     }
 
     public static TheoryData<string, int> functionsData =>
-        new () {
+        new() {
             { "", 0 },
+            { String.Concat(Enumerable.Range(0, 40).Select(i => $"function{i}: {{}}")), 40 },
             { String.Concat(Enumerable.Range(0, 15).Select(i => $"function{i}: {{}}")), 15 },
             { String.Concat(Enumerable.Range(0, 2).Select(i => $"function{i}: {{}}")), 2 }
         };
 
     [Theory]
     [MemberData(nameof(functionsData))]
-    public void Should_Create_x_Functions(string code, int expectedFunctionsCount)
+    public void Should_Create_x_Functions(string input, int expected)
     {
-        ASTNode node = Setup(code);
+        ASTNode _program = (ASTNode)Setup(input, nameof(YALGrammerParser.program));
 
-        Assert.Equal(expectedFunctionsCount, node.Children.Count);
+        _program.Children.Count.Should().Be(expected);
     }
 
     [Theory]
     [InlineData("", 0, 0)]
-    [InlineData("in ()", 0, 0)]
-    [InlineData("out: ()", 0, 0)]
-    [InlineData("in () out: ()", 0, 0)]
-    [InlineData("in () out: (string a)", 0, 1)]
-    [InlineData("in (string a) out: ()", 1, 0)]
+    [InlineData("out (string a)", 0, 1)]
+    [InlineData("in (string a)", 1, 0)]
+    // [InlineData("in (string a) out ()", 1, 0)] We need to discuss if this is it allowed?
     [InlineData("in (int32 a, int32 b)", 2, 0)]
-    [InlineData("in (int32 a, int32 b) out: (int32 c, int32 d)", 2, 2)]
-    public void Assert_Correct_Function_Parameters_Count(string code, int expectedInputParametersCount, int expectedOutputParametersCount)
+    [InlineData("in (int32 a, int32 b) out (int32 c)", 2, 1)]
+    [InlineData("in (int32 a, int32 b) out (int32 c, int32 d)", 2, 2)]
+    [InlineData("in (int32 a) out (int32 c, int32 d)", 1, 2)]
+    public void Correct_Function_Parameters_Count(string input, int expectedInputParametersCount, int expectedOutputParametersCount)
     {
-        ASTNode node = Setup($"my_function: {code} {{}}");
-        
-        Function func = (Function)node.Children[0];
-        
-        Assert.Equal(expectedInputParametersCount, func.InputParameters.Count);
-        Assert.Equal(expectedOutputParametersCount, func.OutputParameters.Count);
+        Function func = (Function)Setup($"my_function: {input} {{}}", nameof(YALGrammerParser.functionDeclaration));
+
+        int actualInputParamsCount = func.InputParameters.Count;
+        int actualOutputParamsCount = func.OutputParameters.Count;
+
+        actualInputParamsCount.Should().Be(expectedInputParametersCount);
+        actualOutputParamsCount.Should().Be(expectedOutputParametersCount);
     }
 
-    public static TheoryData<string, string, List<Types.ValueType>> ParametersData =>
-        new () {
-            { "in", "int32 a, bool b", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
-            { "out", "int32 a, bool b", new List<Types.ValueType> { Types.ValueType.int32, Types.ValueType.@bool } },
-            { "in", "float32 c, float64 d", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
-            { "out", "float32 c, float64 d", new List<Types.ValueType> { Types.ValueType.float32, Types.ValueType.float64 } },
+    public static TheoryData<string, object> FormalParameters =>
+        new() {
+            { "in (bool b)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) }
+            } },
+            { "in (bool b, string s)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) },
+                new Symbol("s") { Type = new YALType(Types.ValueType.@string) }
+            } },
+            { "in (bool b, string s, float64 f)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) },
+                new Symbol("s") { Type = new YALType(Types.ValueType.@string) },
+                new Symbol("f") { Type = new YALType(Types.ValueType.float64) }
+            } },
+            { "out (bool b)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) }
+            } },
+            { "out (bool b, string s)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) },
+                new Symbol("s") { Type = new YALType(Types.ValueType.@string) }
+            } },
+            { "out (bool b, string s, float64 f)", new List<Symbol> {
+                new Symbol("b") { Type = new YALType(Types.ValueType.@bool) },
+                new Symbol("s") { Type = new YALType(Types.ValueType.@string) },
+                new Symbol("f") { Type = new YALType(Types.ValueType.float64) }
+            } },
         };
 
     [Theory]
-    [MemberData(nameof(ParametersData))]
-    public void Assert_Correct_Parameter_Types(string type, string parameters, List<Types.ValueType> expectedParameterTypes)
+    [MemberData(nameof(FormalParameters))]
+    public void Correct_Formal_Parameters(string input, List<Symbol> expected)
     {
-        ASTNode node = Setup($"my_function: {type} ({parameters}) {{ }}");
+        string type = "";
 
-        Function func = (Function)node.Children[0];
-        
-        for (int i = 0; i < expectedParameterTypes.Count; i++) {
-            Types.ValueType expectedType = expectedParameterTypes[i];
-            Symbol param;
-
-            switch (type) {
-                case "in": 
-                    param = (Symbol)func.InputParameters[i]; break;
-                case "out":
-                    param = (Symbol)func.OutputParameters[i]; break;
-                default:
-                    throw new Exception("Type must be either in or out");
-            }
-
-            Assert.Equal(expectedType ,((SingleType)param.Type!).Type);
+        switch (input.Split(" ")[0])
+        {
+            case "in":
+                type = nameof(YALGrammerParser.formalInputParams);
+                break;
+            case "out":
+                type = nameof(YALGrammerParser.formalOutputParams);
+                break;
         }
-    }
-    
-    [Theory]
-    [InlineData("my_function: { }", 0)]
-    [InlineData("my_function: { int32 hej = 1+2; }", 1)]
-    [InlineData("my_function: { int32 hej = 3+4; int32 hej2 = 4+5; }", 2)]
-    [InlineData("my_function: { int32 hej = 5+6; int32 hej3 = 6+7; int32 hej4 = 7+8 }", 3)]
-    public void Assert_Correct_Amount_Of_BlockStatement(string code, int expectedStatementsCount)
-    {
-        ASTNode node = Setup(code);
-        
-        Function func = (Function)node.Children[0];
-        Assert.Equal(expectedStatementsCount, func.Children.Count);
+
+        var actual = Setup(input, type);
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
     }
 
     [Theory]
-    [InlineData("my_function: { hej++ }", typeof(UnaryAssignment))]
-    [InlineData("my_function: { int32 hej = 5+2; }", typeof(BinaryAssignment))]
-    [InlineData("my_function: { for (int32 i = 5; i < 5; i++) { } }", typeof(ForStatement))]
-    [InlineData("my_function: { while (i < 5) { } }", typeof(WhileStatement))]
-    [InlineData("my_function: { functionCall(); }", typeof(FunctionCall))]
-    [InlineData("my_function: { int32 i; }", typeof(VariableDeclaration))]
-    [InlineData("my_function: { i++; }", typeof(UnaryAssignment))]
-    public void Assert_Correct_Statement_Type(string code, Type expectedStatementType)
+    [InlineData("my_function: { }", 1)]
+    [InlineData("my_function: { int32 hej = 1+2; }", 2)]
+    [InlineData("my_function: { int32 hej = 3+4; int32 hej2 = 4+5; }", 3)]
+    [InlineData("my_function: { int32 hej = 5+6; int32 hej3 = 6+7; int32 hej4 = 7+8 }", 4)]
+    public void Correct_Amount_Of_BlockStatements(string input, int expected)
     {
-        ASTNode node = Setup(code);
-        
-        Function func = (Function)node.Children[0];
-        ASTNode stmt = func.Children[0];
+        Function actual = (Function)Setup(input, nameof(YALGrammerParser.functionDeclaration));
 
-        Assert.Equal(expectedStatementType, stmt.GetType());
+        actual.Children.Count.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData("int32 hej = 5+2", typeof(BinaryAssignment))]
+    [InlineData("functionCall()", typeof(FunctionCall))]
+    [InlineData("int32 i", typeof(List<VariableDeclaration>))]
+    [InlineData("i++", typeof(UnaryAssignment))]
+    public void Correct_SingleStatement_Type(string input, Type expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.singleStatement));
+
+        actual.Should().BeOfType(expected);
+    }
+
+    public static TheoryData<string, object> IfStatement =>
+        new() {
+            { "if (true) { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = true } }
+                }
+            } },
+            { "if (true) { } else { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = true } },
+                    new Else { }
+                }
+            } },
+            { "if (false) { } else if (true) { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = false } },
+                    new ElseIf { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = true } }
+                }
+            } },
+            { "if (false) { } else if (false) {} else { }", new IfStatement {
+                Children = {
+                    new If { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = false } },
+                    new ElseIf { Predicate = new YALCompiler.DataTypes.Boolean { LiteralValue = false } },
+                    new Else { }
+                }
+            } }
+        };
+
+    [Theory]
+    [MemberData(nameof(IfStatement))]
+    public void Correct_If_Statement(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.ifStatement));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
+    }
+
+    public static TheoryData<string, object> LoopStatements =>
+        new() {
+            { "while (i < 5) {}", new WhileStatement {
+                Predicate = new CompoundPredicate {
+                    Left = new Identifier("i"),
+                    Right = new Integer(5),
+                    Operator = Operators.PredicateOperator.LessThan
+                }
+            } }
+        };
+
+    [Theory]
+    [MemberData(nameof(LoopStatements))]
+    public void Loops(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.blockStatement));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable" });
+    }
+
+    public static TheoryData<string, object> Identifiers =>
+        new() {
+            { "identifier[5]", new ArrayElementIdentifier("identifier", new Integer(5)) },
+            { "identifier", new Identifier("identifier") },
+            { "ref identifier", new Identifier("identifier") { IsRef = true } },
+            { "id1, id2, id3", new List<Identifier> {
+                new Identifier("id1"),
+                new Identifier("id2"),
+                new Identifier("id3"),
+            } },
+            { "(id)", new Identifier("id") },
+        };
+
+    [Theory]
+    [MemberData(nameof(Identifiers))]
+    public void Identifier(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.identifier));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent", "SymbolTable" });
+    }
+
+    public static TheoryData<string, object> SimpleAssignments =>
+       new() {
+            { "i = k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.Equals
+            }},
+            { "i += k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.AdditionAssignment
+            }},
+            { "i -= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.SubtractionAssignment
+            }},
+            { "i *= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.MultiplicationAssignment
+            }},
+            /* This to be uncommented when grammar has been fixed */
+            /*{ "i /= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.DivisionAssignment
+            }},*/
+            { "i %= k", new BinaryAssignment {
+                Targets = new List<ASTNode> { new Identifier("i") },
+                Values = new List<Expression> { new Identifier("k") },
+                Operator = Operators.AssignmentOperator.ModuloAssignment
+            }},
+            { "++i", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreIncrement
+            }},
+            { "--i", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreDecrement
+            }},
+            { "i++", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostIncrement
+            }},
+            { "i--", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostDecrement
+            }},
+       };
+
+    [Theory]
+    [MemberData(nameof(SimpleAssignments))]
+    public void SimpleAssignment(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.simpleAssignment));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
+    }
+
+    public static TheoryData<string, object> DeclarationAssignments =>
+       new() {
+            { "int32 i = 1", new BinaryAssignment {
+                Targets = new List<ASTNode> {
+                    new VariableDeclaration {
+                        Variable = new Symbol("i") { Type = new YALType(Types.ValueType.int32) },
+                    }
+                },
+                Values = new List<Expression> { new Integer(1) },
+                Operator = Operators.AssignmentOperator.Equals
+            }},
+       };
+
+    [Theory]
+    [MemberData(nameof(DeclarationAssignments))]
+    public void DeclarationAssignment(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.declarationAssignment));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "Initialized", "LineNumber", "Parent" });
+    }
+
+    public static TheoryData<string, object> Expressions =>
+        new() {
+            /*{ "!true", new YALCompiler.DataTypes.Boolean {
+                Negated = true,
+                LiteralValue = true,
+            } },
+            { "!false", new YALCompiler.DataTypes.Boolean {
+                Negated = true,
+                LiteralValue = false,
+            } },*/
+            { "i++", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostIncrement
+            } },
+            { "i--", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PostDecrement
+            } },
+            { "++i", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreIncrement
+            } },
+            { "--i", new UnaryAssignment {
+                Target = new Identifier("i"),
+                Operator = Operators.AssignmentOperator.PreDecrement
+            } },
+            { "1++;", new UnaryAssignment {
+                Target = new Integer(1),
+                Operator = Operators.AssignmentOperator.PostIncrement
+            } },
+            { "1--;", new UnaryAssignment {
+                Target = new Integer(1),
+                Operator = Operators.AssignmentOperator.PostDecrement
+            } },
+            { "5 * 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.Multiplication
+            } },
+            { "5 * my_string", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Identifier("my_string"),
+                Operator = Operators.ExpressionOperator.Multiplication
+            } },
+            { "5 / 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.Division
+            } },
+            { "5 % 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.Modulo
+            } },
+            { "5 % 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.Modulo
+            } },
+            { "5 + 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.Addition
+            } },
+            { "5 - 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.Subtraction
+            } },
+            { "5 << 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.LeftShift
+            } },
+            { "5 >> 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.RightShift
+            } },
+            { "5 & 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.BitwiseAnd
+            } },
+            { "5 ^ 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.BitwiseXor
+            } },
+            { "5 | 2", new CompoundExpression {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.ExpressionOperator.BitwiseOr
+            } },
+            { "~2", new Integer(2) {
+                BitwiseNegated = true,
+            } },
+            { "5 < 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.LessThan
+            } },
+            { "5 <= 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.LessThanOrEqual
+            } },
+            { "5 > 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.GreaterThan
+            } },
+            { "5 >= 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.GreaterThanOrEqual
+            } },
+            { "5 == 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.Equals
+            } },
+            { "5 != 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.NotEquals
+            } },
+            { "5 && 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.And
+            } },
+            { "5 || 2", new CompoundPredicate {
+                Left = new Integer(5),
+                Right = new Integer(2),
+                Operator = Operators.PredicateOperator.Or
+            } },
+            { @"hi = ""whaaat"", k", new BinaryAssignment {
+                Operator = Operators.AssignmentOperator.Equals,
+                Targets = new List<ASTNode> {
+                    new Identifier("hi")
+                },
+                Values = new List<Expression> {
+                    new StringLiteral("whaaat"),
+                    new Identifier("k"),
+                },
+            }},
+            { @"my_custom_variable", new Identifier("my_custom_variable") },
+            { "myCall(param1, param2)", new FunctionCall("myCall", await: false) {
+                InputParameters = new List<Expression> {
+                    new Identifier("param1"),
+                    new Identifier("param2")
+                }
+            }},
+            { "0.4", new SignedFloat(0.4) },
+            { "-0.4", new SignedFloat(-0.4) },
+            { "5", new Integer(5) },
+            { "-5", new Integer(-5) },
+            { @"""my_string""", new StringLiteral("my_string") },
+            { "true", new YALCompiler.DataTypes.Boolean { LiteralValue = true } },
+            { "false", new YALCompiler.DataTypes.Boolean { LiteralValue = false } },
+            { "(5)", new Integer(5) },
+            { "{ 5+2, 3+2 }", new ArrayLiteral {
+                Values = {
+                    new CompoundExpression {
+                        Left = new Integer(5),
+                        Right = new Integer(2),
+                        Operator = Operators.ExpressionOperator.Addition,
+                    },
+                    new CompoundExpression {
+                        Left = new Integer(3),
+                        Right = new Integer(2),
+                        Operator = Operators.ExpressionOperator.Addition,
+                    }
+                }
+            }},
+            { "expr1, expr2, expr3", new List<Expression> {
+                new Identifier("expr1"),
+                new Identifier("expr2"),
+                new Identifier("expr3"),
+            }},
+            { @"5+2, expr1 + 5, ""dd""", new List<Expression> {
+                new CompoundExpression {
+                    Left = new Integer(5),
+                    Right = new Integer(2),
+                    Operator = Operators.ExpressionOperator.Addition,
+                },
+                new CompoundExpression {
+                    Left = new Identifier("expr1"),
+                    Right = new Integer(5),
+                    Operator = Operators.ExpressionOperator.Addition
+                },
+                new StringLiteral("dd"),
+            }},
+        };
+
+    [Theory]
+    [MemberData(nameof(Expressions))]
+    public void Expression_Correct_Values(string input, object expected)
+    {
+        var actual = Setup(input, nameof(YALGrammerParser.expression));
+
+        actual.Should().BeEquivalentTo(expected, excludings: new string[] { "LineNumber", "Parent" });
     }
 }

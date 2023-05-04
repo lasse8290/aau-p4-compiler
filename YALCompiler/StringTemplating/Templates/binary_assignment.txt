@@ -1,1 +1,1 @@
-%%left%% %%op%% %%right%%
+%%left%% %%operator%% %%right%%

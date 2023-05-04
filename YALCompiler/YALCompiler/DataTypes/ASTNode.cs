@@ -5,33 +5,35 @@ namespace YALCompiler.DataTypes;
 
 public abstract class ASTNode
 {
-    public List<ASTNode> Children { get; } = new();
+    public List<ASTNode> Children { get; set; } = new();
     public ASTNode? Parent { get; set; } = default;
-    public Dictionary<string, Symbol> SymbolTable { get; } = new();   
-    public Dictionary<string, Function>FunctionTable { get; } = new();
+    public Dictionary<string, Symbol>? SymbolTable { get; private set; } = null;   
+    public Dictionary<string, Function>? FunctionTable { get; private set; } = null;
     public int LineNumber { get; set; }
 
     public void AddSymbolOrFunction(Symbol symbol)
     {
-        if (!SymbolTable.ContainsKey(symbol.Id) && !FunctionTable.ContainsKey(symbol.Id))
+        if (SymbolTable is null) SymbolTable = new();
+        if (!SymbolTable.ContainsKey(symbol.Name) && (FunctionTable is null || !FunctionTable.ContainsKey(symbol.Name)))
         {
-            SymbolTable.Add(symbol.Id, symbol);
+            SymbolTable.Add(symbol.Name, symbol);
         }
         else
         {
-            throw new VariableAlreadyExistsException(symbol.Id);
+            throw new VariableAlreadyExistsException(symbol.Name);
         }
     }
     
     public void AddSymbolOrFunction(Function function)
     {
-        if (!SymbolTable.ContainsKey(function.Id) && !FunctionTable.ContainsKey(function.Id))
+        if (FunctionTable is null) FunctionTable = new();
+        if ((SymbolTable is null || !SymbolTable.ContainsKey(function.Name)) && !FunctionTable.ContainsKey(function.Name))
         {
-            FunctionTable.Add(function.Id, function);
+            FunctionTable.Add(function.Name, function);
         }
         else
         {
-            throw new VariableAlreadyExistsException(function.Id);
+            throw new VariableAlreadyExistsException(function.Name);
         }
     }
     

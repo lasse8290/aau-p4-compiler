@@ -22,7 +22,7 @@ public static class CompilerUtilities
         Symbol? symbol = null;
         while (symbol is null && node is not null)
         {
-            if (node.SymbolTable.ContainsKey(identifier))
+            if (node.SymbolTable is not null && node.SymbolTable.ContainsKey(identifier))
             {
                 symbol = node.SymbolTable[identifier];
                 break;
@@ -39,7 +39,7 @@ public static class CompilerUtilities
         Function? function = null;
         while (function is null && node is not null)
         {
-            if (node.FunctionTable.ContainsKey(identifier))
+            if (node.FunctionTable is not null && node.FunctionTable.ContainsKey(identifier))
             {
                 function = node.FunctionTable[identifier];
                 break;

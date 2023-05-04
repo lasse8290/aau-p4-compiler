@@ -1,1 +1,1 @@
-%%string_value%%
+(String)"%%string_value%%"

@@ -1,38 +1,28 @@
-external  <"stdio.h/Serial.begin"> serial: in(int32 i);
-external  <"stdio.h/Serial.println"> print: in(string s);
+external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
+external  <"stdio.h/Serial.println"> print: in(int32 s);
 
 external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
 external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
 external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
 external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-int32 INPUT = 1;
-int32 OUTPUT = 3;
-int32 LED_BUILTIN = 2;
-
-async blink: {
-	while (true) {
-		digitalWrite(LED_BUILTIN, 1);
-		delay(1000);
-		digitalWrite(LED_BUILTIN, 0);
-		delay(1000);
-	}
+initialize_values: in(int32 a, int32 b) out(int32 c, int32 d) {
+    c = a;
+    d = b;
 }
 
-async blinkRedLED: {
-	while (true) {
-		digitalWrite(4, 1);
-		delay(2000);
-		digitalWrite(4, 0);
-		delay(2000);
-	}
-}
- 
-async main: {
-	serial(115200);
-	pinMode(LED_BUILTIN, OUTPUT);
-	pinMode(4, OUTPUT);
+x: in(int32 y){
 
-	blink();
-	blinkRedLED();
-} 
+}
+
+print_abcd: in(int32 a, int32 b, int32 c, int32 d) {
+    print(a);
+    print(b);
+    print(c);
+    print(d);
+}
+
+main: {
+    serialBegin(115200);
+    print_abcd(1,2,3,4);
+}

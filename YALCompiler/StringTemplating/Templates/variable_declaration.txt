@@ -1,1 +1,1 @@
-%%type%% %%identifier%%
+%%type%% %%identifier%%%%array%%

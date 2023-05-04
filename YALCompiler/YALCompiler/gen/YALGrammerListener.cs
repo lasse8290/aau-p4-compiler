@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/rilar/source/repos/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.12.0
+// Generated from C:/Users/rilar/Documents/GitHub/aau-p4-compiler/YALCompiler/YALCompiler/Grammar\YALGrammer.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -224,6 +224,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitParenthesizedExpression([NotNull] YALGrammerParser.ParenthesizedExpressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>UintLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterUintLiteral([NotNull] YALGrammerParser.UintLiteralContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>UintLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitUintLiteral([NotNull] YALGrammerParser.UintLiteralContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Variable</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
@@ -441,6 +453,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPostIncrementDecrement([NotNull] YALGrammerParser.PostIncrementDecrementContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>IntLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterIntLiteral([NotNull] YALGrammerParser.IntLiteralContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>IntLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitIntLiteral([NotNull] YALGrammerParser.IntLiteralContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>BitwiseNot</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -476,18 +500,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitExpressionList([NotNull] YALGrammerParser.ExpressionListContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.functionCall"/>.
 	/// </summary>
@@ -538,16 +550,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitWhileStatement([NotNull] YALGrammerParser.WhileStatementContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="YALGrammerParser.forStatement"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterForStatement([NotNull] YALGrammerParser.ForStatementContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="YALGrammerParser.forStatement"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitForStatement([NotNull] YALGrammerParser.ForStatementContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ReferenceIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.

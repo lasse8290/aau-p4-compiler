@@ -23,7 +23,7 @@ public class SymbolTable
 
     public void Add(Symbol symbol)
     {
-        Add(symbol.Id, symbol);
+        Add(symbol.Name, symbol);
     }
     
     public bool ContainsKey(string id)

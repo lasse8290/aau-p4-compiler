@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringTemplating", "StringT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{8C09F67F-14F6-47DA-AFCA-7DB046BD89CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPSimulator", "ESPSimulator\ESPSimulator.csproj", "{BDB74EFE-0C0A-48E4-9403-2520057F8247}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{8C09F67F-14F6-47DA-AFCA-7DB046BD89CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C09F67F-14F6-47DA-AFCA-7DB046BD89CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C09F67F-14F6-47DA-AFCA-7DB046BD89CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDB74EFE-0C0A-48E4-9403-2520057F8247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDB74EFE-0C0A-48E4-9403-2520057F8247}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDB74EFE-0C0A-48E4-9403-2520057F8247}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDB74EFE-0C0A-48E4-9403-2520057F8247}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

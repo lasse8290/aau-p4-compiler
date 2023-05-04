@@ -1,5 +1,3 @@
 {
-    "files.associations": {
-        "*.cog": "c"
-    }
+  "liveServer.settings.port": 5501
 }

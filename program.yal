@@ -1,0 +1,18 @@
+external <"Arduino.h/Serial.println"> print: in (string a);
+external <"Arduino.h/Serial.begin"> begin: in (int64 a);
+external <"Arduino.h/vTaskDelay"> delay: in (int64 a);
+
+async main: {
+	begin(115200);
+
+	int32 b, int32 x;
+
+	print("before");
+	await between();
+	print("after");
+}
+
+async between: {
+	print("between");
+	delay(500);
+}
