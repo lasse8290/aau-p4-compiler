@@ -6,16 +6,16 @@ namespace ESPSimulation
     {
         string Code;
         string WokwiURL = "https://wokwi.com/projects/new/esp32";
-        int SimulationDuration;
+        int? SimulationDuration;
         public List<string> Output = new List<string>();
 
-        public ESPSimulator(string code, int timeout)
+        public ESPSimulator(string code, int? duration)
         {
             this.Code = code;
-            this.SimulationDuration = timeout;
+            this.SimulationDuration = duration;
         }
 
-        public ESPSimulator(string code, int timeout, string wokwiURL) : this(code, timeout)
+        public ESPSimulator(string code, int? duration, string wokwiURL) : this(code, duration)
         {
             this.WokwiURL = wokwiURL;
         }
@@ -55,7 +55,7 @@ namespace ESPSimulation
             await page.WaitForSelectorAsync(startButtonSelector);
             await page.ClickAsync(startButtonSelector);
 
-            await page.WaitForTimeoutAsync(SimulationDuration);
+            await page.WaitForTimeoutAsync(SimulationDuration ?? 99999999); // wait simulation duration or forever
 
             string stopButtonSelector = "button[aria-label='Stop the simulation']";
             await page.WaitForSelectorAsync(stopButtonSelector);
