@@ -31,9 +31,9 @@ variableDeclaration:
 	variableDeclarationFormat (',' variableDeclarationFormat)*;
 
 variableDeclarationFormat:
-	REF variableDeclarationFormat		# ReferenceVariableDeclaration
-	| TYPE '[' POSITIVE_NUMBER? ']' ID	# ArrayDeclaration
-	| TYPE ID							# SimpleVariableDeclaration;
+	REF variableDeclarationFormat	# ReferenceVariableDeclaration
+	| TYPE '[' POSITIVE_INT? ']' ID	# ArrayDeclaration
+	| TYPE ID						# SimpleVariableDeclaration;
 
 assignment: simpleAssignment | declarationAssignment;
 
@@ -76,7 +76,8 @@ expression:
 	| identifier					# Variable
 	| functionCall					# FunctionCallExpression
 	| '-'? FLOAT					# FloatLiteral
-	| '-'? POSITIVE_NUMBER			# NumberLiteral
+	| '-'? POSITIVE_INT				# IntLiteral
+	| POSITIVE_UINT					# UintLiteral
 	| STRING						# StringLiteral
 	| BOOLEAN						# BooleanLiteral
 	| '(' expression ')'			# ParenthesizedExpression
@@ -105,6 +106,8 @@ fragment DIGIT: [0-9];
 fragment LETTER: LOWERCASE | UPPERCASE;
 fragment DOUBLE_QUOTATION_MARK: '"';
 fragment SINGLE_QUOTATION_MARK: '\'';
+fragment UINT_SUFFIX: 'u' | 'U';
+fragment FLOAT_SUFFIX: 'f' | 'F';
 
 EXTERNAL: 'external';
 
@@ -144,9 +147,10 @@ BOOLEAN: 'true' | 'false';
 
 ID: (LETTER | '_') (LETTER | DIGIT | '_')*;
 
-POSITIVE_NUMBER: DIGIT (DIGIT)*;
+POSITIVE_INT: DIGIT (DIGIT)*;
+POSITIVE_UINT: DIGIT (DIGIT)* UINT_SUFFIX;
 
-FLOAT: DIGIT (DIGIT)* '.' DIGIT (DIGIT)*;
+FLOAT: DIGIT (DIGIT)* '.' DIGIT (DIGIT)* FLOAT_SUFFIX?;
 
 TIMES: '*';
 DIV: '/';

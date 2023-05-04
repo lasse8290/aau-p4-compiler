@@ -13,22 +13,14 @@ struct COMPILER_PARAMETERS {
   O *output;
 };
 
-template <typename T>
-int COMPILER_ASSIGN(void* x, T y) {
-    *(T*)x = y;
-    return 1;
-}
-
-template <typename I>
-void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
+template <typename I, typename O>
+void* COMPILER_INVOKE(I inputParameters, O outputParameters, Func func, int isAsync, int isAwait) {
     TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
 
     COMPILER_PARAMETERS<void, void> parameters;
     parameters.taskhandle = taskhandle;
     parameters.input = &inputParameters;
-
-    void* outputParameters;
-    parameters.output = &outputParameters;
+    parameters.output = outputParameters;
 
     if (isAsync) {
       xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
@@ -42,10 +34,6 @@ void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
     return parameters.output;
 }
 
-void loop() {
-  delay(10);
-}
-
 typedef struct COMPILER_INPUT_STRUCT_setup {
   
 } COMPILER_INPUT_STRUCT_setup;
@@ -53,40 +41,38 @@ typedef struct COMPILER_OUTPUT_STRUCT_setup {
   
 } COMPILER_OUTPUT_STRUCT_setup;
 #define COMPILER_PARAMETERS_setup COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_setup, COMPILER_OUTPUT_STRUCT_setup>
-typedef struct COMPILER_INPUT_STRUCT_test {
+typedef struct COMPILER_INPUT_STRUCT_between {
   
-} COMPILER_INPUT_STRUCT_test;
-typedef struct COMPILER_OUTPUT_STRUCT_test {
+} COMPILER_INPUT_STRUCT_between;
+typedef struct COMPILER_OUTPUT_STRUCT_between {
   
-} COMPILER_OUTPUT_STRUCT_test;
-#define COMPILER_PARAMETERS_test COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_test, COMPILER_OUTPUT_STRUCT_test>
+} COMPILER_OUTPUT_STRUCT_between;
+#define COMPILER_PARAMETERS_between COMPILER_PARAMETERS<COMPILER_INPUT_STRUCT_between, COMPILER_OUTPUT_STRUCT_between>
 
 
 void setup () {
-    
-    
-
-    Serial.begin(115200);
+    COMPILER_OUTPUT_STRUCT_between _55530882;
+ Serial.begin(115200);
 int32_t b;
 int32_t x;
-Serial.println("before test");
-(*((COMPILER_OUTPUT_STRUCT_test*) COMPILER_INVOKE(COMPILER_INPUT_STRUCT_test {  }, test, 1, 1)));
-Serial.println("after test");
+Serial.println("before");
+COMPILER_INVOKE(COMPILER_INPUT_STRUCT_between {  }, &_55530882, between, 1, 1)8;
+Serial.println("after");
 
 return;
 
-    
 };
-void test (void *pvParameters) {
-    COMPILER_PARAMETERS_test *_COMPILER_PARAMETERS = (COMPILER_PARAMETERS_test*) pvParameters;
-    
-
-    Serial.println("test");
-vTaskDelay(5000);
+void between (void *pvParameters) {
+     Serial.println("between");
+vTaskDelay(500);
 xTaskNotify(_COMPILER_PARAMETERS->taskhandle, 0, eNoAction);
 vTaskDelete(NULL);
 
 return;
 
-    
 };
+
+
+void loop() {
+  delay(10);
+}

@@ -87,7 +87,7 @@ public static class Types
     
     public static bool CheckTypesAreAssignable((ValueType Type, bool isArray) target, (ValueType Type, bool isArray) source)
     {
-        return target == source || (AssignableTypes.Contains((target.Type, source.Type)) && target.isArray == source.isArray);
+        return (target == source || AssignableTypes.Contains((target.Type, source.Type))) && target.isArray == source.isArray;
     }
     
     public static bool CheckTypesAreAssignable((ValueType type, bool isArray)[] target, (ValueType type, bool isArray)[] source)
@@ -157,8 +157,9 @@ public static class Types
             {
                 string? cType = null;
                 TypesInCPP.TryGetValue(t.Type, out cType);
-                if (cType is not null)
+                if (cType is not null){
                     types.Add(cType);
+                }
             }
         }
         return types;

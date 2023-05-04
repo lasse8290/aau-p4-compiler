@@ -4,21 +4,21 @@ namespace YALCompiler.Helpers;
 
 public class Symbol : ISymbol
 {
-    public string Id { get; set; }
+    public string Name { get; set; }
     public object? Value { get; set; }
     public YALType? Type { get; set; } = null;
     public bool Initialized { get; set; } = false;
     public bool IsRef { get; set; } = false;
     public ulong? ArraySize { get; set; }
 
-    public Symbol(string id)
+    public Symbol(string name)
     {
-        Id = id;
+        Name = name;
     }
 
-    public Symbol(string id, object? value)
+    public Symbol(string name, object? value)
     {
-        Id = id;
+        Name = name;
         Value = value;
         Initialized = true;
     }

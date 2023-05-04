@@ -14,26 +14,26 @@ public abstract class ASTNode
     public void AddSymbolOrFunction(Symbol symbol)
     {
         if (SymbolTable is null) SymbolTable = new();
-        if (!SymbolTable.ContainsKey(symbol.Id) && (FunctionTable is null || !FunctionTable.ContainsKey(symbol.Id)))
+        if (!SymbolTable.ContainsKey(symbol.Name) && (FunctionTable is null || !FunctionTable.ContainsKey(symbol.Name)))
         {
-            SymbolTable.Add(symbol.Id, symbol);
+            SymbolTable.Add(symbol.Name, symbol);
         }
         else
         {
-            throw new VariableAlreadyExistsException(symbol.Id);
+            throw new VariableAlreadyExistsException(symbol.Name);
         }
     }
     
     public void AddSymbolOrFunction(Function function)
     {
         if (FunctionTable is null) FunctionTable = new();
-        if ((SymbolTable is null || !SymbolTable.ContainsKey(function.Id)) && !FunctionTable.ContainsKey(function.Id))
+        if ((SymbolTable is null || !SymbolTable.ContainsKey(function.Name)) && !FunctionTable.ContainsKey(function.Name))
         {
-            FunctionTable.Add(function.Id, function);
+            FunctionTable.Add(function.Name, function);
         }
         else
         {
-            throw new VariableAlreadyExistsException(function.Id);
+            throw new VariableAlreadyExistsException(function.Name);
         }
     }
     

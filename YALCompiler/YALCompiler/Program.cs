@@ -30,6 +30,8 @@ public partial class Program
         else
             s = new(code, timeout);
 
+        Console.WriteLine("Running code...");
         s.Run().Wait();
+        Console.WriteLine("Excited...");
     }
 }

@@ -225,6 +225,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitParenthesizedExpression([NotNull] YALGrammerParser.ParenthesizedExpressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>UintLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterUintLiteral([NotNull] YALGrammerParser.UintLiteralContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>UintLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitUintLiteral([NotNull] YALGrammerParser.UintLiteralContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>Variable</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -441,6 +453,18 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPostIncrementDecrement([NotNull] YALGrammerParser.PostIncrementDecrementContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>IntLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterIntLiteral([NotNull] YALGrammerParser.IntLiteralContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>IntLiteral</c>
+	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitIntLiteral([NotNull] YALGrammerParser.IntLiteralContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>BitwiseNot</c>
 	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
 	/// </summary>
@@ -476,18 +500,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitExpressionList([NotNull] YALGrammerParser.ExpressionListContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>NumberLiteral</c>
-	/// labeled alternative in <see cref="YALGrammerParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitNumberLiteral([NotNull] YALGrammerParser.NumberLiteralContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="YALGrammerParser.functionCall"/>.
 	/// </summary>

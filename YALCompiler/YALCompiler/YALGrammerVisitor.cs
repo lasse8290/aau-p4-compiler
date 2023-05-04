@@ -109,7 +109,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
         {
             LibraryName = string.Join("/", context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").SkipLast(1).ToArray()),
             FunctionName = context.STRING().GetText().Trim().Substring(1, context.STRING().GetText().Trim().Length - 2).Split("/").Last(),
-            Id = context.ID().GetText(),
+            Name = context.ID().GetText(),
         };
 
         //handle input params
@@ -163,7 +163,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
     {
         var func = new Function
         {
-            Id = context.ID().GetText(),
+            Name = context.ID().GetText(),
             IsAsync = context.ASYNC() != null
         };
 
@@ -272,7 +272,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
             _errorHandler.AddError(e, context);
         }
 
-        if (context.POSITIVE_NUMBER() != null && ulong.TryParse(context.POSITIVE_NUMBER().GetText(), out ulong size))
+        if (context.POSITIVE_INT() != null && ulong.TryParse(context.POSITIVE_INT().GetText(), out ulong size))
         {
             symbol.ArraySize = size;
         }
@@ -395,7 +395,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
         {
             try
             {
-                ifPath.SymbolTable.Add(symbol.Id, symbol);
+                ifPath.AddSymbolOrFunction(symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -430,7 +430,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
                 {
                     try
                     {
-                        elseIfPath.SymbolTable.Add(symbol.Id, symbol);
+                        elseIfPath.AddSymbolOrFunction(symbol);
                     }
                     catch (VariableAlreadyExistsException e)
                     {
@@ -457,7 +457,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
             {
                 try
                 {
-                    elsePath.SymbolTable.Add(symbol.Id, symbol);
+                    elsePath.AddSymbolOrFunction(symbol);
                 }
                 catch (VariableAlreadyExistsException e)
                 {
@@ -495,7 +495,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
         {
             try
             {
-                whileStatement.SymbolTable.Add(symbol.Id, symbol);
+                whileStatement.AddSymbolOrFunction(symbol);
             }
             catch (VariableAlreadyExistsException e)
             {
@@ -595,10 +595,17 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
         return Visit(context.identifier());
     }
 
-    public override object VisitNumberLiteral(YALGrammerParser.NumberLiteralContext context)
+    public override object VisitIntLiteral(YALGrammerParser.IntLiteralContext context)
     {
-        if (UInt64.TryParse(context.POSITIVE_NUMBER().GetText(), out var number))
-            return new SignedNumber(number, context.MINUS() != null) { LineNumber = context.Start.Line };
+        if (Int64.TryParse(context.POSITIVE_INT().GetText(), out var number))
+            return new Integer(context.MINUS() == null ? number : -number) { LineNumber = context.Start.Line };
+        return null;
+    }
+
+    public override object VisitUintLiteral(YALGrammerParser.UintLiteralContext context)
+    {
+        if (UInt64.TryParse(context.POSITIVE_UINT().GetText().Replace("u", "", StringComparison.OrdinalIgnoreCase), out var number))
+            return new UnsignedInteger(number) { LineNumber = context.Start.Line };
         return null;
     }
 

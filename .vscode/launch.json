@@ -10,12 +10,12 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/YALCompiler/bin/Debug/net7.0/YALCompiler.dll",
+            "program": "${workspaceFolder}/YALCompiler/YALCompiler/bin/Debug/net7.0/YALCompiler.dll",
             "args": [
                 "-i${workspaceFolder}/program.yal",
                 "-o${workspaceFolder}/output.txt",
             ],
-            "cwd": "${workspaceFolder}/YALCompiler",
+            "cwd": "${workspaceFolder}/YALCompiler/YALCompiler",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false

@@ -1,0 +1,22 @@
+external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
+external  <"stdio.h/Serial.println"> print: in(int32 s);
+
+external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
+external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
+external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
+external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
+
+
+func: in(ref int32 x) {
+    x = 5;
+    return;
+}
+
+
+
+main: {
+    serialBegin(115200);
+    int32 i = 1;
+    func(ref i);
+    print(i);
+}

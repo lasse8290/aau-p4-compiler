@@ -1,1 +1,1 @@
-%%prefix%% %%left%% %%operator%% %%right%%
+%%left%% %%operator%% %%right%%

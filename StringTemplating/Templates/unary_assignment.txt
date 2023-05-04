@@ -1,1 +1,0 @@
-%%pre_operator%%%%operand%%%%post_operator%%

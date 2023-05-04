@@ -12,22 +12,14 @@ struct COMPILER_PARAMETERS {
   O *output;
 };
 
-template <typename T>
-int COMPILER_ASSIGN(void* x, T y) {
-    *(T*)x = y;
-    return 1;
-}
-
-template <typename I>
-void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
+template <typename I, typename O>
+void* COMPILER_INVOKE(I inputParameters, O outputParameters, Func func, int isAsync, int isAwait) {
     TaskHandle_t taskhandle = xTaskGetCurrentTaskHandle();
 
     COMPILER_PARAMETERS<void, void> parameters;
     parameters.taskhandle = taskhandle;
     parameters.input = &inputParameters;
-
-    void* outputParameters;
-    parameters.output = &outputParameters;
+    parameters.output = outputParameters;
 
     if (isAsync) {
       xTaskCreate(func, NULL, 4096, &parameters, 10, &taskhandle);
@@ -41,10 +33,10 @@ void* COMPILER_INVOKE(I inputParameters, Func func, int isAsync, int isAwait) {
     return parameters.output;
 }
 
-void loop() {
-  delay(10);
-}
-
 %%declarations%%
 
 %%program%%
+
+void loop() {
+  delay(10);
+}
