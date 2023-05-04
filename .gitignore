@@ -5,6 +5,9 @@
 
 .DS_Store
 
+output.cpp
+output.txt
+
 *.user
 bin
 obj
