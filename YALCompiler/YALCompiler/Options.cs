@@ -9,7 +9,7 @@ public partial class Program
         public string InputFilePath { get; set; } = default!;
 
         [Option('o', "output", Required = false, HelpText = "Path for the destination file.")]
-        public string OutputFilePath { get; set; } = default!;
+        public string? OutputFilePath { get; set; }
 
         [Option('s', "simulator", Required = false, HelpText = "Run the program using a ESP32 Simulator.")]
         public bool UseSimulator { get; set; } = default!;
