@@ -30,7 +30,7 @@ void* COMPILER_INVOKE(I inputParameters, O *outputParameters, Func func, int isA
       func(parameters);
     }
 
-    return parameters->output;
+    return output;
 }
 
 %%declarations%%
