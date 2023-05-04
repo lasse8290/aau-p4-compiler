@@ -42,7 +42,7 @@ public class CodeGenTraverser : ASTTraverser
                     var symbol = function.InputParameters.FirstOrDefault(x => x.Name == localName);
                     if (symbol != null)
                     {
-                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input->{localName})";
+                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{localName})";
                     }
 
                     symbol = function.OutputParameters.FirstOrDefault(x => x.Name == localName);
