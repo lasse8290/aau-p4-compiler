@@ -52,7 +52,7 @@ public class Transpiler
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            TerminalExtension.LogError(e.Message);
         }
     }
 
