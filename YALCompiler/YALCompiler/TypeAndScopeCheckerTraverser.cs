@@ -109,16 +109,11 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         switch (node.Target)
         {
             case Identifier identifier:
-                if (CompilerUtilities.FindSymbol(identifier.Name, node) is Symbol symbol)
-                {
-                    targetType = symbol.Type;
-                    symbol.Initialized = true;
-                }
-                else
-                {
-                    _errorHandler.AddError(new IdentifierNotFoundException(identifier.Name), node.LineNumber);
-                }
 
+                if ((targetType = Visit(identifier) as YALType) is null)
+                {
+                    return null;
+                }
                 break;
             default:
                 _errorHandler.AddError(new InvalidAssignmentException(node), node.LineNumber);
@@ -168,7 +163,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
         foreach (var inputParameter in node.InputParameters)
         {
-            actualParams.Add(Visit(inputParameter) as YALType);
+            if (Visit(inputParameter) is YALType inputParamType)
+                actualParams.Add(inputParamType);
         }
 
         YALType finalFormalInputParam = new YALType(formalInputParams.ToArray());
