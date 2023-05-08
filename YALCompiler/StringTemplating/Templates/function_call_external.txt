@@ -1,1 +1,1 @@
-%%function%%(%%arguments%%)%%suffix%%
+%%function%%(%%input_parameters%%)
