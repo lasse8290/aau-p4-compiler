@@ -163,7 +163,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
         foreach (var inputParameter in node.InputParameters)
         {
-            actualParams.Add(Visit(inputParameter) as YALType);
+            if (Visit(inputParameter) is YALType inputParamType)
+                actualParams.Add(inputParamType);
         }
 
         YALType finalFormalInputParam = new YALType(formalInputParams.ToArray());
