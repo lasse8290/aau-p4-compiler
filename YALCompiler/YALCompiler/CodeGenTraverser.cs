@@ -9,10 +9,8 @@ namespace YALCompiler;
 public class CodeGenTraverser : ASTTraverser
 {
     private readonly StringBuilder _declarationsBuilder = new();
-    private readonly List<string>  _externalLibraries   = new();
-
+    private readonly HashSet<string>  _externalLibraries   = new();
     private readonly Dictionary<string, string> _externalNicknames = new();
-    private readonly StringBuilder              _includeBuilder    = new();
     private readonly Template                   _template          = new("program");
     private          StringBuilder              _scopeBuilder      = new();
 
@@ -59,13 +57,19 @@ public class CodeGenTraverser : ASTTraverser
     {
         var stringBuilder = new StringBuilder();
 
+        // Invoke external functions
         foreach (var child in _startNode.FunctionTable)
             if (child.Value is ExternalFunction)
-            {
-                var x = (string)InvokeVisitor(child.Value);
-            }
+                InvokeVisitor(child.Value);
+        
+        // Visit children
+        foreach (var child in _startNode.Children)
+            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
-        foreach (var child in _startNode.Children) stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+        // Build includes from external libraries
+        StringBuilder _includeBuilder = new();
+        foreach (string libraryName in _externalLibraries)
+            _includeBuilder.AppendLine($"#include <{libraryName}>");
 
         _template.SetKeys(new List<Tuple<string, string>>
         {
@@ -93,12 +97,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ExternalFunction externalFunction)
     {
-        if (!_externalLibraries.Contains(externalFunction.LibraryName))
-        {
-            _externalLibraries.Add(externalFunction.LibraryName);
-            _includeBuilder.AppendLine($"#include <{externalFunction.LibraryName}>");
-        }
-
+        _externalLibraries.Add(externalFunction.LibraryName);
         _externalNicknames[externalFunction.Name] = externalFunction.FunctionName;
         return "";
     }
