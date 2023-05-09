@@ -43,7 +43,7 @@ simpleAssignment:
 		| '+='
 		| '-='
 		| '*='
-		| '=/'
+		| '/='
 		| '%='
 	) expression							# IdAssignment
 	| operator = ('++' | '--') identifier	# IdPreIncrementDecrementAssignment
