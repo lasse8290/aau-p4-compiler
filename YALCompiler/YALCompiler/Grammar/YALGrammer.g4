@@ -38,12 +38,12 @@ variableDeclarationFormat:
 assignment: simpleAssignment | declarationAssignment;
 
 simpleAssignment:
-	identifier operator = (
+	identifier (',' identifier)* operator = (
 		'='
 		| '+='
 		| '-='
 		| '*='
-		| '=/'
+		| '/='
 		| '%='
 	) expression							# IdAssignment
 	| operator = ('++' | '--') identifier	# IdPreIncrementDecrementAssignment
@@ -96,9 +96,7 @@ whileStatement: 'while' '(' expression ')' statementBlock;
 identifier:
 	ID '[' expression ']'			# ArrayElementIdentifier
 	| ID							# SimpleIdentifier
-	| REF identifier				# ReferenceIdentifier
-	| identifier (',' identifier)+	# IdentifierList
-	| '(' identifier ')'			# ParenthesizedIdentifier;
+	| REF identifier				# ReferenceIdentifier;
 
 fragment LOWERCASE: [a-z];
 fragment UPPERCASE: [A-Z];

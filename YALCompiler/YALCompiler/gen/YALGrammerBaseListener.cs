@@ -648,34 +648,6 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitWhileStatement([NotNull] YALGrammerParser.WhileStatementContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>ReferenceIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>ReferenceIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>ParenthesizedIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>ParenthesizedIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>ArrayElementIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -704,19 +676,19 @@ public partial class YALGrammerBaseListener : IYALGrammerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>IdentifierList</c>
+	/// Enter a parse tree produced by the <c>ReferenceIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterIdentifierList([NotNull] YALGrammerParser.IdentifierListContext context) { }
+	public virtual void EnterReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by the <c>IdentifierList</c>
+	/// Exit a parse tree produced by the <c>ReferenceIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitIdentifierList([NotNull] YALGrammerParser.IdentifierListContext context) { }
+	public virtual void ExitReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>
