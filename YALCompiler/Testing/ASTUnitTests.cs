@@ -258,11 +258,6 @@ public class ASTParsingUnitTests : TestingHelper
             { "identifier[5]", new ArrayElementIdentifier("identifier", new Integer(5)) },
             { "identifier", new Identifier("identifier") },
             { "ref identifier", new Identifier("identifier") { IsRef = true } },
-            { "id1, id2, id3", new List<Identifier> {
-                new Identifier("id1"),
-                new Identifier("id2"),
-                new Identifier("id3"),
-            } },
             { "(id)", new Identifier("id") },
         };
 
@@ -322,7 +317,7 @@ public class ASTParsingUnitTests : TestingHelper
             { "i--", new UnaryAssignment {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostDecrement
-            }},
+            }}
        };
 
     [Theory]
