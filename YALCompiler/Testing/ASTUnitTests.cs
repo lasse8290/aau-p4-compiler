@@ -108,7 +108,6 @@ public class ASTParsingUnitTests : TestingHelper
     [InlineData("", 0, 0)]
     [InlineData("out (string a)", 0, 1)]
     [InlineData("in (string a)", 1, 0)]
-    // [InlineData("in (string a) out ()", 1, 0)] We need to discuss if this is it allowed?
     [InlineData("in (int32 a, int32 b)", 2, 0)]
     [InlineData("in (int32 a, int32 b) out (int32 c)", 2, 1)]
     [InlineData("in (int32 a, int32 b) out (int32 c, int32 d)", 2, 2)]
@@ -299,11 +298,11 @@ public class ASTParsingUnitTests : TestingHelper
                 Operator = Operators.AssignmentOperator.MultiplicationAssignment
             }},
             /* This to be uncommented when grammar has been fixed */
-            /*{ "i /= k", new BinaryAssignment {
+            { "i /= k", new BinaryAssignment {
                 Targets = new List<ASTNode> { new Identifier("i") },
                 Values = new List<Expression> { new Identifier("k") },
                 Operator = Operators.AssignmentOperator.DivisionAssignment
-            }},*/
+            }},
             { "i %= k", new BinaryAssignment {
                 Targets = new List<ASTNode> { new Identifier("i") },
                 Values = new List<Expression> { new Identifier("k") },

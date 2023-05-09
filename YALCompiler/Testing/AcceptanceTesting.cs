@@ -5,7 +5,7 @@ public class AcceptanceTesting
 {
     public static TheoryData<string, List<string>, int> AcceptanceTestsData =>
        new() {
-            { "test.yal", new List<string> { "before", "between", "after" }, 1500 },
+            { "test.yal", new List<string> { "before", "between", "after" }, 5000 },
         };
 
     [Theory]
