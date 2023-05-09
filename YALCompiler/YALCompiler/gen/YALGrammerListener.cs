@@ -551,30 +551,6 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitWhileStatement([NotNull] YALGrammerParser.WhileStatementContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>ReferenceIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>ReferenceIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>ParenthesizedIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>ParenthesizedIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>ArrayElementIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// </summary>
@@ -599,15 +575,15 @@ public interface IYALGrammerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>IdentifierList</c>
+	/// Enter a parse tree produced by the <c>ReferenceIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterIdentifierList([NotNull] YALGrammerParser.IdentifierListContext context);
+	void EnterReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>IdentifierList</c>
+	/// Exit a parse tree produced by the <c>ReferenceIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitIdentifierList([NotNull] YALGrammerParser.IdentifierListContext context);
+	void ExitReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
 }
