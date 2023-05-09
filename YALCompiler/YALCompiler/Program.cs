@@ -14,10 +14,18 @@ public partial class Program
                     return;
                 }
 
-                Transpiler transpiler = new(o.InputFilePath, o.OutputFilePath);
-                transpiler.Transpile();
+                try
+                {
+                    Transpiler transpiler = new(o.InputFilePath, o.OutputFilePath);
+                    transpiler.Transpile();
 
-                if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Duration, o.WokwiURL);
+                    if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Duration, o.WokwiURL);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
             });
     }
 
