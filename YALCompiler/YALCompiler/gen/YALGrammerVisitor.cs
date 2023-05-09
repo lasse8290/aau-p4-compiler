@@ -338,20 +338,6 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitWhileStatement([NotNull] YALGrammerParser.WhileStatementContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>ReferenceIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>ParenthesizedIdentifier</c>
-	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitParenthesizedIdentifier([NotNull] YALGrammerParser.ParenthesizedIdentifierContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>ArrayElementIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// </summary>
@@ -366,10 +352,10 @@ public interface IYALGrammerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSimpleIdentifier([NotNull] YALGrammerParser.SimpleIdentifierContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>IdentifierList</c>
+	/// Visit a parse tree produced by the <c>ReferenceIdentifier</c>
 	/// labeled alternative in <see cref="YALGrammerParser.identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdentifierList([NotNull] YALGrammerParser.IdentifierListContext context);
+	Result VisitReferenceIdentifier([NotNull] YALGrammerParser.ReferenceIdentifierContext context);
 }
