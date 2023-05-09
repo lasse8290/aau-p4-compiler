@@ -2,33 +2,19 @@ external <"Arduino.h/Serial.println"> print: in (int32 a);
 external <"Arduino.h/Serial.begin"> begin: in (int64 a);
 external <"Arduino.h/vTaskDelay"> delay: in (int64 a);
 
-twoInputAndOutput: in(int32 a, int32 b) out(int32 c, int32 d){
-    c = a + 1;
-    d = b + 2;
-    return;
-}
-
-oneOutput: out(int32 a) {
-    a = 1;
-    return;
-}
-
-oneInputTwoOutput:in(int32 c) out(int32 a, int32 b){
-    a = 1;
-    b = 2;
+test: in(ref int32 a) out(int32 b) {
+    b = a + 1;
+    // a = a + 1;
+    a++;
     return;
 }
 
 async main: {
     begin(115200);
-   
-    int32 a, int32 b = twoInputAndOutput(oneInputTwoOutput(oneOutput()));
-    print(a);
-    print(b);
-    
-    int32 c;
-    
-    if((c = oneOutput()) == 1){
-        print(666);
+
+    int32 k = 1;
+
+    while (test(ref k) < 4) {
+        print(k);
     }
 }
