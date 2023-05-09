@@ -297,7 +297,6 @@ public class ASTParsingUnitTests : TestingHelper
                 Values = new List<Expression> { new Identifier("k") },
                 Operator = Operators.AssignmentOperator.MultiplicationAssignment
             }},
-            /* This to be uncommented when grammar has been fixed */
             { "i /= k", new BinaryAssignment {
                 Targets = new List<ASTNode> { new Identifier("i") },
                 Values = new List<Expression> { new Identifier("k") },
@@ -359,14 +358,14 @@ public class ASTParsingUnitTests : TestingHelper
 
     public static TheoryData<string, object> Expressions =>
         new() {
-            /*{ "!true", new YALCompiler.DataTypes.Boolean {
+            { "!true", new YALCompiler.DataTypes.Boolean {
                 Negated = true,
                 LiteralValue = true,
             } },
             { "!false", new YALCompiler.DataTypes.Boolean {
                 Negated = true,
                 LiteralValue = false,
-            } },*/
+            } },
             { "i++", new UnaryAssignment {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostIncrement

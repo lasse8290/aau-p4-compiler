@@ -14,7 +14,13 @@ async main: {
 
     int32 k = 1;
 
-    while (test(ref k) < 4) {
-        print(k);
+    bool a = false;
+
+    if (!a) {
+        print(1);
+    }
+
+    if (!false) {
+        print(2);
     }
 }
