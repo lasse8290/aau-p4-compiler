@@ -67,14 +67,14 @@ public class CodeGenTraverser : ASTTraverser
             stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
         // Build includes from external libraries
-        StringBuilder _includeBuilder = new();
+        StringBuilder includeBuilder = new();
         foreach (string libraryName in _externalLibraries)
-            _includeBuilder.AppendLine($"#include <{libraryName}>");
+            includeBuilder.AppendLine($"#include <{libraryName}>");
 
         _template.SetKeys(new List<Tuple<string, string>>
         {
             new("declarations", _declarationsBuilder.ToString()),
-            new("includes", _includeBuilder.ToString()),
+            new("includes", includeBuilder.ToString()),
             new("program", stringBuilder.ToString())
         });
     }
