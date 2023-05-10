@@ -470,7 +470,7 @@ public class CodeGenTraverser : ASTTraverser
         var inputParametersBuilder = new StringBuilder();
 
         foreach (var expression in functionCall.InputParameters)
-            if (expression is FunctionCall inputFunctionCall)
+            if (expression is FunctionCall inputFunctionCall && inputFunctionCall.Function is not ExternalFunction)
             {
                 functionCallBuilder.Append($"{(string)InvokeVisitor(inputFunctionCall)};");
                 for (var y = 0; y < inputFunctionCall.Function.OutputParameters.Count; y++)
