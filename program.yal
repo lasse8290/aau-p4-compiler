@@ -24,4 +24,7 @@ async main: {
      if (!!!test()) {
         print(4);
     }
+    if(!!((0+0) == 0)){
+    print(5);
+    }
 }

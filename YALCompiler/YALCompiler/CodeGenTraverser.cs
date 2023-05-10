@@ -92,7 +92,7 @@ public class CodeGenTraverser : ASTTraverser
             new("boolean", boolean.LiteralValue == true ? "1" : "0")
         });
 
-        return (boolean.Negated ? "!" : "") + template.ReplacePlaceholders();
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(ExternalFunction externalFunction)
@@ -111,6 +111,16 @@ public class CodeGenTraverser : ASTTraverser
         return sb.ToString();
     }
 
+    internal override object? Visit(LogicalNegation logicalNegation)
+    {
+        return $"!({InvokeVisitor(logicalNegation.Expression)})";
+    }
+
+    internal override object? Visit(BitwiseNegation bitwiseNegation)
+    {
+        return $"~({InvokeVisitor(bitwiseNegation.Expression)})";
+
+    }
     internal override object? Visit(If ifNode)
     {
 
@@ -219,6 +229,8 @@ public class CodeGenTraverser : ASTTraverser
 
         return template.ReplacePlaceholders(true);
     }
+    
+    
 
     internal override object? Visit(CompoundPredicate compoundPredicate)
     {
@@ -245,7 +257,7 @@ public class CodeGenTraverser : ASTTraverser
             new("right", right)
         });
 
-        return (compoundPredicate.Negated ? "!" : "") + template.ReplacePlaceholders();
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(UnsignedInteger uInt)
@@ -380,7 +392,7 @@ public class CodeGenTraverser : ASTTraverser
             new("name", $"{(identifier.IsRef ? "&" : "")}{GetVariableName(identifier)}")
         });
 
-        return (identifier.Negated ? "!" : "") + template.ReplacePlaceholders();
+        return template.ReplacePlaceholders();
     }
 
     internal override object? Visit(UnaryAssignment unaryAssignment)
@@ -438,9 +450,11 @@ public class CodeGenTraverser : ASTTraverser
             new("index", (string)InvokeVisitor(arrayElementIdentifier.Index))
         });
 
-        return (arrayElementIdentifier.Negated ? "!" : "") + template.ReplacePlaceholders();
+        return template.ReplacePlaceholders();
     }
-
+    
+    
+    
     internal override object? Visit(FunctionCall functionCall)
     {
         var argumentCounter = 0;
