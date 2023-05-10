@@ -511,9 +511,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
     public override object VisitNot(YALGrammerParser.NotContext context)
     {
         if (Visit(context.expression()) is not Expression expression) return null;
-        expression.Negated = !expression.Negated;
         expression.LineNumber = context.Start.Line;
-        return expression;
+        var negation = new LogicalNegation(expression);
+        negation.LineNumber = context.Start.Line;
+        return negation;
     }
 
     public override object VisitAnd(YALGrammerParser.AndContext context)
@@ -819,9 +820,10 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
             _errorHandler.AddError(new InvalidExpressionException(context.GetText()), context);
             return null;
         }
-        expression.BitwiseNegated = true;
         expression.LineNumber = context.Start.Line;
-        return expression;
+        var negation = new BitwiseNegation(expression);
+        negation.LineNumber = context.Start.Line;
+        return negation;
     }
 
     public override object VisitPostIncrementDecrement(YALGrammerParser.PostIncrementDecrementContext context)
@@ -856,9 +858,6 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
                 break;
             case YALGrammerLexer.DECREMENT:
                 compoundExpression.Operator = Operators.AssignmentOperator.PreDecrement;
-                break;
-            case YALGrammerLexer.BITWISE_NOT:
-                compoundExpression.Operator = Operators.AssignmentOperator.BitwiseNot;
                 break;
         }
         compoundExpression.LineNumber = context.Start.Line;

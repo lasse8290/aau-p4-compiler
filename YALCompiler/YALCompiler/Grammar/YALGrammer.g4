@@ -55,7 +55,7 @@ expression:
 	'!' expression											# Not
 	| '~' expression										# BitwiseNot
 	| expression operator = ('++' | '--')					# PostIncrementDecrement
-	| operator = ('++' | '--' | '~') expression				# PrefixUnary
+	| operator = ('++' | '--') expression				    # PrefixUnary
 	| expression operator = ('*' | '/' | '%') expression	# MultiplicationDivisionModulo
 	| expression operator = ('+' | '-') expression			# AdditionSubtraction
 	| expression operator = ('<<' | '>>') expression		# LeftRightShift

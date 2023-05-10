@@ -9,7 +9,6 @@ public class UnaryAssignment : Assignment
     {
         Operators.AssignmentOperator.PreDecrement => $"{Operator.ToStringValue()}{Target}",
         Operators.AssignmentOperator.PreIncrement => $"{Operator.ToStringValue()}{Target}",
-        Operators.AssignmentOperator.BitwiseNot => $"{Operator.ToStringValue()}{Target}",
         _ => $"{Target}{Operator.ToStringValue()}",
     };
 }

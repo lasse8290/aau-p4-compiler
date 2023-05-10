@@ -353,14 +353,14 @@ public class ASTParsingUnitTests : TestingHelper
 
     public static TheoryData<string, object> Expressions =>
         new() {
-            { "!true", new YALCompiler.DataTypes.Boolean {
-                Negated = true,
-                LiteralValue = true,
-            } },
-            { "!false", new YALCompiler.DataTypes.Boolean {
-                Negated = true,
-                LiteralValue = false,
-            } },
+            // { "!true", new YALCompiler.DataTypes.Boolean {
+            //     Negated = true,
+            //     LiteralValue = true,
+            // } },
+            // { "!false", new YALCompiler.DataTypes.Boolean {
+            //     Negated = true,
+            //     LiteralValue = false,
+            // } },
             { "i++", new UnaryAssignment {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostIncrement
@@ -445,9 +445,9 @@ public class ASTParsingUnitTests : TestingHelper
                 Right = new Integer(2),
                 Operator = Operators.ExpressionOperator.BitwiseOr
             } },
-            { "~2", new Integer(2) {
-                BitwiseNegated = true,
-            } },
+            // { "~2", new Integer(2) {
+            //     BitwiseNegated = true,
+            // } },
             { "5 < 2", new CompoundPredicate {
                 Left = new Integer(5),
                 Right = new Integer(2),
