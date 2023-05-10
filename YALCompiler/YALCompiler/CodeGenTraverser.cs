@@ -113,10 +113,10 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(If ifNode)
     {
-        _scopeBuilderStack.Push(new StringBuilder());
 
         // Visit the predicate of the if statement
         var predicateCode = (string)InvokeVisitor(ifNode.Predicate);
+        _scopeBuilderStack.Push(new StringBuilder());
 
         // Visit the children of the if statement
         var childrenBuilder = new StringBuilder();
@@ -137,10 +137,11 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ElseIf elseIfNode)
     {
-        _scopeBuilderStack.Push(new StringBuilder());
 
         // Visit the Predicate of the ElseIf node
         var predicateCode = (string)InvokeVisitor(elseIfNode.Predicate);
+        
+        _scopeBuilderStack.Push(new StringBuilder());
 
         // Visit the children of the ElseIf node
         StringBuilder body = new();
@@ -153,15 +154,14 @@ public class CodeGenTraverser : ASTTraverser
             new("predicate", predicateCode),
             new("body", $"{_scopeBuilderStack.Pop()} {body}")
         });
-
         return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(Else elseNode)
     {
-        _scopeBuilderStack.Push(new StringBuilder());
 
         StringBuilder bodyBuilder = new();
+        _scopeBuilderStack.Push(new StringBuilder());
         foreach (var child in elseNode.Children) bodyBuilder.AppendLine((string)InvokeVisitor(child));
 
         var template = new Template("else");
@@ -169,7 +169,7 @@ public class CodeGenTraverser : ASTTraverser
         {
             new("body", $"{_scopeBuilderStack.Pop()} {bodyBuilder}")
         });
-        
+
         return template.ReplacePlaceholders(true);
     }
 
@@ -260,19 +260,21 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(WhileStatement whileLoop)
     {
+
+        var    stringBuilder = new StringBuilder();
+        string predicate     = (string)InvokeVisitor(whileLoop.Predicate);
+        
         _scopeBuilderStack.Push(new StringBuilder());
 
-        var stringBuilder = new StringBuilder();
         foreach (var child in whileLoop.Children)
             stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
         var template = new Template("while");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("predicate", (string)InvokeVisitor(whileLoop.Predicate)),
+            new("predicate", predicate),
             new("body", $"{_scopeBuilderStack.Pop()} {stringBuilder}")
         });
-
 
         return template.ReplacePlaceholders(true);
     }
