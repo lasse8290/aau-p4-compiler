@@ -23,7 +23,7 @@ public partial class Program
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    throw e;
                 }
 
             });

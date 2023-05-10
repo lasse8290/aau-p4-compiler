@@ -12,10 +12,10 @@ public class CodeGenTraverser : ASTTraverser
     private readonly HashSet<string>  _externalLibraries   = new();
     private readonly Dictionary<string, string> _externalNicknames = new();
     private readonly Template                   _template          = new("program");
-    private          StringBuilder              _scopeBuilder      = new();
+    private readonly Stack<StringBuilder> _scopeBuilderStack      = new();
 
     public CodeGenTraverser(ASTNode node) : base(node)
-    {
+    {        
     }
 
     // Helper function to get the variable name from an ASTNode
@@ -113,23 +113,23 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(If ifNode)
     {
+        _scopeBuilderStack.Push(new StringBuilder());
+
         // Visit the predicate of the if statement
         var predicateCode = (string)InvokeVisitor(ifNode.Predicate);
-
-        StringBuilder scopeBuilder = new();
-        _scopeBuilder = scopeBuilder;
 
         // Visit the children of the if statement
         var childrenBuilder = new StringBuilder();
         foreach (var child in ifNode.Children)
             childrenBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
+
         // Generate the if statement code using a template
         var template = new Template("if");
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("predicate", predicateCode),
-            new("body", $"{scopeBuilder} {childrenBuilder}")
+            new("body", $"{_scopeBuilderStack.Pop()} {childrenBuilder}")
         });
 
         return template.ReplacePlaceholders(true);
@@ -137,8 +137,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ElseIf elseIfNode)
     {
-        StringBuilder scopeBuilder = new();
-        _scopeBuilder = scopeBuilder;
+        _scopeBuilderStack.Push(new StringBuilder());
 
         // Visit the Predicate of the ElseIf node
         var predicateCode = (string)InvokeVisitor(elseIfNode.Predicate);
@@ -152,7 +151,7 @@ public class CodeGenTraverser : ASTTraverser
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("predicate", predicateCode),
-            new("body", $"{scopeBuilder} {body}")
+            new("body", $"{_scopeBuilderStack.Pop()} {body}")
         });
 
         return template.ReplacePlaceholders(true);
@@ -160,8 +159,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(Else elseNode)
     {
-        StringBuilder scopeBuilder = new();
-        _scopeBuilder = scopeBuilder;
+        _scopeBuilderStack.Push(new StringBuilder());
 
         StringBuilder bodyBuilder = new();
         foreach (var child in elseNode.Children) bodyBuilder.AppendLine((string)InvokeVisitor(child));
@@ -169,16 +167,15 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("else");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("body", $"{scopeBuilder} {bodyBuilder}")
+            new("body", $"{_scopeBuilderStack.Pop()} {bodyBuilder}")
         });
-
+        
         return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(Function function)
     {
-        StringBuilder scopeBuilder = new();
-        _scopeBuilder = scopeBuilder;
+        _scopeBuilderStack.Push(new StringBuilder());
 
         var inputArguments = "void *pvParameters";
 
@@ -201,6 +198,7 @@ public class CodeGenTraverser : ASTTraverser
             new("name", function.Name),
             new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name};\n")))
         });
+        
 
         _declarationsBuilder
             .AppendLine(inputTemplate.ReplacePlaceholders(true))
@@ -216,7 +214,7 @@ public class CodeGenTraverser : ASTTraverser
         {
             new("name", function.Name),
             new("input_arguments", inputArguments),
-            new("body", $"{scopeBuilder} {bodyBuilder}")
+            new("body", $"{_scopeBuilderStack.Pop()} {bodyBuilder}")
         });
 
         return template.ReplacePlaceholders(true);
@@ -262,8 +260,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(WhileStatement whileLoop)
     {
-        StringBuilder scopeBuilder = new();
-        _scopeBuilder = scopeBuilder;
+        _scopeBuilderStack.Push(new StringBuilder());
 
         var stringBuilder = new StringBuilder();
         foreach (var child in whileLoop.Children)
@@ -273,10 +270,11 @@ public class CodeGenTraverser : ASTTraverser
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("predicate", (string)InvokeVisitor(whileLoop.Predicate)),
-            new("body", stringBuilder.ToString())
+            new("body", $"{_scopeBuilderStack.Pop()} {stringBuilder}")
         });
 
-        return $"{scopeBuilder} {template.ReplacePlaceholders(true)}";
+
+        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(SignedFloat signedFloat)
@@ -481,7 +479,7 @@ public class CodeGenTraverser : ASTTraverser
         }
         else
         {
-            _scopeBuilder.AppendLine($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} _{functionCall.GetHashCode().ToString()};");
+            _scopeBuilderStack.Peek().AppendLine($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} _{functionCall.GetHashCode().ToString()};");
 
             var template      = new Template("function_call");
             var lambdaBuilder = new Template("input_lambda");
