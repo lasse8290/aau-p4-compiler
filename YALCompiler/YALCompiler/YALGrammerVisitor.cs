@@ -511,7 +511,7 @@ public class YALGrammerVisitor : YALGrammerBaseVisitor<object>
     public override object VisitNot(YALGrammerParser.NotContext context)
     {
         if (Visit(context.expression()) is not Expression expression) return null;
-        expression.Negated = true;
+        expression.Negated = !expression.Negated;
         expression.LineNumber = context.Start.Line;
         return expression;
     }
