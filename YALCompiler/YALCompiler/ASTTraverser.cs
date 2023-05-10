@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Data;
 using System.Reflection;
 using YALCompiler.DataTypes;
 using Boolean = YALCompiler.DataTypes.Boolean;
@@ -39,8 +38,10 @@ public abstract class ASTTraverser
     internal virtual object? Visit(ExternalFunction        node) => node;
     internal virtual object? Visit(ArrayElementIdentifier  node) => node;
     internal virtual object? Visit(CompoundExpression      node) => node;
+    internal virtual object? Visit(BitwiseNegation         node) => node;
+    internal virtual object? Visit(LogicalNegation         node) => node;
     internal virtual object? Visit(Expression              node) => node;
-    internal virtual object? Visit(YALCompiler.DataTypes.Program                 node) => node;
+    internal virtual object? Visit(DataTypes.Program       node) => node;
     internal virtual object? Visit(ASTNode                 node) => node;
     internal virtual object? Visit(Function                node) => node;
 
