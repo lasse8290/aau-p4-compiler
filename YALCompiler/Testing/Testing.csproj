@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="src\*.*">
+        <None Update="tests\*.*">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>

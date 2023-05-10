@@ -34,7 +34,7 @@ namespace ESPSimulation
 
             page.Console += (sender, eventArgs) =>
             {
-                if (eventArgs.Message.Type != ConsoleType.Log) return;
+                if (eventArgs.Message.Type != ConsoleType.Log || eventArgs.Message.Text == "Build aborted") return;
 
                 string output = eventArgs.Message.Text.Substring(10).Trim();
                 Console.WriteLine(output);
