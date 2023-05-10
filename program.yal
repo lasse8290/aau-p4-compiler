@@ -2,29 +2,23 @@ external <"Arduino.h/Serial.println"> print: in (int32 a);
 external <"Arduino.h/Serial.begin"> begin: in (int64 a);
 external <"Arduino.h/vTaskDelay"> delay: in (int64 a);
 
-test: out(bool a){
-    a = true;
+twoInNOut: in(int32 x, int32 y) out(int32 a, int32 b){
+    a = x + 1;
+    b = y + 1;
+    return;
 }
 
 async main: {
     begin(115200);
-
-
-    if (test()) {
-        print(1);
-    }
-
-    if (!test()) {
-        print(2);
-    }
-
-    if (!!test()) {
-        print(3);
-    }
-     if (!!!test()) {
-        print(4);
-    }
-    if(!!((0+0) == 0)){
-    print(5);
-    }
+    
+    int32 a;
+    int32 b;
+    a = 5;
+    int32 x = 10;
+    x  = 5;
+      a,b = twoInNOut(1,2);
+    twoInNOut((a,b = 5,5));
+    print(a);
+    print(b);
+    
 }

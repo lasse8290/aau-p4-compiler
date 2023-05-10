@@ -310,7 +310,7 @@ public class CodeGenTraverser : ASTTraverser
             });
             return template.ReplacePlaceholders(true);
         }
-
+        
         var op = binaryAssignment.Operator switch
         {
             Operators.AssignmentOperator.Equals                   => "=",
@@ -340,12 +340,12 @@ public class CodeGenTraverser : ASTTraverser
                 {
                     var targetName = (string)InvokeVisitor(binaryAssignment.Targets[assignmentCount]);
                     assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{outputParameter.Name}", op));
-                    //HOTFIX
-                    if (binaryAssignment.Targets.Count > 1)
-                        assignmentsBuilder.Append(";");
-
                     assignmentCount++;
+                    if (binaryAssignment.Targets.Count > 1 && assignmentCount < binaryAssignment.Targets.Count)
+                        assignmentsBuilder.Append(",");
                 }
+                //HOTFIX
+
             }
             else
             {
@@ -353,8 +353,8 @@ public class CodeGenTraverser : ASTTraverser
                 assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}", op));
                 assignmentCount++;
                 //HOTFIX
-                if (binaryAssignment.Targets.Count > 1)
-                    assignmentsBuilder.Append(";");
+                if (binaryAssignment.Targets.Count > 1 && assignmentCount < binaryAssignment.Targets.Count)
+                    assignmentsBuilder.Append(",");
             }
         }
 

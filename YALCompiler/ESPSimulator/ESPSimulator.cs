@@ -47,7 +47,7 @@ namespace ESPSimulation
             };
 
             await page.WaitForSelectorAsync("div[class='react-draggable']");
-
+            await page.WaitForTimeoutAsync(200);
             await page.SelectAllText();
             await page.Paste(Code);
 
