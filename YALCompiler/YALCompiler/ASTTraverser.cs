@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Data;
 using System.Reflection;
 using YALCompiler.DataTypes;
 using Boolean = YALCompiler.DataTypes.Boolean;
@@ -39,8 +38,10 @@ public abstract class ASTTraverser
     internal virtual object? Visit(ExternalFunction        node) => node;
     internal virtual object? Visit(ArrayElementIdentifier  node) => node;
     internal virtual object? Visit(CompoundExpression      node) => node;
+    internal virtual object? Visit(BitwiseNegation         node) => node;
+    internal virtual object? Visit(LogicalNegation         node) => node;
     internal virtual object? Visit(Expression              node) => node;
-    internal virtual object? Visit(YALCompiler.DataTypes.Program                 node) => node;
+    internal virtual object? Visit(DataTypes.Program       node) => node;
     internal virtual object? Visit(ASTNode                 node) => node;
     internal virtual object? Visit(Function                node) => node;
 
@@ -56,22 +57,6 @@ public abstract class ASTTraverser
         {
             var node = stack.Pop();
             InvokeVisitor(node);
-
-            // commented this out because every nodes which aren't in the children list but are part of another wrapper node
-            // are being checked twice, adding the same error to the error list twice
-            // but don't delete it just yet till i've tested it more thoroughly
-
-            // var properties = GetNodeChildProperties(node.GetType());
-            //
-            // foreach (var property in properties)
-            // {
-            //     var childNode = property.GetValue(node) as ASTNode;
-            //     if (childNode != null)
-            //     {
-            //         childNode.Parent = node;
-            //         stack.Push(childNode);
-            //     }
-            // }
 
             for (int i = node.Children.Count - 1; i >= 0; i--)
                 stack.Push(node.Children[i]);

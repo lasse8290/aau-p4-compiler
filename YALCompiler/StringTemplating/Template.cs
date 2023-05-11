@@ -41,12 +41,21 @@ public partial class Template {
     }
     
     
+    /// <summary>
+    /// Clear all keys and set them to empty string
+    /// </summary>
     private void ClearAllKeys() {
         foreach (string k in _replacementKeys.Keys) {
             this[k] = "";
         }
     }
     
+    /// <summary>
+    ///  clears all keys and sets them to empty string
+    /// </summary>
+    /// <param name="keys"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <exception cref="KeyNotFoundException"></exception>
     private void ClearKeys<T>(List<Tuple<string, T>> keys) {
         foreach (var k in keys) {
 
@@ -57,6 +66,20 @@ public partial class Template {
             
             this[k.Item1] = "";
         }
+    }
+    
+    /// <summary>
+    /// Clears the given key and sets it to empty string
+    /// </summary>
+    /// <param name="key"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    private void ClearKey(string key) {
+        if (!_replacementKeys.ContainsKey(key)) {
+            string availableKeys = string.Join(", ", _replacementKeys.Keys);
+            throw new KeyNotFoundException($"Key: {key} not found in template, availableKeys: {availableKeys}");
+        }
+        
+        this[key] = "";
     }
 
     /// <summary>
@@ -86,6 +109,21 @@ public partial class Template {
         // replace all keys, some keys might be used multiple times for add multiple templates to same key
         foreach (Tuple<string, Template> k in replacementKeys) {
             this[k.Item1] += k.Item2.ReplacePlaceholders();
+        }
+    }
+    
+    /// <summary>
+    /// Replaces the given key placeholders in the selected template with the given values
+    /// Keys may be used multiple times to add multiple templates to the same key
+    /// </summary>
+    /// <pram name="Lable">the key to replace</pram>
+    /// <pram name="templates">a list of templates that will evaluate with ReplacePlaceholders</pram>
+    public void SetKey(string label, List<Template> templates) {
+        
+        ClearKey(label);
+        
+        foreach (Template t in templates) {
+            this[label] += t.ReplacePlaceholders();
         }
     }
     

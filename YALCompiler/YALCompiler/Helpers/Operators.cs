@@ -29,6 +29,7 @@ public static class Operators
         GreaterThanOrEqual = 0x1 << 5 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float,
         Equals = 0x1 << 6 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float ^ TypeMasks.String ^ TypeMasks.Bool,
         NotEquals = 0x1 << 7 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float ^ TypeMasks.String ^ TypeMasks.Bool,
+        Not = 0x1 << 8 ^ TypeMasks.Bool,
     }
 
     public enum ExpressionOperator
@@ -62,7 +63,6 @@ public static class Operators
         PreDecrement = 0x1 << 7 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float,
         PostIncrement = 0x1 << 8 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float,
         PostDecrement = 0x1 << 9 ^ TypeMasks.IntUint ^ TypeMasks.Char ^ TypeMasks.Float,
-        BitwiseNot = 0x1 << 10 ^ TypeMasks.IntUint ^ TypeMasks.Char,
     }
 
     public enum TypeMasks
@@ -130,7 +130,6 @@ public static class Operators
         AssignmentOperator.PreDecrement => "--",
         AssignmentOperator.PostIncrement => "++",
         AssignmentOperator.PostDecrement => "--",
-        AssignmentOperator.BitwiseNot => "~",
         _ => throw new ArgumentOutOfRangeException(nameof(@operator), @operator, null)
     };
     

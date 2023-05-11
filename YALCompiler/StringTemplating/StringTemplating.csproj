@@ -10,6 +10,9 @@
       <None Remove="Templates\NewFile1.txt" />
       <None Remove="Templates\NewFile3.txt" />
       <None Remove="Templates\ParameterStruct.txt" />
+      <None Update="Templates\input_lambda.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>

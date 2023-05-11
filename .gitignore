@@ -5,6 +5,9 @@
 
 .DS_Store
 
+output.cpp
+output.txt
+
 *.user
 bin
 obj
@@ -15,3 +18,4 @@ node_modules
 
 coverageresults
 TestResults
+program.yal

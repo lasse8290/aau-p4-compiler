@@ -510,4 +510,36 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
         return node.Variable.Type;
     }
+
+    internal override object? Visit(LogicalNegation node)
+    {
+        if (Visit(node.Expression) is not YALType expressionType)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(node.ToString()), node.LineNumber);
+            return null;
+        }
+
+        if (!Operators.CheckOperationIsValid(expressionType, Operators.PredicateOperator.Not))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(Operators.PredicateOperator.Not, expressionType), node.LineNumber);
+        }
+
+        return expressionType;
+    }
+    
+    internal override object? Visit(BitwiseNegation node)
+    {
+        if (Visit(node.Expression) is not YALType expressionType)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(node.ToString()), node.LineNumber);
+            return null;
+        }
+
+        if (!Operators.CheckOperationIsValid(expressionType, Operators.ExpressionOperator.BitwiseNot))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(Operators.ExpressionOperator.BitwiseNot, expressionType), node.LineNumber);
+        }
+
+        return expressionType;
+    }
 }

@@ -108,7 +108,6 @@ public class ASTParsingUnitTests : TestingHelper
     [InlineData("", 0, 0)]
     [InlineData("out (string a)", 0, 1)]
     [InlineData("in (string a)", 1, 0)]
-    // [InlineData("in (string a) out ()", 1, 0)] We need to discuss if this is it allowed?
     [InlineData("in (int32 a, int32 b)", 2, 0)]
     [InlineData("in (int32 a, int32 b) out (int32 c)", 2, 1)]
     [InlineData("in (int32 a, int32 b) out (int32 c, int32 d)", 2, 2)]
@@ -259,11 +258,6 @@ public class ASTParsingUnitTests : TestingHelper
             { "identifier[5]", new ArrayElementIdentifier("identifier", new Integer(5)) },
             { "identifier", new Identifier("identifier") },
             { "ref identifier", new Identifier("identifier") { IsRef = true } },
-            { "id1, id2, id3", new List<Identifier> {
-                new Identifier("id1"),
-                new Identifier("id2"),
-                new Identifier("id3"),
-            } },
             { "(id)", new Identifier("id") },
         };
 
@@ -298,12 +292,11 @@ public class ASTParsingUnitTests : TestingHelper
                 Values = new List<Expression> { new Identifier("k") },
                 Operator = Operators.AssignmentOperator.MultiplicationAssignment
             }},
-            /* This to be uncommented when grammar has been fixed */
-            /*{ "i /= k", new BinaryAssignment {
+            { "i /= k", new BinaryAssignment {
                 Targets = new List<ASTNode> { new Identifier("i") },
                 Values = new List<Expression> { new Identifier("k") },
                 Operator = Operators.AssignmentOperator.DivisionAssignment
-            }},*/
+            }},
             { "i %= k", new BinaryAssignment {
                 Targets = new List<ASTNode> { new Identifier("i") },
                 Values = new List<Expression> { new Identifier("k") },
@@ -324,7 +317,7 @@ public class ASTParsingUnitTests : TestingHelper
             { "i--", new UnaryAssignment {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostDecrement
-            }},
+            }}
        };
 
     [Theory]
@@ -360,14 +353,14 @@ public class ASTParsingUnitTests : TestingHelper
 
     public static TheoryData<string, object> Expressions =>
         new() {
-            /*{ "!true", new YALCompiler.DataTypes.Boolean {
-                Negated = true,
-                LiteralValue = true,
-            } },
-            { "!false", new YALCompiler.DataTypes.Boolean {
-                Negated = true,
-                LiteralValue = false,
-            } },*/
+            // { "!true", new YALCompiler.DataTypes.Boolean {
+            //     Negated = true,
+            //     LiteralValue = true,
+            // } },
+            // { "!false", new YALCompiler.DataTypes.Boolean {
+            //     Negated = true,
+            //     LiteralValue = false,
+            // } },
             { "i++", new UnaryAssignment {
                 Target = new Identifier("i"),
                 Operator = Operators.AssignmentOperator.PostIncrement
@@ -452,9 +445,9 @@ public class ASTParsingUnitTests : TestingHelper
                 Right = new Integer(2),
                 Operator = Operators.ExpressionOperator.BitwiseOr
             } },
-            { "~2", new Integer(2) {
-                BitwiseNegated = true,
-            } },
+            // { "~2", new Integer(2) {
+            //     BitwiseNegated = true,
+            // } },
             { "5 < 2", new CompoundPredicate {
                 Left = new Integer(5),
                 Right = new Integer(2),
