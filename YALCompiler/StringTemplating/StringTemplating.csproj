@@ -25,9 +25,6 @@
       <None Update="Templates\function.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Templates\declaration_assignment.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="Templates\else.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

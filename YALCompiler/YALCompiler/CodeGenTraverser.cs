@@ -73,8 +73,11 @@ public class CodeGenTraverser : ASTTraverser
 
         _template.SetKeys(new List<Tuple<string, string>>
         {
+            //Function structs and other global scoped declarations
             new("declarations", _declarationsBuilder.ToString()),
+            //External libreary includes
             new("includes", includeBuilder.ToString()),
+            //
             new("program", stringBuilder.ToString())
         });
     }
@@ -121,6 +124,7 @@ public class CodeGenTraverser : ASTTraverser
         return $"~({InvokeVisitor(bitwiseNegation.Expression)})";
 
     }
+    
     internal override object? Visit(If ifNode)
     {
 
@@ -229,8 +233,6 @@ public class CodeGenTraverser : ASTTraverser
 
         return template.ReplacePlaceholders(true);
     }
-    
-    
 
     internal override object? Visit(CompoundPredicate compoundPredicate)
     {
@@ -310,6 +312,14 @@ public class CodeGenTraverser : ASTTraverser
             });
             return template.ReplacePlaceholders(true);
         }
+        void AppendSeperator(StringBuilder builder, int assignmentCount)
+        {
+            string separator =  binaryAssignment.Targets[assignmentCount] is VariableDeclaration ? ";" : ",";
+            
+            if (binaryAssignment.Targets.Count > 1 && assignmentCount - 1 < binaryAssignment.Targets.Count)
+                builder.Append(separator);
+
+        }
         
         var op = binaryAssignment.Operator switch
         {
@@ -327,8 +337,7 @@ public class CodeGenTraverser : ASTTraverser
 
         var functionCallsBuilder = new StringBuilder();
         var assignmentsBuilder   = new StringBuilder();
-
-        var assignmentCount = 0;
+        var assignmentCount      = 0;
         for (var i = 0; i < binaryAssignment.Values.Count; i++)
         {
             var value = binaryAssignment.Values[i];
@@ -340,21 +349,18 @@ public class CodeGenTraverser : ASTTraverser
                 {
                     var targetName = (string)InvokeVisitor(binaryAssignment.Targets[assignmentCount]);
                     assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{outputParameter.Name}", op));
+                    AppendSeperator(assignmentsBuilder, assignmentCount);
                     assignmentCount++;
-                    if (binaryAssignment.Targets.Count > 1 && assignmentCount < binaryAssignment.Targets.Count)
-                        assignmentsBuilder.Append(",");
+                    
                 }
-                //HOTFIX
-
             }
             else
             {
                 var targetName = (string)InvokeVisitor(binaryAssignment.Targets[assignmentCount]);
                 assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}", op));
+                AppendSeperator(assignmentsBuilder, assignmentCount);
                 assignmentCount++;
-                //HOTFIX
-                if (binaryAssignment.Targets.Count > 1 && assignmentCount < binaryAssignment.Targets.Count)
-                    assignmentsBuilder.Append(",");
+                
             }
         }
 
@@ -452,9 +458,7 @@ public class CodeGenTraverser : ASTTraverser
 
         return template.ReplacePlaceholders();
     }
-    
-    
-    
+
     internal override object? Visit(FunctionCall functionCall)
     {
         var argumentCounter = 0;
