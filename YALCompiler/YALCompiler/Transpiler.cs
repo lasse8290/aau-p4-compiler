@@ -45,7 +45,7 @@ public class Transpiler
 
         if (OutputFilePath != null)
         {
-            File.WriteAllText(OutputFilePath, CompiledCode);
+            TerminalExtension.LogError(e.Message);
         }
 
     }
