@@ -6,55 +6,49 @@ namespace YALCompiler;
 public partial class Program {
     private static async Task Main(string[] args) {
 
-        /*
-         Parser.Default.ParseArguments<DefaultOptions>(args).WithParsed(defaultOptions => {
-            if (!File.Exists(defaultOptions.InputFilePath)) {
-                Console.WriteLine("Input file does not exist.");
-                return;
-            }
 
-            Transpiler transpiler = new(defaultOptions.InputFilePath, defaultOptions.OutputFilePath);
-            transpiler.Transpile();
-
-            if (defaultOptions.UseSimulator)
-                RunSimulator(transpiler.CompiledCode, defaultOptions.Duration, defaultOptions.WokwiUrl);
-        });
-*/
         Parser.Default.ParseArguments<ProjectOptions, CompileOptions>(args).MapResult(
             (ProjectOptions opts) => {
                 HandleProjectOptions(opts).Wait();
                 return 0;
             },
             (CompileOptions opts) => {
-                HandleCompileOptions(opts);
+                HandleCompileOptions(opts).Wait();
                 return 0;
             },
-            errs => 1);
-        
-        
-
+            errs => {
+                foreach (Error? e in errs) {
+                    TerminalExtension.LogError(e.ToString());
+                }
+                return 0;
+            });
     }
 
-    private static void HandleCompileOptions(CompileOptions opts) { }
+    private static async Task  HandleCompileOptions(CompileOptions opts) {
+        
+        CompileManager compileManager = new(opts);
+        await compileManager.Compile();
+    }
+
 
     private static async Task HandleProjectOptions(ProjectOptions projectOptions) {
 
         projectOptions.ProjectDir = "./test";
         
-        var projectmanager = new ProjectManager(projectOptions);
+        var projectManager = new ProjectManager(projectOptions);
 
         if (projectOptions.InitProject) {
 
-            bool x = await projectmanager.CreateProject();
+            bool x = await projectManager.CreateProject();
         }
         else if (projectOptions.CleanProject) {
-            bool x = await projectmanager.CleanProject();
+            bool x = await projectManager.CleanProject();
         }
         else if (projectOptions.CompileProject) {
-           bool x = await projectmanager.CompileProject();
+           bool x = await projectManager.CompileProject();
         }
         else if (projectOptions.RunProject) {
-            bool x = await projectmanager.RunProject();
+            bool x = await projectManager.RunProject();
         }
         else {
             TerminalExtension.LogError("No action specified.");

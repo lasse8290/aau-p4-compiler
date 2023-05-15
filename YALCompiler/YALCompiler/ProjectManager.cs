@@ -106,7 +106,7 @@ public class ProjectManager {
 
     }
 
-    async Task RunPIOCommand(string args, string errorMsg) {
+    async Task RunPIOCommand(string args, string? errorMsg) {
         try {
             BufferedCommandResult mm = await Cli.Wrap(_projectOptions.PIOCLIPath)
                 .WithArguments(args)

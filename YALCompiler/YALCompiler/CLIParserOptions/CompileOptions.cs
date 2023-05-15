@@ -11,12 +11,10 @@ public record CompileOptions {
     [Option('o', "output", Required = false, HelpText = "Path for the destination file.")]
     public string? OutputFilePath { get; set; }
 
-    //[Option('s', "simulator", Required = false, HelpText = "Run the program using a ESP32 Simulator.")]
-    //public bool UseSimulator { get; set; } = default!;
 
     [Option('t', "timeout", Required = false, HelpText = "Timeout/Duration for the simulation in milliseconds.")]
     public int? Duration { get; set; }
 
     [Option('w', "wokwi", Required = false, HelpText = "URL to Wokwi project to be used")]
-    public string WokwiUrl { get; set; } = string.Empty;
+    public string? WokwiUrl { get; set; } = string.Empty;
 }
