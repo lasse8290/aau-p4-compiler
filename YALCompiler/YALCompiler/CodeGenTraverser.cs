@@ -38,10 +38,12 @@ public class CodeGenTraverser : ASTTraverser
                 if (testNode.Parent is Function function)
                 {
                     var symbol = function.InputParameters.FirstOrDefault(x => x.Name == localName);
-                    if (symbol != null) return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{localName})";
+                    if (symbol != null) 
+                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{localName})";
 
                     symbol = function.OutputParameters.FirstOrDefault(x => x.Name == localName);
-                    if (symbol != null) return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{localName}";
+                    if (symbol != null) 
+                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{localName}";
                 }
 
                 break;
@@ -316,7 +318,7 @@ public class CodeGenTraverser : ASTTraverser
         {
             string separator =  binaryAssignment.Targets[assignmentCount] is VariableDeclaration ? ";" : ",";
             
-            if (binaryAssignment.Targets.Count > 1 && assignmentCount - 1 < binaryAssignment.Targets.Count)
+            if (binaryAssignment.Targets.Count > 1 && assignmentCount + 1 < binaryAssignment.Targets.Count)
                 builder.Append(separator);
 
         }
