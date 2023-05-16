@@ -470,7 +470,7 @@ public class CodeGenTraverser : ASTTraverser
             return argumentCounter == functionCall.Function.InputParameters.Count ? "" : ",";
         }
 
-        var suffix = functionCall.Function.OutputParameters.Count == 1 ? $"->{functionCall.Function.OutputParameters[0].Name}" : "";
+        var suffix = functionCall.Function.OutputParameters.Count > 0 ? $"->{functionCall.Function.OutputParameters[0].Name}" : "";
 
         var functionCallBuilder    = new StringBuilder();
         var inputParametersBuilder = new StringBuilder();
