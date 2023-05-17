@@ -79,7 +79,7 @@ public class CodeGenTraverser : ASTTraverser
             new("declarations", _declarationsBuilder.ToString()),
             //External libreary includes
             new("includes", includeBuilder.ToString()),
-            //
+            
             new("program", stringBuilder.ToString())
         });
     }
@@ -346,14 +346,19 @@ public class CodeGenTraverser : ASTTraverser
 
             if (value is FunctionCall functionCall)
             {
-                functionCallsBuilder.Append($"{(string)InvokeVisitor(value)};");
-                foreach (var outputParameter in functionCall.Function.OutputParameters)
+                //functionCallsBuilder.Append($"{(string)InvokeVisitor(value)};");
+                for (var index = 0; index < functionCall.Function.OutputParameters.Count; index++)
                 {
-                    var targetName = (string)InvokeVisitor(binaryAssignment.Targets[assignmentCount]);
-                    assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{outputParameter.Name}", op));
+                    var outputParameter = functionCall.Function.OutputParameters[index];
+                    var targetName      = (string)InvokeVisitor(binaryAssignment.Targets[assignmentCount]);
+                    
+                    if(index == 0)
+                        assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}", op));
+                    else
+                        assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{outputParameter.Name}", op));
+                    
                     AppendSeperator(assignmentsBuilder, assignmentCount);
                     assignmentCount++;
-                    
                 }
             }
             else
