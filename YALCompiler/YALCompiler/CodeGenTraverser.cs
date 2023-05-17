@@ -368,7 +368,9 @@ public class CodeGenTraverser : ASTTraverser
                 
             }
         }
-        
+
+
+
         return assignmentsBuilder.ToString();
     }
 
@@ -470,10 +472,17 @@ public class CodeGenTraverser : ASTTraverser
         var functionCallBuilder    = new StringBuilder();
         var inputParametersBuilder = new StringBuilder();
 
+        if (functionCall.Function is not ExternalFunction)
+        {
+            _scopeBuilderStack.Peek().AppendLine($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} _{functionCall.GetHashCode().ToString()};");
+            _scopeBuilderStack.Push(new StringBuilder());
+        }
+
         foreach (var expression in functionCall.InputParameters)
             if (expression is FunctionCall inputFunctionCall && inputFunctionCall.Function is not ExternalFunction)
             {
                 functionCallBuilder.Append($"{(string)InvokeVisitor(inputFunctionCall)};");
+                
                 for (var y = 0; y < inputFunctionCall.Function.OutputParameters.Count; y++)
                     inputParametersBuilder.Append($"_{inputFunctionCall.GetHashCode().ToString()}.{inputFunctionCall.Function.OutputParameters[y].Name}{GetInputSeparator()}");
             }
@@ -496,13 +505,12 @@ public class CodeGenTraverser : ASTTraverser
         }
         else
         {
-            _scopeBuilderStack.Peek().AppendLine($"COMPILER_OUTPUT_STRUCT_{functionCall.Function.Name} _{functionCall.GetHashCode().ToString()};");
-
             var template      = new Template("function_call");
             var lambdaBuilder = new Template("input_lambda");
 
             lambdaBuilder.SetKeys(new List<Tuple<string, string>>
             {
+                new("output_structs", _scopeBuilderStack.Pop().ToString()),
                 new("functionCalls", functionCallBuilder.ToString()),
                 new("function", functionCall.Function.Name),
                 new("input_parameters", inputParametersBuilder.ToString())
