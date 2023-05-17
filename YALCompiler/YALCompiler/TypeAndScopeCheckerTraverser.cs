@@ -99,7 +99,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         if (!Operators.CheckOperationIsValid(targetType, node.Operator))
             _errorHandler.AddError(new InvalidOperatorException(node.Operator, targetType), node.LineNumber);
 
-        return targetType;
+        return valueType;
 
     }
 

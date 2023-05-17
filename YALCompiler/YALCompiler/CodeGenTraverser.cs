@@ -337,7 +337,6 @@ public class CodeGenTraverser : ASTTraverser
         if (binaryAssignment.Targets.Count == 1)
             return GetSimpleBinaryAssignment((string)InvokeVisitor(binaryAssignment.Targets[0]), (string)InvokeVisitor(binaryAssignment.Values[0]), op);
 
-        var functionCallsBuilder = new StringBuilder();
         var assignmentsBuilder   = new StringBuilder();
         var assignmentCount      = 0;
         for (var i = 0; i < binaryAssignment.Values.Count; i++)
@@ -346,7 +345,6 @@ public class CodeGenTraverser : ASTTraverser
 
             if (value is FunctionCall functionCall)
             {
-                //functionCallsBuilder.Append($"{(string)InvokeVisitor(value)};");
                 for (var index = 0; index < functionCall.Function.OutputParameters.Count; index++)
                 {
                     var outputParameter = functionCall.Function.OutputParameters[index];
@@ -370,16 +368,8 @@ public class CodeGenTraverser : ASTTraverser
                 
             }
         }
-
-        // Set up and populate the template with the generated code
-        var template = new Template("binary_assignment_literal");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("functionCalls", functionCallsBuilder.ToString()),
-            new("assignments", assignmentsBuilder.ToString())
-        });
-
-        return template.ReplacePlaceholders(true);
+        
+        return assignmentsBuilder.ToString();
     }
 
     internal override object? Visit(VariableDeclaration variableDeclaration)
