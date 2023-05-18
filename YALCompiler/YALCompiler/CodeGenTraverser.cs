@@ -8,11 +8,11 @@ namespace YALCompiler;
 
 public class CodeGenTraverser : ASTTraverser
 {
-    private readonly StringBuilder _declarationsBuilder = new();
-    private readonly HashSet<string>  _externalLibraries   = new();
-    private readonly Dictionary<string, string> _externalNicknames = new();
-    private readonly Template                   _template          = new("program");
-    private readonly Stack<StringBuilder> _scopeBuilderStack      = new();
+    private readonly StringBuilder              _declarationsBuilder = new();
+    private readonly HashSet<string>            _externalLibraries   = new();
+    private readonly Dictionary<string, string> _externalNicknames   = new();
+    private readonly Stack<StringBuilder>       _scopeBuilderStack   = new();
+    private          string                     program              = "";
 
     public CodeGenTraverser(ASTNode node) : base(node)
     {        
@@ -57,7 +57,29 @@ public class CodeGenTraverser : ASTTraverser
 
     public override void BeginTraverse()
     {
+        program = (string)InvokeVisitor(_startNode);
+    }   
+
+    public override string ToString()
+    {
+        return program;
+    }
+
+    internal override object? Visit(Boolean boolean)
+    {
+        var template = new Template("boolean");
+        template.SetKeys(new List<Tuple<string, string>>
+        {
+            new("boolean", boolean.LiteralValue == true ? "1" : "0")
+        });
+
+        return template.ReplacePlaceholders();
+    }
+
+    internal override object? Visit(DataTypes.Program program)
+    {
         var stringBuilder = new StringBuilder();
+        Template template = new("program");
 
         // Invoke external functions
         foreach (var child in _startNode.FunctionTable)
@@ -73,7 +95,7 @@ public class CodeGenTraverser : ASTTraverser
         foreach (string libraryName in _externalLibraries)
             includeBuilder.AppendLine($"#include <{libraryName}>");
 
-        _template.SetKeys(new List<Tuple<string, string>>
+        template.SetKeys(new List<Tuple<string, string>>
         {
             //Function structs and other global scoped declarations
             new("declarations", _declarationsBuilder.ToString()),
@@ -82,22 +104,8 @@ public class CodeGenTraverser : ASTTraverser
             
             new("program", stringBuilder.ToString())
         });
-    }
-
-    public override string ToString()
-    {
-        return _template.ReplacePlaceholders();
-    }
-
-    internal override object? Visit(Boolean boolean)
-    {
-        var template = new Template("boolean");
-        template.SetKeys(new List<Tuple<string, string>>
-        {
-            new("boolean", boolean.LiteralValue == true ? "1" : "0")
-        });
-
-        return template.ReplacePlaceholders();
+        
+        return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(ExternalFunction externalFunction)
