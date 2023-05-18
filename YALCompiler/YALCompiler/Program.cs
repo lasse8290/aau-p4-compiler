@@ -2,36 +2,58 @@ using CommandLine;
 using ESPSimulation;
 
 namespace YALCompiler;
-public partial class Program
-{
-    static void Main(string[] args)
-    {
-        CommandLine.Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
-            {
-                if (!File.Exists(o.InputFilePath))
-                {
-                    Console.WriteLine("Input file does not exist.");
-                    return;
+
+public partial class Program {
+    private static async Task Main(string[] args) {
+
+
+        Parser.Default.ParseArguments<ProjectOptions, CompileOptions>(args).MapResult(
+            (ProjectOptions opts) => {
+                HandleProjectOptions(opts).Wait();
+                return 0;
+            },
+            (CompileOptions opts) => {
+                HandleCompileOptions(opts).Wait();
+                return 0;
+            },
+            errs => {
+                foreach (Error? e in errs) {
+                    TerminalExtension.LogError(e.ToString());
                 }
-
-                Transpiler transpiler = new(o.InputFilePath, o.OutputFilePath);
-                transpiler.Transpile();
-
-                if (o.UseSimulator) RunSimulator(transpiler.CompiledCode, o.Duration, o.WokwiURL);
+                return 0;
             });
     }
 
-    static void RunSimulator(string code, int? duration, string? wokwiURL = null)
-    {
-        ESPSimulator s;
+    private static async Task  HandleCompileOptions(CompileOptions opts) {
+        
+        CompileManager compileManager = new(opts);
+        await compileManager.Compile();
+    }
 
-        if (wokwiURL != null)
-            s = new(code, duration, wokwiURL);
-        else
-            s = new(code, duration);
 
-        Console.WriteLine("Running code...");
-        s.Run().Wait();
-        Console.WriteLine("Exited...");
+    private static async Task HandleProjectOptions(ProjectOptions projectOptions) {
+
+        projectOptions.ProjectDir = "./test";
+        
+        var projectManager = new ProjectManager(projectOptions);
+
+        if (projectOptions.InitProject) {
+
+            bool x = await projectManager.CreateProject();
+        }
+        else if (projectOptions.CleanProject) {
+            bool x = await projectManager.CleanProject();
+        }
+        else if (projectOptions.CompileProject) {
+           bool x = await projectManager.CompileProject();
+        }
+        else if (projectOptions.RunProject) {
+            bool x = await projectManager.RunProject();
+        }
+        else {
+            TerminalExtension.LogError("No action specified.");
+        }
+
     }
 }
+

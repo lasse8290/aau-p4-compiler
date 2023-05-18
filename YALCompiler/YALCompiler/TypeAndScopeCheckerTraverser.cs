@@ -100,7 +100,6 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             _errorHandler.AddError(new InvalidOperatorException(node.Operator, targetType), node.LineNumber);
 
         return targetType;
-
     }
 
     internal override object? Visit(UnaryAssignment node)
@@ -109,16 +108,11 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         switch (node.Target)
         {
             case Identifier identifier:
-                if (CompilerUtilities.FindSymbol(identifier.Name, node) is Symbol symbol)
-                {
-                    targetType = symbol.Type;
-                    symbol.Initialized = true;
-                }
-                else
-                {
-                    _errorHandler.AddError(new IdentifierNotFoundException(identifier.Name), node.LineNumber);
-                }
 
+                if ((targetType = Visit(identifier) as YALType) is null)
+                {
+                    return null;
+                }
                 break;
             default:
                 _errorHandler.AddError(new InvalidAssignmentException(node), node.LineNumber);
@@ -168,7 +162,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
 
         foreach (var inputParameter in node.InputParameters)
         {
-            actualParams.Add(Visit(inputParameter) as YALType);
+            if (Visit(inputParameter) is YALType inputParamType)
+                actualParams.Add(inputParamType);
         }
 
         YALType finalFormalInputParam = new YALType(formalInputParams.ToArray());
@@ -513,5 +508,37 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             node.Variable.Initialized = true;
 
         return node.Variable.Type;
+    }
+
+    internal override object? Visit(LogicalNegation node)
+    {
+        if (Visit(node.Expression) is not YALType expressionType)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(node.ToString()), node.LineNumber);
+            return null;
+        }
+
+        if (!Operators.CheckOperationIsValid(expressionType, Operators.PredicateOperator.Not))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(Operators.PredicateOperator.Not, expressionType), node.LineNumber);
+        }
+
+        return expressionType;
+    }
+    
+    internal override object? Visit(BitwiseNegation node)
+    {
+        if (Visit(node.Expression) is not YALType expressionType)
+        {
+            _errorHandler.AddError(new InvalidExpressionException(node.ToString()), node.LineNumber);
+            return null;
+        }
+
+        if (!Operators.CheckOperationIsValid(expressionType, Operators.ExpressionOperator.BitwiseNot))
+        {
+            _errorHandler.AddError(new InvalidOperatorException(Operators.ExpressionOperator.BitwiseNot, expressionType), node.LineNumber);
+        }
+
+        return expressionType;
     }
 }

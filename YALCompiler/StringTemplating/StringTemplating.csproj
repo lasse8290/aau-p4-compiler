@@ -10,19 +10,16 @@
       <None Remove="Templates\NewFile1.txt" />
       <None Remove="Templates\NewFile3.txt" />
       <None Remove="Templates\ParameterStruct.txt" />
+      <None Update="Templates\input_lambda.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Templates\binary_assignment_literal.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="Templates\async_function.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Templates\function.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Templates\declaration_assignment.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Templates\else.txt">

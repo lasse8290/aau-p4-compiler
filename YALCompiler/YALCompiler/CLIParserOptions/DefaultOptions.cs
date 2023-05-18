@@ -3,7 +3,7 @@ using CommandLine;
 namespace YALCompiler;
 public partial class Program
 {
-    public class Options
+    public class DefaultOptions
     {
         [Option('i', "input", Required = true, HelpText = "Path to the source file. It must be a (.YAL)")]
         public string InputFilePath { get; set; } = default!;
@@ -18,7 +18,7 @@ public partial class Program
         public int? Duration { get; set; }
 
         [Option('w', "wokwi", Required = false, HelpText = "URL to Wokwi project to be used")]
-        public string WokwiURL { get; set; } = default!;
+        public string WokwiUrl { get; set; } = string.Empty;
+        
     }
-
 }

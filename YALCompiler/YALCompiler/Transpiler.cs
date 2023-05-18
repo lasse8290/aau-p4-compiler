@@ -31,29 +31,23 @@ public class Transpiler
 
     public void Transpile()
     {
-        try
+        Parse();
+
+        AssignParentChildRelations();
+
+        PerformSemanticAnalysis();
+
+        PrintWarnings();
+
+        CheckErrors();
+
+        GenerateCode();
+
+        if (OutputFilePath != null)
         {
-            Parse();
-
-            AssignParentChildRelations();
-
-            PerformSemanticAnalysis();
-
-            PrintWarnings();
-
-            CheckErrors();
-
-            GenerateCode();
-
-            if (OutputFilePath != null)
-            {
-                File.WriteAllText(OutputFilePath, CompiledCode);
-            }
+            File.WriteAllText(OutputFilePath, CompiledCode);
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
+
     }
 
     // Generates Abstract Syntax Tree

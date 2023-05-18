@@ -11,6 +11,7 @@
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+      <PackageReference Include="CliWrap" Version="3.6.1" />
       <PackageReference Include="CommandLineParser" Version="2.9.1" />
       <ProjectReference Include="..\StringTemplating\StringTemplating.csproj" />
       <ProjectReference Include="..\ESPSimulator\ESPSimulator.csproj" />
@@ -32,5 +33,9 @@
 
     <ItemGroup>
       <ClCompile Include="bin\Debug\net7.0\output.cpp" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="test\pioBuild\" />
     </ItemGroup>
 </Project>

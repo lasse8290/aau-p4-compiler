@@ -1,4 +1,5 @@
 ﻿using PuppeteerSharp;
+using PuppeteerSharp.Input;
 
 namespace ESPSimulation
 {
@@ -34,7 +35,7 @@ namespace ESPSimulation
 
             page.Console += (sender, eventArgs) =>
             {
-                if (eventArgs.Message.Type != ConsoleType.Log) return;
+                if (eventArgs.Message.Type != ConsoleType.Log || eventArgs.Message.Text == "Build aborted") return;
 
                 string output = eventArgs.Message.Text.Substring(10).Trim();
                 Console.WriteLine(output);
@@ -47,7 +48,7 @@ namespace ESPSimulation
             };
 
             await page.WaitForSelectorAsync("div[class='react-draggable']");
-
+            await page.WaitForTimeoutAsync(200);
             await page.SelectAllText();
             await page.Paste(Code);
 

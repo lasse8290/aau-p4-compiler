@@ -6,14 +6,7 @@ external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
 external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
 external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-initialize_values: in(int32 a, int32 b) out(int32 c, int32 d) {
-    c = a;
-    d = b;
-}
 
-x: in(int32 y){
-
-}
 
 print_abcd: in(int32 a, int32 b, int32 c, int32 d) {
     print(a);
