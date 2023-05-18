@@ -1,45 +1,43 @@
-external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
-external  <"stdio.h/Serial.println"> serialPrintln: in(string s);
-external  <"stdio.h/Serial.print"> serialPrint: in(string s);
-external  <"stdio.h/String"> toString: in(int32 i) out(string s);
+external <"Arduino.h/Serial.println"> print: in (int32 a);
+external <"Arduino.h/Serial.begin"> begin: in (int64 a);
+external <"Arduino.h/vTaskDelay"> delay: in (int64 a);
 
-external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
-external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
-external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
-external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
-
-int32 _LED_BUILTIN = 2;
-int32 _INPUT = 1;
-int32 _OUTPUT = 3;
-
-int32 _HIGH = 1;
-int32 _LOW = 0;
-
-stringAndIntPrintln: in(string s, int32 i) {
-    serialPrint(s);
-    serialPrint(": ");
-    serialPrint(toString(i));
-    serialPrint("\n");
+twoInputAndOutput: in(int32 a, int32 b) out(int32 c, int32 d){
+    c = a + 1;
+    d = b + 2;
+    return;
 }
 
-async blinkEveryXMinutes: in(int32 delayMs, int32 holdMs) {
-    while (true) {
-        digitalWrite(_LED_BUILTIN, _HIGH);
-        delay(holdMs);
-        digitalWrite(_LED_BUILTIN, _LOW);
-        delay(delayMs);
-    }
+oneOutput: out(int32 a) {
+    a = 1;
+    return;
 }
 
-main: {
-    serialBegin(115200);
-    pinMode(_LED_BUILTIN, _OUTPUT);
+twoOutputOneInput:in(int32 c) out(int32 a, int32 b){
+    a = 1;
+    b = 2;
+    return;
+}
+
+twoOutput: out(int32 a, int32 b){
+    a = 1;
+    b = 2;
+    return;
+}
+
+async main: {
+    begin(115200);
+   
+    int32 a, int32 b = twoInputAndOutput(twoOutputOneInput(oneOutput()));
+    int32 x, int32 y = twoOutput();
+    x, y = twoOutput();
+    twoInputAndOutput((a, b = twoOutput()));
+    print(a);
+    print(b);
     
-    int32 delayMs = 5000;
-    int32 holdMs = 500;
-
-    blinkEveryXMinutes((delayMs, holdMs = 1000 * 10, 1000));
-
-    stringAndIntPrintln("delayMs", delayMs);
-    stringAndIntPrintln("holdMs", holdMs);
+    int32 c;
+    
+    if((c = oneOutput()) == 1){
+        print(666);
+    }
 }

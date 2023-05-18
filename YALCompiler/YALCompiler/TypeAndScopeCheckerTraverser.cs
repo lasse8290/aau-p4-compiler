@@ -100,7 +100,6 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
             _errorHandler.AddError(new InvalidOperatorException(node.Operator, targetType), node.LineNumber);
 
         return targetType;
-
     }
 
     internal override object? Visit(UnaryAssignment node)
