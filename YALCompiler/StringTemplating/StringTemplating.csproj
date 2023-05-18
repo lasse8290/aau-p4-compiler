@@ -16,16 +16,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Templates\binary_assignment_literal.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="Templates\async_function.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Templates\function.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Templates\declaration_assignment.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Templates\else.txt">

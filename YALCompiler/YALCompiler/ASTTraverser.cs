@@ -63,7 +63,7 @@ public abstract class ASTTraverser
         }
     }
 
-    protected virtual object? InvokeVisitor(ASTNode node)
+    protected object? InvokeVisitor(ASTNode node)
     {
         Type nodeType = node.GetType();
         MethodInfo? visitMethod = GetVisitMethodForNodeType(nodeType);
