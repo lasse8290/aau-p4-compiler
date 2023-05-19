@@ -32,7 +32,6 @@ variableDeclaration:
 
 variableDeclarationFormat:
 	REF variableDeclarationFormat	# ReferenceVariableDeclaration
-	| TYPE '[' POSITIVE_INT? ']' ID	# ArrayDeclaration
 	| TYPE ID						# SimpleVariableDeclaration;
 
 assignment: simpleAssignment | declarationAssignment;
@@ -94,8 +93,7 @@ elseStatement: 'else' statementBlock;
 whileStatement: 'while' '(' expression ')' statementBlock;
 
 identifier:
-	ID '[' expression ']'			# ArrayElementIdentifier
-	| ID							# SimpleIdentifier
+	ID							    # SimpleIdentifier
 	| REF identifier				# ReferenceIdentifier;
 
 fragment LOWERCASE: [a-z];
@@ -125,7 +123,6 @@ TYPE:
 	| 'uint64'
 	| 'float32'
 	| 'float64'
-	| 'char'
 	| 'string'
 	| 'bool';
 
