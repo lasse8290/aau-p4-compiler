@@ -78,7 +78,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(DataTypes.Program program)
     {
-        var stringBuilder = new StringBuilder();
+        var programBuilder = new StringBuilder();
         Template template = new("program");
 
         // Invoke external functions
@@ -86,14 +86,16 @@ public class CodeGenTraverser : ASTTraverser
             if (child.Value is ExternalFunction)
                 InvokeVisitor(child.Value);
         
-        // Visit children
-        foreach (var child in _startNode.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
-
         // Build includes from external libraries
         StringBuilder includeBuilder = new();
         foreach (string libraryName in _externalLibraries)
             includeBuilder.AppendLine($"#include <{libraryName}>");
+        
+        // Visit children
+        foreach (var child in _startNode.Children)
+            programBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+
+
 
         template.SetKeys(new List<Tuple<string, string>>
         {
@@ -102,7 +104,7 @@ public class CodeGenTraverser : ASTTraverser
             //External libreary includes
             new("includes", includeBuilder.ToString()),
             
-            new("program", stringBuilder.ToString())
+            new("program", programBuilder.ToString())
         });
         
         return template.ReplacePlaceholders(true);
