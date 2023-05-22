@@ -2,7 +2,7 @@
 
 YAL is a language which natively supports concurrent tasks through *async/await* keywords for microcontrollers (such as the ESP23 or Arduino). YAL source code can be transpiled to C++ through the provided compiler, or scaffold a PlatformIO project to "easily" flash onto the device. There are 2 ways to compile yal, either singlefile or as a project, both support emulating the code using wokwi.com 
 
-###Single file compile###
+### Single file compile
 
 **Step 1:**  
 Clone the Github repository.
@@ -17,7 +17,7 @@ Run the build command to compile the compiler:
 **Step 4:**  
 Compile the sample code to C++:  
 `$ .\YALCompiler\YALCompiler\bin\Release\net7.0\YALCompiler.exe compile -i program.yal -o output.cpp`
-To run in a simulator automaticly `-w <wokwi_url>` can be used
+To run in a simulator automaticly `-w <wokwi_url>` can be used, recomended url to use with test is https://wokwi.com/projects/new/esp32
 
 **Step 5:**
 The generated output must mannaully be copied to into platformIO project to be compiled.
@@ -45,7 +45,8 @@ platform name is defined by the list maintained by platfromIO which can be found
 **Step 3:**
 To flash the file you may either use the pio cli to flash or altertivly open the pioBuild folder with vscode and the pio plugin.
 
-To run in a simulator automaticly `-w <wokwi_url>` can be used
+To run in a simulator automaticly `-w <wokwi_url>` can be used, recomended url to use with test is https://wokwi.com/projects/new/esp32
+
 
 ### System Requirements
 - .NET 7 SDK
