@@ -291,19 +291,19 @@ public class CodeGenTraverser : ASTTraverser
     internal override object? Visit(WhileStatement whileStatement)
     {
 
-        var    stringBuilder = new StringBuilder();
+        var    bodyBuilder = new StringBuilder();
         string predicate     = (string)InvokeVisitor(whileStatement.Predicate);
         
         _scopeBuilderStack.Push(new StringBuilder());
 
         foreach (var child in whileStatement.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+            bodyBuilder.AppendLine((string)InvokeVisitor(child) + ";");
 
         var template = new Template("while");
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("predicate", predicate),
-            new("body", $"{_scopeBuilderStack.Pop()} {stringBuilder}")
+            new("body", $"{_scopeBuilderStack.Pop()} {bodyBuilder}")
         });
 
         return template.ReplacePlaceholders(true);
