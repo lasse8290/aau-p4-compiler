@@ -19,18 +19,16 @@ public class CompileManager {
             return false;
         }
 
-        string code = File.ReadAllText(_options.InputFilePath);
-
         if (_options.OutputFilePath == null) {
             _options.OutputFilePath = Path.Join(Path.GetDirectoryName(_options.InputFilePath), $"{Path.GetFileNameWithoutExtension(_options.InputFilePath)}.ino");
         }
 
-        Transpiler tp = new(code, _options.OutputFilePath);
+        Transpiler tp = new(_options.InputFilePath, _options.OutputFilePath);
         
         tp.Transpile();
 
         if (_options.WokwiUrl != null) {
-            await RunSimulator(code, _options.Duration ??= 10000, _options.WokwiUrl);
+            await RunSimulator(tp.CompiledCode, _options.Duration ??= 10000, _options.WokwiUrl);
         }
         
         return true;
