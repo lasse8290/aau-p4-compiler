@@ -78,7 +78,7 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(DataTypes.Program program)
     {
-        var stringBuilder = new StringBuilder();
+        var programBuilder = new StringBuilder();
         Template template = new("program");
 
         // Invoke external functions
@@ -86,14 +86,16 @@ public class CodeGenTraverser : ASTTraverser
             if (child.Value is ExternalFunction)
                 InvokeVisitor(child.Value);
         
-        // Visit children
-        foreach (var child in _startNode.Children)
-            stringBuilder.AppendLine((string)InvokeVisitor(child) + ";");
-
         // Build includes from external libraries
         StringBuilder includeBuilder = new();
         foreach (string libraryName in _externalLibraries)
             includeBuilder.AppendLine($"#include <{libraryName}>");
+        
+        // Visit children
+        foreach (var child in _startNode.Children)
+            programBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+
+
 
         template.SetKeys(new List<Tuple<string, string>>
         {
@@ -102,7 +104,7 @@ public class CodeGenTraverser : ASTTraverser
             //External libreary includes
             new("includes", includeBuilder.ToString()),
             
-            new("program", stringBuilder.ToString())
+            new("program", programBuilder.ToString())
         });
         
         return template.ReplacePlaceholders(true);
@@ -199,6 +201,10 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(Function function)
     {
+        string GetVariables(List<Symbol> symbols) => string.Concat(symbols.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name}{(symbol.Type.Types.First().IsArray ? $"[{(symbol.ArraySize?.ToString())}]" : "")};\n")); //Doesnt work lol
+        
+        
+        
         _scopeBuilderStack.Push(new StringBuilder());
 
         var inputArguments = "void *pvParameters";
@@ -213,14 +219,14 @@ public class CodeGenTraverser : ASTTraverser
         inputTemplate.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Name),
-            new("initialized_parameters", string.Concat(function.InputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name};\n")))
+            new("initialized_parameters", GetVariables(function.InputParameters))
         });
 
         Template outputTemplate = new("parameter_output_struct");
         outputTemplate.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Name),
-            new("initialized_parameters", string.Concat(function.OutputParameters.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name};\n")))
+            new("initialized_parameters", GetVariables(function.OutputParameters))
         });
         
 
@@ -459,7 +465,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("array_element_identifier");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("array_name", arrayElementIdentifier.Name),
+            new("array_name", GetVariableName(arrayElementIdentifier)),
             new("index", (string)InvokeVisitor(arrayElementIdentifier.Index))
         });
 

@@ -116,7 +116,6 @@ public static class Types
         }
         
         return CheckTypesAreAssignable(target.Types.ToArray(), source.Types.ToArray());
-
     }
 
     public static bool CheckCompoundExpressionTypesAreValid(YALType leftType, YALType rightType)
