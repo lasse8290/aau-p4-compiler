@@ -288,11 +288,11 @@ public class CodeGenTraverser : ASTTraverser
         return integer.ToString();
     }
 
-    internal override object? Visit(WhileStatement whileLoop)
+    internal override object? Visit(WhileStatement whileStatement)
     {
         var bodyBuilder = new StringBuilder();
         var predicate     = (string)InvokeVisitor(whileLoop.Predicate);
-
+        
         _scopeBuilderStack.Push(new StringBuilder());
 
         foreach (var child in whileLoop.Children)
