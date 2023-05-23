@@ -45,7 +45,7 @@ platform name is defined by the list maintained by platfromIO which can be found
 **Step 3:**
 To flash the file you may either use the pio cli to flash or altertivly open the pioBuild folder with vscode and the pio plugin.
 
-To run in a simulator automaticly `-w <wokwi_url>` can be used, recomended url to use with test is https://wokwi.com/projects/new/esp32
+To run in a simulator automaticly use `-rw <wokwi_url>` can be used, recomended url to use with test is https://wokwi.com/projects/new/esp32
 
 
 ### System Requirements
