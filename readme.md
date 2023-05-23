@@ -20,7 +20,7 @@ Compile the sample code to C++:
 To run in a simulator automaticly `-w <wokwi_url>` can be used, recomended url to use with test is https://wokwi.com/projects/new/esp32
 
 **Step 5:**
-The generated output must mannaully be copied to into platformIO project to be compiled.
+The generated output must manually be copied to into platformIO project to be compiled.
 
 
 The compiled C++ code can be found in `./output.cpp`
