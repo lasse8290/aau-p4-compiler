@@ -28,6 +28,16 @@ The compiled C++ code can be found in `./output.cpp`
 ### System Requirements
 - .NET 7 SDK
 
+## Single file compile and run (simulator)
+
+**Step 1:**  
+(Assuming the repository has been cloned and built) Run the following command to build the YAL program source (the example uses `./program.yal`) to a C++ file (`/output.cpp`) and run the simulator.  
+`$ .\YALCompiler\YALCompiler\bin\Release\net7.0\YALCompiler.exe compile -i program.yal -o output.cpp -w https://wokwi.com/projects/new/esp32`  
+This example uses the default Wokwi simulator for ESP32. The first build may take a while to set up the required (Puppeteer) dependencies.
+
+### System Requirements
+- .NET 7 SDK
+
 ## Project Scaffolding
 
 **Step 1:**  
@@ -45,7 +55,7 @@ platform name is defined by the list maintained by platfromIO which can be found
 **Step 3:**
 To flash the file you may either use the pio cli to flash or altertivly open the pioBuild folder with vscode and the pio plugin.
 
-To run in a simulator automaticly `-w <wokwi_url>` can be used, recomended url to use with test is https://wokwi.com/projects/new/esp32
+To run in a simulator automatically `-rw <wokwi_url>` can be used, recomended url to use with test is https://wokwi.com/projects/new/esp32
 
 
 ### System Requirements
