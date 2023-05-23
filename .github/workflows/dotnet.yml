@@ -22,6 +22,10 @@ jobs:
           cd YALCompiler
           dotnet restore
       - name: Build
-        run: dotnet build --no-restore
+        run: |
+          cd YALCompiler
+          dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --verbosity normal --filter "Category!=AcceptanceTests"
+        run: |
+          cd YALCompiler
+          dotnet test --no-build --verbosity normal --filter "Category!=AcceptanceTests"
