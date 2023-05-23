@@ -15,7 +15,7 @@ public class CodeGenTraverser : ASTTraverser
     private          string                     program              = "";
 
     public CodeGenTraverser(ASTNode node) : base(node)
-    {        
+    {
     }
 
     // Helper function to get the variable name from an ASTNode
@@ -38,11 +38,11 @@ public class CodeGenTraverser : ASTTraverser
                 if (testNode.Parent is Function function)
                 {
                     var symbol = function.InputParameters.FirstOrDefault(x => x.Name == localName);
-                    if (symbol != null) 
+                    if (symbol != null)
                         return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{localName})";
 
                     symbol = function.OutputParameters.FirstOrDefault(x => x.Name == localName);
-                    if (symbol != null) 
+                    if (symbol != null)
                         return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{localName}";
                 }
 
@@ -58,7 +58,7 @@ public class CodeGenTraverser : ASTTraverser
     public override void BeginTraverse()
     {
         program = (string)InvokeVisitor(_startNode);
-    }   
+    }
 
     public override string ToString()
     {
@@ -70,7 +70,10 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("boolean");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("boolean", boolean.LiteralValue == true ? "1" : "0")
+            new("boolean", boolean.LiteralValue == true
+                    ? "1"
+                    : "0"
+            )
         });
 
         return template.ReplacePlaceholders();
@@ -78,23 +81,22 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(DataTypes.Program program)
     {
-        var programBuilder = new StringBuilder();
-        Template template = new("program");
+        var      programBuilder = new StringBuilder();
+        Template template       = new("program");
 
         // Invoke external functions
         foreach (var child in _startNode.FunctionTable)
             if (child.Value is ExternalFunction)
                 InvokeVisitor(child.Value);
-        
+
         // Build includes from external libraries
         StringBuilder includeBuilder = new();
-        foreach (string libraryName in _externalLibraries)
+        foreach (var libraryName in _externalLibraries)
             includeBuilder.AppendLine($"#include <{libraryName}>");
-        
+
         // Visit children
         foreach (var child in _startNode.Children)
-            programBuilder.AppendLine((string)InvokeVisitor(child) + ";");
-
+            programBuilder.AppendLine($"{(string)InvokeVisitor(child)};");
 
 
         template.SetKeys(new List<Tuple<string, string>>
@@ -103,10 +105,10 @@ public class CodeGenTraverser : ASTTraverser
             new("declarations", _declarationsBuilder.ToString()),
             //External libreary includes
             new("includes", includeBuilder.ToString()),
-            
+
             new("program", programBuilder.ToString())
         });
-        
+
         return template.ReplacePlaceholders(true);
     }
 
@@ -134,12 +136,10 @@ public class CodeGenTraverser : ASTTraverser
     internal override object? Visit(BitwiseNegation bitwiseNegation)
     {
         return $"~({InvokeVisitor(bitwiseNegation.Expression)})";
-
     }
-    
+
     internal override object? Visit(If ifNode)
     {
-
         // Visit the predicate of the if statement
         var predicateCode = (string)InvokeVisitor(ifNode.Predicate);
         _scopeBuilderStack.Push(new StringBuilder());
@@ -147,7 +147,7 @@ public class CodeGenTraverser : ASTTraverser
         // Visit the children of the if statement
         var childrenBuilder = new StringBuilder();
         foreach (var child in ifNode.Children)
-            childrenBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+            childrenBuilder.AppendLine($"{(string)InvokeVisitor(child)};");
 
 
         // Generate the if statement code using a template
@@ -163,32 +163,30 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(ElseIf elseIfNode)
     {
-
         // Visit the Predicate of the ElseIf node
         var predicateCode = (string)InvokeVisitor(elseIfNode.Predicate);
-        
+
         _scopeBuilderStack.Push(new StringBuilder());
 
         // Visit the children of the ElseIf node
-        StringBuilder body = new();
-        foreach (var child in elseIfNode.Children) body.AppendLine((string)InvokeVisitor(child));
+        StringBuilder bodyBuilder = new();
+        foreach (var child in elseIfNode.Children) bodyBuilder.AppendLine($"{(string)InvokeVisitor(child)};");
 
 
         var template = new Template("else_if");
         template.SetKeys(new List<Tuple<string, string>>
         {
             new("predicate", predicateCode),
-            new("body", $"{_scopeBuilderStack.Pop()} {body}")
+            new("body", $"{_scopeBuilderStack.Pop()} {bodyBuilder}")
         });
         return template.ReplacePlaceholders(true);
     }
 
     internal override object? Visit(Else elseNode)
     {
-
         StringBuilder bodyBuilder = new();
         _scopeBuilderStack.Push(new StringBuilder());
-        foreach (var child in elseNode.Children) bodyBuilder.AppendLine((string)InvokeVisitor(child));
+        foreach (var child in elseNode.Children) bodyBuilder.AppendLine($"{(string)InvokeVisitor(child)};");
 
         var template = new Template("else");
         template.SetKeys(new List<Tuple<string, string>>
@@ -201,10 +199,12 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(Function function)
     {
-        string GetVariables(List<Symbol> symbols) => string.Concat(symbols.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name}{(symbol.Type.Types.First().IsArray ? $"[{(symbol.ArraySize?.ToString())}]" : "")};\n")); //Doesnt work lol
-        
-        
-        
+        string GetVariables(List<Symbol> symbols)
+        {
+            return string.Concat(symbols.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name}{(symbol.Type.Types.First().IsArray ? $"[{symbol.ArraySize?.ToString()}]" : "")};\n"));
+        } //Doesnt work lol
+
+
         _scopeBuilderStack.Push(new StringBuilder());
 
         var inputArguments = "void *pvParameters";
@@ -228,7 +228,7 @@ public class CodeGenTraverser : ASTTraverser
             new("name", function.Name),
             new("initialized_parameters", GetVariables(function.OutputParameters))
         });
-        
+
 
         _declarationsBuilder
             .AppendLine(inputTemplate.ReplacePlaceholders(true))
@@ -290,14 +290,13 @@ public class CodeGenTraverser : ASTTraverser
 
     internal override object? Visit(WhileStatement whileStatement)
     {
-
-        var    bodyBuilder = new StringBuilder();
-        string predicate     = (string)InvokeVisitor(whileStatement.Predicate);
+        var bodyBuilder = new StringBuilder();
+        var predicate     = (string)InvokeVisitor(whileLoop.Predicate);
         
         _scopeBuilderStack.Push(new StringBuilder());
 
-        foreach (var child in whileStatement.Children)
-            bodyBuilder.AppendLine((string)InvokeVisitor(child) + ";");
+        foreach (var child in whileLoop.Children)
+            bodyBuilder.AppendLine($"{(string)InvokeVisitor(child)};");
 
         var template = new Template("while");
         template.SetKeys(new List<Tuple<string, string>>
@@ -328,15 +327,15 @@ public class CodeGenTraverser : ASTTraverser
             });
             return template.ReplacePlaceholders(true);
         }
+
         void AppendSeperator(StringBuilder builder, int assignmentCount)
         {
-            string separator =  binaryAssignment.Targets[assignmentCount] is VariableDeclaration ? ";" : ",";
-            
+            var separator = binaryAssignment.Targets[assignmentCount] is VariableDeclaration ? ";" : ",";
+
             if (binaryAssignment.Targets.Count > 1 && assignmentCount + 1 < binaryAssignment.Targets.Count)
                 builder.Append(separator);
-
         }
-        
+
         var op = binaryAssignment.Operator switch
         {
             Operators.AssignmentOperator.Equals                   => "=",
@@ -351,8 +350,8 @@ public class CodeGenTraverser : ASTTraverser
         if (binaryAssignment.Targets.Count == 1)
             return GetSimpleBinaryAssignment((string)InvokeVisitor(binaryAssignment.Targets[0]), (string)InvokeVisitor(binaryAssignment.Values[0]), op);
 
-        var assignmentsBuilder   = new StringBuilder();
-        var assignmentCount      = 0;
+        var assignmentsBuilder = new StringBuilder();
+        var assignmentCount    = 0;
         for (var i = 0; i < binaryAssignment.Values.Count; i++)
         {
             var value = binaryAssignment.Values[i];
@@ -363,12 +362,13 @@ public class CodeGenTraverser : ASTTraverser
                 {
                     var outputParameter = functionCall.Function.OutputParameters[index];
                     var targetName      = (string)InvokeVisitor(binaryAssignment.Targets[assignmentCount]);
-                    
-                    if(index == 0)
-                        assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}", op));
-                    else
-                        assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{outputParameter.Name}", op));
-                    
+
+                    assignmentsBuilder.Append(
+                        index == 0
+                            ? GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}",                                  op)
+                            : GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{outputParameter.Name}", op)
+                    );
+
                     AppendSeperator(assignmentsBuilder, assignmentCount);
                     assignmentCount++;
                 }
@@ -379,11 +379,8 @@ public class CodeGenTraverser : ASTTraverser
                 assignmentsBuilder.Append(GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}", op));
                 AppendSeperator(assignmentsBuilder, assignmentCount);
                 assignmentCount++;
-                
             }
         }
-
-
 
         return assignmentsBuilder.ToString();
     }
@@ -400,6 +397,7 @@ public class CodeGenTraverser : ASTTraverser
             new("type", variableDeclaration.Variable.Type.ToCPPType().First()),
             new("identifier", variableDeclaration.Variable.Name)
         });
+
         return template.ReplacePlaceholders();
     }
 
@@ -475,6 +473,7 @@ public class CodeGenTraverser : ASTTraverser
     internal override object? Visit(FunctionCall functionCall)
     {
         var argumentCounter = 0;
+
         string GetInputSeparator()
         {
             argumentCounter++;
@@ -493,10 +492,11 @@ public class CodeGenTraverser : ASTTraverser
         }
 
         foreach (var expression in functionCall.InputParameters)
+        {
             if (expression is FunctionCall inputFunctionCall && inputFunctionCall.Function is not ExternalFunction)
             {
                 functionCallBuilder.Append($"{(string)InvokeVisitor(inputFunctionCall)};");
-                
+
                 for (var y = 0; y < inputFunctionCall.Function.OutputParameters.Count; y++)
                     inputParametersBuilder.Append($"_{inputFunctionCall.GetHashCode().ToString()}.{inputFunctionCall.Function.OutputParameters[y].Name}{GetInputSeparator()}");
             }
@@ -504,23 +504,13 @@ public class CodeGenTraverser : ASTTraverser
             {
                 inputParametersBuilder.Append($"{(string)InvokeVisitor(expression)}{GetInputSeparator()}");
             }
-        
-
-        if (functionCall.Function is ExternalFunction)
-        {
-            var template = new Template("function_call_external");
-
-            template.SetKeys(new List<Tuple<string, string>>
-            {
-                new("input_parameters", inputParametersBuilder.ToString()),
-                new("function", _externalNicknames[functionCall.Function.Name])
-            });
-            return template.ReplacePlaceholders(true);
         }
-        else
+
+
+        if (functionCall.Function is not ExternalFunction)
         {
-            var template      = new Template("function_call");
-            var lambdaBuilder = new Template("input_lambda");
+            var functionCallTemplate = new Template("function_call");
+            var lambdaBuilder        = new Template("input_lambda");
 
             lambdaBuilder.SetKeys(new List<Tuple<string, string>>
             {
@@ -529,7 +519,7 @@ public class CodeGenTraverser : ASTTraverser
                 new("function", functionCall.Function.Name),
                 new("input_parameters", inputParametersBuilder.ToString())
             });
-            template.SetKeys(new List<Tuple<string, string>>
+            functionCallTemplate.SetKeys(new List<Tuple<string, string>>
             {
                 new("function", functionCall.Function.Name),
                 new("lambda", lambdaBuilder.ReplacePlaceholders(true)),
@@ -538,7 +528,19 @@ public class CodeGenTraverser : ASTTraverser
                 new("is_await", functionCall.Await ? "1" : "0"),
                 new("suffix", suffix)
             });
-            return template.ReplacePlaceholders(true);
+
+            return functionCallTemplate.ReplacePlaceholders(true);
+        }
+        else
+        {
+            var externalFunctionCallTemplate = new Template("function_call_external");
+
+            externalFunctionCallTemplate.SetKeys(new List<Tuple<string, string>>
+            {
+                new("input_parameters", inputParametersBuilder.ToString()),
+                new("function", _externalNicknames[functionCall.Function.Name])
+            });
+            return externalFunctionCallTemplate.ReplacePlaceholders(true);
         }
     }
 
