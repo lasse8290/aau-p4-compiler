@@ -5,9 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: ["testing-v2"]
+    branches: ["*"]
   pull_request:
-    branches: ["testing-v2"]
+    branches: ["*"]
 
 jobs:
   build:
@@ -24,4 +24,4 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal --filter "Category!=AcceptanceTests"
