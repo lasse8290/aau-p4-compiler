@@ -1,43 +1,64 @@
-external <"Arduino.h/Serial.println"> print: in (int32 a);
-external <"Arduino.h/Serial.begin"> begin: in (int64 a);
-external <"Arduino.h/vTaskDelay"> delay: in (int64 a);
+external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
+external  <"stdio.h/Serial.println"> serialPrintln: in(string s);
+external  <"stdio.h/Serial.print"> serialPrint: in(string s);
+external  <"stdio.h/String"> i2s: in(int32 i) out(string s);
+external  <"stdio.h/String"> u2s: in(uint32 i) out(string s);
 
-twoInputAndOutput: in(int32 a, int32 b) out(int32 c, int32 d){
-    c = a + 1;
-    d = b + 2;
-    return;
-}
+external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
+external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
+external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
+external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-oneOutput: out(int32 a) {
-    a = 1;
-    return;
-}
-
-twoOutputOneInput:in(int32 c) out(int32 a, int32 b){
-    a = 1;
-    b = 2;
-    return;
-}
-
-twoOutput: out(int32 a, int32 b){
-    a = 1;
-    b = 2;
-    return;
-}
+int32 pinHigh = 1;
+int32 pinLow = 0;
 
 async main: {
-    begin(115200);
-   
-    int32 a, int32 b = twoInputAndOutput(twoOutputOneInput(oneOutput()));
-    int32 x, int32 y = twoOutput();
-    x, y = twoOutput();
-    twoInputAndOutput((a, b = twoOutput()));
-    print(a);
-    print(b);
-    
-    int32 c;
-    
-    if((c = oneOutput()) == 1){
-        print(666);
+
+    serialBegin(115200);
+    serialPrintln("Hello World");
+
+    int32 a, int32 b;
+
+    int32 c = add2(1, 2);
+
+    serialPrint("1 + 2 = ");
+    serialPrintln(i2s(c));
+
+    flashLED(13, 1000, 10000);
+
+    //should be 1 134 903 170
+    uint32 fibRes = await fib(10u);
+
+    serialPrint("fib(10) = ");
+    serialPrintln(u2s(fibRes));
+
+}
+
+async flashLED: in(int32 pin, int32 delay, int32 totalTime) {
+    int32 i = 0;
+
+    while (i < totalTime) {
+        digitalWrite(pin, pinHigh);
+        delay(delay);
+
+        digitalWrite(pin, pinLow);
+        delay(delay);
+
+        i = i + 2 * delay;
+    }
+}
+
+add2: in(int32 a, int32 b) out(int32 c) {
+    c = a + b;
+}
+
+async fib: in(uint32 n) out(uint32 f) {
+    if (n <= 1) {
+        f = n;
+    } else {
+        uint32 f1, uint32 f2;
+        delay(100);
+        f1, f2 = await fib(n - 1u), await fib(n - 2u);
+        f = f1 + f2;
     }
 }

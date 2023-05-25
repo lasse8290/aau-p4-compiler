@@ -34,24 +34,24 @@ public class CodeGenTraverser : ASTTraverser
             _                                       => "Da hell, how is this possible! 🤷‍♂️"
         };
 
-        variableName = GetVariableNamePrefixed(variableName);
+        string prefixedVariableName = GetVariableNamePrefixed(variableName);
         
         var currentNode = node;
         while (currentNode.Parent != null)
         {
             var parentSymbolTable = currentNode.Parent.SymbolTable;
 
-            if (parentSymbolTable is not null && !parentSymbolTable.ContainsKey(variableName))
+            if (parentSymbolTable is not null && parentSymbolTable.ContainsKey(variableName))
             {
                 if (currentNode.Parent is Function function)
                 {
                     var symbol = function.InputParameters.FirstOrDefault(x => x.Name == variableName);
                     if (symbol != null)
-                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{variableName})";
+                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{prefixedVariableName})";
 
                     symbol = function.OutputParameters.FirstOrDefault(x => x.Name == variableName);
                     if (symbol != null)
-                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{variableName}";
+                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{prefixedVariableName}";
                 }
 
                 break;
@@ -60,7 +60,7 @@ public class CodeGenTraverser : ASTTraverser
             currentNode = currentNode.Parent;
         }
 
-        return variableName;
+        return prefixedVariableName;
     }
 
     public override void BeginTraverse()
@@ -502,19 +502,16 @@ public class CodeGenTraverser : ASTTraverser
         foreach (var expression in functionCall.InputParameters)
         {
             if (expression is FunctionCall inputFunctionCall && inputFunctionCall.Function is not ExternalFunction)
-            {
-                functionCallBuilder.Append($"{(string)InvokeVisitor(inputFunctionCall)};");
-
                 for (var y = 0; y < inputFunctionCall.Function.OutputParameters.Count; y++)
-                    inputParametersBuilder.Append($"_{inputFunctionCall.GetHashCode().ToString()}.{GetVariableNamePrefixed(inputFunctionCall.Function.OutputParameters[y].Name)}{GetInputSeparator()}");
-            }
+                    inputParametersBuilder.Append(
+                        y == 0 
+                            ? $"{(string)InvokeVisitor(inputFunctionCall)}{GetInputSeparator()}" 
+                            : $"_{inputFunctionCall.GetHashCode().ToString()}.{GetVariableNamePrefixed(inputFunctionCall.Function.OutputParameters[y].Name)}{GetInputSeparator()}");
             else
-            {
                 inputParametersBuilder.Append($"{(string)InvokeVisitor(expression)}{GetInputSeparator()}");
-            }
+            
         }
-
-
+        
         if (functionCall.Function is not ExternalFunction)
         {
             var functionCallTemplate = new Template("function_call");
