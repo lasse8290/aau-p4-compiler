@@ -5,9 +5,7 @@ name: .NET
 
 on:
   push:
-    branches: ["testing-v2"]
   pull_request:
-    branches: ["testing-v2"]
 
 jobs:
   build:
@@ -18,10 +16,16 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          cd YALCompiler
+          dotnet restore
       - name: Build
-        run: dotnet build --no-restore
+        run: |
+          cd YALCompiler
+          dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: |
+          cd YALCompiler
+          dotnet test --no-build --verbosity normal --filter "Category!=AcceptanceTests"

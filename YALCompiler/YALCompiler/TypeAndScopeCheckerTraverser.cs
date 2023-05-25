@@ -38,7 +38,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                         }
                         if (identifier is ArrayElementIdentifier arrayElementIdentifier)
                         {
-                            idType.Types[0] = idType.Types[0] with {IsArray = false};
+                            idType = new YALType(symbol.Type.Types.Select(t => (t.Type, false)).ToArray());
                             if (symbol.ArraySize is not null && 
                                 (arrayElementIdentifier.Index is Integer index && 
                                 index.Value >= (long)symbol.ArraySize ||
@@ -60,7 +60,7 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
                                 }
                             }
                         }
-                        targetTypes.Add(symbol.Type);
+                        targetTypes.Add(idType);
                         symbol.Initialized = true;
                     }
                     else
@@ -89,7 +89,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
         }
 
         valueType = new(valueTypes.ToArray());
-
+        
+        
         if (!Types.CheckTypesAreAssignable(targetType, valueType))
         {
             _errorHandler.AddError(new TypeMismatchException(valueType?.ToString() ?? "null",
@@ -417,8 +418,8 @@ public class TypeAndScopeCheckerTraverser : ASTTraverser
     }
 
     internal override object? Visit(DataTypes.Boolean node) => new YALType(Types.ValueType.@bool);
-
-    internal override object? Visit(Predicate node) => new YALType(Types.ValueType.@bool);
+    
+    internal override object? Visit(Predicate         node) => new YALType(Types.ValueType.@bool);
 
     internal override object? Visit(ArrayLiteral node)
     {

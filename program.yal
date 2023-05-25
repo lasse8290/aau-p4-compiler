@@ -1,43 +1,91 @@
-external <"Arduino.h/Serial.println"> print: in (int32 a);
-external <"Arduino.h/Serial.begin"> begin: in (int64 a);
-external <"Arduino.h/vTaskDelay"> delay: in (int64 a);
+external  <"stdio.h/Serial.begin"> serialBegin: in(int32 i);
+external  <"stdio.h/Serial.println"> serialPrintln: in(string s);
+external  <"stdio.h/Serial.print"> serialPrint: in(string s);
+external  <"stdio.h/String"> i2s: in(int32 i) out(string s);
+external  <"stdio.h/String"> u2s: in(uint32 i) out(string s);
+external  <"stdio.h/millis"> millis: out(int32 i);
 
-twoInputAndOutput: in(int32 a, int32 b) out(int32 c, int32 d){
-    c = a + 1;
-    d = b + 2;
-    return;
-}
+external  <"Arduino.h/digitalRead"> digitalRead: in(int32 i) out(int32 ii);
+external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
+external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
+external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-oneOutput: out(int32 a) {
-    a = 1;
-    return;
-}
-
-twoOutputOneInput:in(int32 c) out(int32 a, int32 b){
-    a = 1;
-    b = 2;
-    return;
-}
-
-twoOutput: out(int32 a, int32 b){
-    a = 1;
-    b = 2;
-    return;
-}
+int32 HIGH = 1;
+int32 LOW = 0;
+int32 OUTPUT = 3;
+int32 INPUT = 1;
+int32 LED_BUILTIN = 2;
 
 async main: {
-    begin(115200);
-   
-    int32 a, int32 b = twoInputAndOutput(twoOutputOneInput(oneOutput()));
-    int32 x, int32 y = twoOutput();
-    x, y = twoOutput();
-    twoInputAndOutput((a, b = twoOutput()));
-    print(a);
-    print(b);
+    serialBegin(115200);
+    pinMode(LED_BUILTIN, OUTPUT);
     
-    int32 c;
+    int64 long, int32 int, int16 short, int8 sByte;
+    //Assigning variable to different types which can be cast without loss of data.
+    long = int = short = sByte = 1;
     
-    if((c = oneOutput()) == 1){
-        print(666);
+    int32 delay, int32 timeout;
+
+    //Sets "delaySum" to the sum of "delay" and "timeout" & uses a single assignment of two variables as two input parameters
+    int32 delaySum = add2((delay, timeout = getDelayAndTimeout()));
+    
+    serialPrintln("delaySum = " + i2s(delaySum));
+    
+    flashLED(LED_BUILTIN, delay, timeout);
+    
+    int32 fibonacciStartTime = millis();
+    int32 fibonacciRuntime = 0;
+    uint32 fibonacciResult = await fibonacci(10u, ref fibonacciRuntime);
+    
+    serialPrintln("fibonacci(10) = " + u2s(fibonacciResult) + " in " + i2s(fibonacciRuntime - fibonacciStartTime) + "ms");
+    
+    //1 and 2 are incremented 7 times, so "x" should be 8 and "y" should be 9
+    //incrementTwo has two input variables and two output variables, and as such can be used as a single input parameter
+    int32 x, int32 y = incrementTwo(incrementTwo(incrementTwo(incrementTwo(incrementTwo(incrementTwo(incrementTwo(1, 2)))))));
+    
+    serialPrintln("x = " + i2s(x) + ", y = " + i2s(y));
+}
+
+//Flashes an led after a delay for a certain amount of time
+async flashLED: in(int32 pin, int32 delay, int32 totalTime) {
+    int32 i = 0;
+    
+    while (i < totalTime) {
+        digitalWrite(pin, HIGH);
+        delay(delay);
+
+        digitalWrite(pin, LOW);
+        delay(delay);
+
+        i = i + 2 * delay;
     }
 }
+
+//Adds two numbers and returns the result
+add2: in(int32 a, int32 b) out(int32 c) {
+    c = a + b;
+}
+
+//Runs the an expensive fibonacci algorithm asynchronously
+async fibonacci: in(uint32 n, ref int32 runtime) out(uint32 f) {
+    if (n <= 1) {
+        f = n;
+    } else {
+        uint32 f1, uint32 f2;
+        delay(100);
+        f1, f2 = await fibonacci(n - 1u, ref runtime), await fibonacci(n - 2u, ref runtime);
+        f = f1 + f2;
+    }
+    runtime = millis();
+}
+
+getDelayAndTimeout: out(int32 delay, int32 timeout) {
+    delay = 500;
+    timeout = 20000;
+}
+
+incrementTwo: in(int32 a, int32 b) out(int32 c, int32 d) {
+    c = a + 1;
+    d = b + 1;
+}
+

@@ -16,5 +16,5 @@ public record CompileOptions {
     public int? Duration { get; set; }
 
     [Option('w', "wokwi", Required = false, HelpText = "URL to Wokwi project to be used")]
-    public string? WokwiUrl { get; set; } = string.Empty;
+    public string? WokwiUrl { get; set; } = null;
 }
