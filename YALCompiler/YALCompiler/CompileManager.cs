@@ -28,7 +28,7 @@ public class CompileManager {
         tp.Transpile();
 
         if (_options.WokwiUrl != null) {
-            await RunSimulator(tp.CompiledCode, _options.Duration ??= 10000, _options.WokwiUrl);
+            await RunSimulator(tp.CompiledCode, _options.Duration ??= 99999999, _options.WokwiUrl);
         }
         
         return true;
