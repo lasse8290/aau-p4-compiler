@@ -9,14 +9,17 @@ external  <"Arduino.h/digitalWrite"> digitalWrite: in(int32 i, int32 ii);
 external  <"Arduino.h/pinMode"> pinMode: in(int32 i, int32 ii);
 external  <"Arduino.h/vTaskDelay"> delay: in(int32 i);
 
-int32 pinHigh = 1;
-int32 pinLow = 0;
+int32 HIGH = 1;
+int32 LOW = 0;
+int32 OUTPUT = 3;
+int32 INPUT = 1;
+int32 LED_BUILTIN = 2;
 
 async main: {
 
     serialBegin(115200);
     serialPrintln("Hello World");
-
+    pinMode(LED_BUILTIN, OUTPUT);
     int32 a, int32 b;
 
     int32 c = add2(1, 2);
@@ -24,7 +27,7 @@ async main: {
     serialPrint("1 + 2 = ");
     serialPrintln(i2s(c));
 
-    flashLED(13, 1000, 10000);
+    flashLED(LED_BUILTIN, 1000, 10000);
 
     //should be 1 134 903 170
     uint32 fibRes = await fib(10u);
@@ -38,10 +41,10 @@ async flashLED: in(int32 pin, int32 delay, int32 totalTime) {
     int32 i = 0;
 
     while (i < totalTime) {
-        digitalWrite(pin, pinHigh);
+        digitalWrite(pin, HIGH);
         delay(delay);
 
-        digitalWrite(pin, pinLow);
+        digitalWrite(pin, LOW);
         delay(delay);
 
         i = i + 2 * delay;

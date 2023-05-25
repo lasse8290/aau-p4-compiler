@@ -1,5 +1,4 @@
 [&](){
     %%output_structs%%
-    %%functionCalls%%
     return COMPILER_INPUT_STRUCT_%%function%% { %%input_parameters%% };
 }()

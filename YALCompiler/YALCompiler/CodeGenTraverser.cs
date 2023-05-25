@@ -490,7 +490,6 @@ public class CodeGenTraverser : ASTTraverser
 
         var suffix = functionCall.Function.OutputParameters.Count > 0 ? $"->{GetVariableNamePrefixed(functionCall.Function.OutputParameters[0].Name)}" : "";
 
-        var functionCallBuilder    = new StringBuilder();
         var inputParametersBuilder = new StringBuilder();
 
         if (functionCall.Function is not ExternalFunction)
@@ -520,7 +519,6 @@ public class CodeGenTraverser : ASTTraverser
             lambdaBuilder.SetKeys(new List<Tuple<string, string>>
             {
                 new("output_structs", _scopeBuilderStack.Pop().ToString()),
-                new("functionCalls", functionCallBuilder.ToString()),
                 new("function", functionCall.Function.Name),
                 new("input_parameters", inputParametersBuilder.ToString())
             });
