@@ -1,3 +1,3 @@
 ﻿typedef struct COMPILER_OUTPUT_STRUCT_%%name%% {
-  %%initialized_parameters%%
+  %%parameters%%
 } COMPILER_OUTPUT_STRUCT_%%name%%;

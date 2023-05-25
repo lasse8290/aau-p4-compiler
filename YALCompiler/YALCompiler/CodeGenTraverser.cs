@@ -18,41 +18,49 @@ public class CodeGenTraverser : ASTTraverser
     {
     }
 
+    private string GetVariableNamePrefixed(string variableName) {
+        string prefix = "_";
+        return $"{prefix}{variableName}";
+    }
+
     // Helper function to get the variable name from an ASTNode
-    private string GetVariableName(ASTNode node)
+    private string GetNodeVariableReference(ASTNode node)
     {
-        var localName = node switch
+        var variableName = node switch
         {
+            
             Identifier identifier                   => identifier.Name,
             VariableDeclaration variableDeclaration => variableDeclaration.Variable.Name,
             _                                       => "Da hell, how is this possible! 🤷‍♂️"
         };
 
-
-        var testNode = node;
-
-        while (testNode.Parent != null)
+        variableName = GetVariableNamePrefixed(variableName);
+        
+        var currentNode = node;
+        while (currentNode.Parent != null)
         {
-            if (testNode.Parent.SymbolTable is not null && testNode.Parent.SymbolTable.ContainsKey(localName))
-            {
-                if (testNode.Parent is Function function)
-                {
-                    var symbol = function.InputParameters.FirstOrDefault(x => x.Name == localName);
-                    if (symbol != null)
-                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{localName})";
+            var parentSymbolTable = currentNode.Parent.SymbolTable;
 
-                    symbol = function.OutputParameters.FirstOrDefault(x => x.Name == localName);
+            if (parentSymbolTable is not null && !parentSymbolTable.ContainsKey(variableName))
+            {
+                if (currentNode.Parent is Function function)
+                {
+                    var symbol = function.InputParameters.FirstOrDefault(x => x.Name == variableName);
                     if (symbol != null)
-                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{localName}";
+                        return $"{(symbol.IsRef ? "*" : "")}(((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->input.{variableName})";
+
+                    symbol = function.OutputParameters.FirstOrDefault(x => x.Name == variableName);
+                    if (symbol != null)
+                        return $"((COMPILER_PARAMETERS_{function.Name}*) pvParameters)->output->{variableName}";
                 }
 
                 break;
             }
 
-            testNode = testNode.Parent;
+            currentNode = currentNode.Parent;
         }
 
-        return localName;
+        return variableName;
     }
 
     public override void BeginTraverse()
@@ -201,7 +209,7 @@ public class CodeGenTraverser : ASTTraverser
     {
         string GetVariables(List<Symbol> symbols)
         {
-            return string.Concat(symbols.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {symbol.Name}{(symbol.Type.Types.First().IsArray ? $"[{symbol.ArraySize?.ToString()}]" : "")};\n"));
+            return string.Concat(symbols.Select(symbol => $"{symbol.Type.ToCPPType().First()}{(symbol.IsRef ? "*" : "")} {GetVariableNamePrefixed(symbol.Name)}{(symbol.Type.Types.First().IsArray ? $"[{symbol.ArraySize?.ToString()}]" : "")};\n"));
         } //Doesnt work lol
 
 
@@ -219,14 +227,14 @@ public class CodeGenTraverser : ASTTraverser
         inputTemplate.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Name),
-            new("initialized_parameters", GetVariables(function.InputParameters))
+            new("parameters", GetVariables(function.InputParameters))
         });
 
         Template outputTemplate = new("parameter_output_struct");
         outputTemplate.SetKeys(new List<Tuple<string, string>>
         {
             new("name", function.Name),
-            new("initialized_parameters", GetVariables(function.OutputParameters))
+            new("parameters", GetVariables(function.OutputParameters))
         });
 
 
@@ -366,7 +374,7 @@ public class CodeGenTraverser : ASTTraverser
                     assignmentsBuilder.Append(
                         index == 0
                             ? GetSimpleBinaryAssignment(targetName, $"{(string)InvokeVisitor(value)}",                                  op)
-                            : GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{outputParameter.Name}", op)
+                            : GetSimpleBinaryAssignment(targetName, $"_{functionCall.GetHashCode().ToString()}.{GetVariableNamePrefixed(outputParameter.Name)}", op)
                     );
 
                     AppendSeperator(assignmentsBuilder, assignmentCount);
@@ -395,7 +403,7 @@ public class CodeGenTraverser : ASTTraverser
         {
             new("array", isArray ? $"[{(arrayLength == null ? "" : arrayLength)}]" : ""),
             new("type", variableDeclaration.Variable.Type.ToCPPType().First()),
-            new("identifier", variableDeclaration.Variable.Name)
+            new("identifier", GetVariableNamePrefixed(variableDeclaration.Variable.Name))
         });
 
         return template.ReplacePlaceholders();
@@ -406,7 +414,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("identifier");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("name", $"{(identifier.IsRef ? "&" : "")}{GetVariableName(identifier)}")
+            new("name", $"{(identifier.IsRef ? "&" : "")}{GetNodeVariableReference(identifier)}")
         });
 
         return template.ReplacePlaceholders();
@@ -463,7 +471,7 @@ public class CodeGenTraverser : ASTTraverser
         var template = new Template("array_element_identifier");
         template.SetKeys(new List<Tuple<string, string>>
         {
-            new("array_name", GetVariableName(arrayElementIdentifier)),
+            new("array_name", GetNodeVariableReference(arrayElementIdentifier)),
             new("index", (string)InvokeVisitor(arrayElementIdentifier.Index))
         });
 
@@ -480,7 +488,7 @@ public class CodeGenTraverser : ASTTraverser
             return argumentCounter == functionCall.Function.InputParameters.Count ? "" : ",";
         }
 
-        var suffix = functionCall.Function.OutputParameters.Count > 0 ? $"->{functionCall.Function.OutputParameters[0].Name}" : "";
+        var suffix = functionCall.Function.OutputParameters.Count > 0 ? $"->{GetVariableNamePrefixed(functionCall.Function.OutputParameters[0].Name)}" : "";
 
         var functionCallBuilder    = new StringBuilder();
         var inputParametersBuilder = new StringBuilder();
@@ -498,7 +506,7 @@ public class CodeGenTraverser : ASTTraverser
                 functionCallBuilder.Append($"{(string)InvokeVisitor(inputFunctionCall)};");
 
                 for (var y = 0; y < inputFunctionCall.Function.OutputParameters.Count; y++)
-                    inputParametersBuilder.Append($"_{inputFunctionCall.GetHashCode().ToString()}.{inputFunctionCall.Function.OutputParameters[y].Name}{GetInputSeparator()}");
+                    inputParametersBuilder.Append($"_{inputFunctionCall.GetHashCode().ToString()}.{GetVariableNamePrefixed(inputFunctionCall.Function.OutputParameters[y].Name)}{GetInputSeparator()}");
             }
             else
             {
