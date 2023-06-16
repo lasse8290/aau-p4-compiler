@@ -591,16 +591,18 @@ public class CodeGenTraverser : ASTTraverser
         if (returnStatement.function.Name != "setup")
         {
             StringBuilder outputParametersBuilder = new();
+            
             if (returnStatement.function.IsAsync)
                 outputParametersBuilder
                     .AppendLine($"xTaskNotify(((COMPILER_PARAMETERS_{returnStatement.function.Name}*) pvParameters)->taskhandle, 0, eNoAction);")
                     .AppendLine("vTaskDelete(NULL);");
+            
+            outputParametersBuilder.AppendLine("delete pvParameters;");
 
             template.SetKeys(new List<Tuple<string, string>>
             {
                 new("output_parameters", outputParametersBuilder.ToString())
             });
-            outputParametersBuilder.AppendLine("delete pvParameters;");
         }
 
         return template.ReplacePlaceholders(true);
