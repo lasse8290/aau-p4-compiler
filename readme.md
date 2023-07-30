@@ -1,6 +1,6 @@
 # YAL: Yet Another Language
 
-YAL is a language which natively supports concurrent tasks through *async/await* keywords for microcontrollers (such as the ESP23 or Arduino). YAL source code can be transpiled to C++ through the provided compiler, or scaffold a PlatformIO project to "easily" flash onto the device. There are 2 ways to compile yal, either singlefile or as a project, both support emulating the code using wokwi.com 
+YAL is a language which natively supports concurrent tasks through *async/await* keywords for microcontrollers (such as the ESP32 or Arduino). YAL source code can be transpiled to C++ through the provided compiler, or scaffold a PlatformIO project to "easily" flash onto the device. There are 2 ways to compile yal, either singlefile or as a project, both support emulating the code using wokwi.com 
 
 ### Single file compile
 
